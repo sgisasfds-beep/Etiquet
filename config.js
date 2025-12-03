@@ -5,7 +5,7 @@
 
 // 1. URL DEL BACKEND EN PRODUCCIÓN
 //    👉 Cámbiala por la de tu servidor real
-const API_BASE_URL = "https://TU-DOMINIO-O-IP:4000";
+const API_BASE_URL = "https://84f94bcb513f.ngrok-free.app";
 
 // 2. URL DEL BACKEND EN DESARROLLO LOCAL
 const API_LOCAL_URL = "http://localhost:4000";
