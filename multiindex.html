@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Generar Múltiples Etiquetas</title>
+
+<style>
+  /* ======== MISMO ESTILO BASE DE index.html ======== */
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2fb;
+    color: #1e1e1e;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #000000, #003d99);
+    color: #b7d9ff;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-bottom: 3px solid #007bff;
+  }
+
+  .hero h1 {
+    font-size: 36px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #008cff;
+    margin: 0;
+  }
+
+  /* ======== CONTENEDOR ======== */
+  .container {
+    max-width: 1200px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid #dfe6f5;
+  }
+
+  /* ======== FORM ======== */
+  .controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 25px;
+  }
+
+  input, select {
+    padding: 12px;
+    border: 1px solid #c9c9c9;
+    border-radius: 6px;
+    background: #f9f9f9;
+    width: 100%;
+  }
+
+  label {
+    font-weight: bold;
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  .grid-forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+
+  .form-card {
+    padding: 16px;
+    border: 1px solid #dfe6f5;
+    border-radius: 8px;
+    background: #fafafa;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
+
+  .form-row {
+    margin-bottom: 12px;
+  }
+
+  button {
+    background: #007bff;
+    padding: 14px 26px;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+
+  button:hover {
+    background: #0066dd;
+    transform: scale(1.03);
+  }
+
+  button.secondary {
+    background: #6c757d;
+  }
+
+  .note {
+    margin-top: 16px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  .actions {
+    margin-top: 25px;
+    text-align: center;
+  }
+
+  /* Autocomplete idéntico a index */
+  .lista-autocomplete {
+    position: absolute;
+    background: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+    width: calc(100% - 2px);
+    z-index: 9999;
+    display: none;
+  }
+
+  .reactivo-opcion {
+    padding: 10px;
+    cursor: pointer;
+  }
+
+  .reactivo-opcion:hover {
+    background: #e6f0ff;
+  }
+</style>
+
+</head>
+<body>
+
+<!-- ===== HERO SUPERIOR ===== -->
+<div class="hero">
+  <h1>Generar Múltiples Etiquetas</h1>
+</div>
+
+<div class="container">
+
+  <!-- CONTROL SUPERIOR -->
+  <div class="controls">
+    <label for="numEtiquetas">¿Cuántas etiquetas diferentes necesitas?</label>
+    <input id="numEtiquetas" type="number" min="1" value="1" style="width:120px">
+    <button id="btnGenerarForm">Generar formularios</button>
+    <button id="btnAgregar" class="secondary" type="button">Agregar 1</button>
+  </div>
+
+  <!-- CONTENEDOR DE FORMULARIOS -->
+  <div id="formContainer" class="grid-forms"></div>
+
+  <div class="note">Cada tarjeta corresponde a una etiqueta diferente.</div>
+
+  <!-- BOTÓN SIGUIENTE -->
+  <div class="actions">
+    <button id="btnSiguiente">Siguiente → Generar documento</button>
+  </div>
+</div>
+
+<script type="module">
+  import { API_URL } from "./config.js";
+
+/* ======================================
+     🔵 CARGAR LISTA DE REACTIVOS
+====================================== */
+let listaReactivosGlobal = [];
+
+async function cargarReactivos() {
+  try {
+    const res = await fetch(`${API_URL}/api/listaReactivos`);
+    listaReactivosGlobal = await res.json();
+  } catch (err) {
+    console.error("Error cargando reactivos:", err);
+  }
+}
+
+cargarReactivos();
+
+/* ======================================
+     🔵 CREAR FORMULARIO INDIVIDUAL
+====================================== */
+function crearFormulario(i) {
+
+  const card = document.createElement("div");
+  card.className = "form-card";
+  card.dataset.index = i;
+
+  const idLista = `listaReact_${i}`;
+  const idInput = `reactivoInput_${i}`;
+
+  card.innerHTML = `
+    <h3 style="margin-top:0;">Etiqueta #${i + 1}</h3>
+
+    <label>Nombre del reactivo:</label>
+    <div style="position:relative;">
+      <input id="${idInput}" class="fld nombreReactivo" autocomplete="off">
+      <div id="${idLista}" class="lista-autocomplete"></div>
+    </div>
+
+    <label>Iniciales del responsable:</label>
+    <input class="fld analista">
+
+    <label>Área de trabajo:</label>
+    <input class="fld area">
+
+    <label>Tiempo de vigencia:</label>
+    <div class="form-row" style="display:flex; gap:12px;">
+      <input class="fld vigenciaValor" type="number" placeholder="Valor" style="width:80px;">
+      <select class="fld vigenciaUnidad">
+        <option>Día(s)</option>
+        <option>Semana(s)</option>
+        <option>Mes(es)</option>
+        <option>Año(s)</option>
+      </select>
+    </div>
+
+    <label>Selecciona fabricante:</label>
+    <select class="fld fabricante">
+      <option value="">-- Seleccione --</option>
+      <option>MERCK</option>
+      <option>PANREAC</option>
+      <option>ACCUSTANDARD</option>
+      <option>ACROS ORGANICS</option>
+      <option>ALFA AESAR</option>
+      <option>BIOPHARCHEM</option>
+      <option>CARLO ERBA</option>
+      <option>CDH</option>
+      <option>CHEMI</option>
+      <option>CIACOMEQ</option>
+      <option>EKI</option>
+      <option>FERMONT</option>
+      <option>FISHER CHEMICAL</option>
+      <option>HACH</option>
+      <option>HANNA</option>
+      <option>HONEYWELL</option>
+      <option>J.T.BAKER</option>
+      <option>LABKEM</option>
+      <option>LOBA CHEMIE</option>
+      <option>MOL LABS</option>
+      <option>QUINALTEC</option>
+      <option>RESTEK</option>
+      <option>SIGMA-ALDRICH</option>
+      <option>THERMO FISHER</option>
+      <option>VHG</option>
+      <option>QUIMMEN</option>
+      <option>HIMEDIA</option>
+      <option>TIMSEN</option>
+    </select>
+
+    <label>Seleccione envase:</label>
+    <select class="fld envase">
+      <option value="">-- Seleccione --</option>
+      <option>30 mL</option>
+      <option>40 mL</option>
+      <option>60 mL</option>
+      <option>100 mL</option>
+      <option>250 mL</option>
+      <option>500 mL</option>
+      <option>1000 mL</option>
+      <option>2000 mL</option>
+      <option>3000 mL</option>
+      <option>10 L</option>
+      <option>20 L</option>
+      <option>30 L</option>
+      <option>40 L</option>
+      <option>50 L</option>
+    </select>
+
+    <label>Copias de esta etiqueta:</label>
+    <input type="number" class="fld copias" min="1" value="1">
+
+    <label style="display:flex;align-items:center; gap:8px; margin-top:10px;">
+      <input type="checkbox" class="fld incluirFechas"> Incluir fechas en etiqueta
+    </label>
+  `;
+
+  /* ============================  
+       AUTOCOMPLETE INDIVIDUAL  
+  ============================ */
+  const inputReactivo = card.querySelector(`#${idInput}`);
+  const lista = card.querySelector(`#${idLista}`);
+
+  inputReactivo.addEventListener("input", () => {
+    const texto = inputReactivo.value.toLowerCase();
+    lista.innerHTML = "";
+
+    if (!texto) {
+      lista.style.display = "none";
+      return;
+    }
+
+    const filtrados = listaReactivosGlobal.filter(n =>
+      n.toLowerCase().includes(texto)
+    );
+
+    filtrados.slice(0, 20).forEach(nombre => {
+      const div = document.createElement("div");
+      div.className = "reactivo-opcion";
+      div.textContent = nombre;
+
+      div.addEventListener("click", () => {
+        inputReactivo.value = nombre;
+        lista.style.display = "none";
+      });
+
+      lista.appendChild(div);
+    });
+
+    lista.style.display = filtrados.length ? "block" : "none";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!lista.contains(e.target) && e.target !== inputReactivo) {
+      lista.style.display = "none";
+    }
+  });
+
+  return card;
+}
+
+/* ======================================
+     🔵 GENERAR FORMULARIOS
+====================================== */
+const formContainer = document.getElementById("formContainer");
+
+function generarNForms(n) {
+  formContainer.innerHTML = "";
+  for (let i = 0; i < n; i++) {
+    formContainer.appendChild(crearFormulario(i));
+  }
+}
+
+document.getElementById("btnGenerarForm").addEventListener("click", () => {
+  generarNForms(Number(document.getElementById("numEtiquetas").value || 1));
+});
+
+document.getElementById("btnAgregar").addEventListener("click", () => {
+  const index = formContainer.children.length;
+  formContainer.appendChild(crearFormulario(index));
+  document.getElementById("numEtiquetas").value = formContainer.children.length;
+});
+
+/* ======================================
+     🔵 BOTÓN SIGUIENTE
+====================================== */
+document.getElementById("btnSiguiente").addEventListener("click", () => {
+
+  const cards = [...formContainer.children];
+  const etiquetas = [];
+
+  for (const c of cards) {
+    const nombre = c.querySelector(".nombreReactivo").value.trim();
+    if (!nombre) {
+      alert("Cada etiqueta debe tener un nombre de reactivo.");
+      return;
+    }
+
+    etiquetas.push({
+      nombreReactivo: nombre,
+      analista: c.querySelector(".analista").value.trim(),
+      area: c.querySelector(".area").value.trim(),
+      vigenciaValor: c.querySelector(".vigenciaValor").value.trim(),
+      vigenciaUnidad: c.querySelector(".vigenciaUnidad").value,
+      fabricante: c.querySelector(".fabricante").value.trim(),
+      envase: c.querySelector(".envase").value.trim(),
+      incluirFechas: c.querySelector(".incluirFechas").checked,
+      copias: parseInt(c.querySelector(".copias").value || "1")
+    });
+  }
+
+  sessionStorage.setItem("multiEtiquetas_datos", JSON.stringify(etiquetas));
+
+  window.location.href = "multiEtiqueta.html";
+});
+
+</script>
+
+</body>
+</html>

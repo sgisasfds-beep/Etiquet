@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Vista previa de múltiples etiquetas</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2fb;
+    color: #1e1e1e;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #000000, #003d99);
+    color: #b7d9ff;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-bottom: 3px solid #007bff;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 0 10px #008cff;
+  }
+
+  .container {
+    max-width: 960px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid #dfe6f5;
+  }
+
+  h2 {
+    color: #004a99;
+    font-size: 26px;
+    margin-top: 0;
+    text-align: center;
+  }
+
+  /* CONTENEDOR GENERAL DE TODAS LAS ETIQUETAS */
+  #listaEtiquetas {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    align-items: center;
+    margin-top: 25px;
+  }
+
+  /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
+  .etiqueta {
+    width: 820px;
+    border: 2px solid black;
+    padding: 20px;
+    font-family: Arial;
+    font-size: 15px;
+    background: white;
+  }
+
+  .img-pictograma {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  button {
+    background: #007bff;
+    padding: 12px 20px;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  button.secondary {
+    background: #6c757d;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  #status {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 15px;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+</head>
+<body>
+
+<div class="hero"><h1>Vista previa de múltiples etiquetas</h1></div>
+
+<div class="container">
+
+  <h2>Etiquetas generadas</h2>
+
+  <div id="listaEtiquetas"></div>
+
+  <div class="controls">
+    <button id="btnGenerarDOCX">Generar archivo DOCX</button>
+    <button id="btnDescargar" class="secondary">Descargar archivo</button>
+  </div>
+
+  <div id="status"></div>
+
+</div>
+
+<script type="module">
+import { API_URL } from "./config.js";
+
+/* =====================================================
+   Recuperar datos enviados desde multiIndex.html
+===================================================== */
+const datosJSON = sessionStorage.getItem("multiEtiquetas_datos");
+const datos = datosJSON ? JSON.parse(datosJSON) : [];
+window.datos = datos; // Guardamos en window para que sea globalmente accesible
+
+if (datos.length === 0) {
+    console.error("No se encontraron datos de etiquetas en sessionStorage.");
+    // Podrías redirigir al usuario aquí o mostrar un mensaje
+}
+
+
+function setStatus(message, isError = false) {
+    const statusDiv = document.getElementById("statusMessage");
+    if (!statusDiv) return;
+    statusDiv.textContent = message;
+    statusDiv.style.color = isError ? "red" : "green";
+    console.log(isError ? `[ERROR] ${message}` : `[STATUS] ${message}`);
+}
+
+/* =====================================================
+   Plantilla HTML original de etiqueta (igual al index)
+===================================================== */
+function crearPlantillaEtiqueta() {
+  const div = document.createElement("div");
+  div.className = "etiqueta";
+  div.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+      <div style="grid-column: 1;">
+        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
+      </div>
+
+      <div style="grid-column: 3; text-align:center;">
+        <strong>Pictogramas de<br>Peligro</strong>
+      </div>
+
+      <div style="grid-column: 1; margin-top:14px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
+
+      <div style="grid-column: 1; margin-top:20px;">
+        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
+        <br><br>
+
+        <p><strong>Preparación:</strong></p>
+        <p class="preparacion">---</p>
+
+        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+
+        <div class="frasesHP"></div>
+      </div>
+
+      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+        <div class="zonaPictogramas" style="min-height: 220px;"></div>
+        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
+      </div>
+
+      <div style="grid-column: 1; margin-top:20px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
+
+      <div style="grid-column: 1; margin-top:20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+          <div>
+            <strong>Fecha Preparado:</strong><br>
+            <span class="fechaPreparado">DD/MM/YYYY</span>
+          </div>
+
+          <div style="text-align: right;">
+            <strong>Fecha Vencimiento:</strong><br>
+            <span class="fechaVencimiento">DD/MM/YYYY</span>
+          </div>
+        </div>
+
+        <div style="margin-top:18px;">
+          <strong>Preparado por:</strong><br>
+          <span class="analista">---</span>
+        </div>
+      </div>
+    </div>
+  `;
+  return div;
+}
+
+/* =====================================================
+   Renderizar TODAS las etiquetas solicitadas
+===================================================== */
+async function cargarEtiquetas() {
+  const contenedor = document.getElementById("listaEtiquetas");
+  const statusEl = document.getElementById("status"); // Asegúrate de tener este elemento o usa console
+
+  // Mostrar mensaje de carga porque esto tardará unos segundos creando carpetas
+  if(statusEl) statusEl.textContent = "Generando carpetas y QRs en Google Drive, por favor espera...";
+
+  for (const item of datos) {
+
+    // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
+    const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        nombreReactivo: item.nombreReactivo,
+        fabricante: item.fabricante,
+        volumen: item.envase
+      })
+    });
+    const info = await resVisual.json();
+
+    // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
+    // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
+    let qrBase64 = "";
+    try {
+        const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                nombreReactivo: item.nombreReactivo,
+                usuarioAnalista: item.analista
+            })
+        });
+        const dataQR = await resQR.json();
+        
+        if (dataQR.ok) {
+            qrBase64 = dataQR.qr; // Aquí recibimos el QR único de la nueva carpeta
+        } else {
+            console.error("Error generando QR:", dataQR.error);
+        }
+    } catch (err) {
+        console.error("Error conectando para QR:", err);
+    }
+
+    if (!resVisual.ok) continue;
+
+    const copias = item.copias || 1;
+
+    // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
+    for (let c = 0; c < copias; c++) {
+
+      const et = crearPlantillaEtiqueta();
+
+      // Llenar datos visuales
+      et.querySelector(".nombreReactivo").textContent = info.nombre;
+      et.querySelector(".preparacion").textContent = info.preparación || "No aplica";
+      et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
+      et.querySelector(".analista").textContent = item.analista || "—";
+
+      let htmlHP = "";
+      info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
+      info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
+      et.querySelector(".frasesHP").innerHTML = htmlHP;
+
+      if (info.imagenPictograma) {
+        et.querySelector(".zonaPictogramas")
+          .innerHTML = `<img src="${info.imagenPictograma}" class="img-pictograma">`;
+      }
+
+      // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
+      if (qrBase64) {
+          et.querySelector(".qr").src = qrBase64;
+      }
+      // ------------------------------------------------------
+
+      // Fechas
+      if (!item.incluirFechas) {
+        et.querySelector(".fechaPreparado").style.display = "none";
+        et.querySelector(".fechaVencimiento").style.display = "none";
+      } else {
+        const hoy = new Date();
+        et.querySelector(".fechaPreparado").textContent =
+          hoy.toLocaleDateString("es-CO");
+
+        let venc = new Date(hoy);
+        // Conversión segura a número
+        const valorVigencia = parseInt(item.vigenciaValor) || 0;
+        
+        switch (item.vigenciaUnidad) {
+          case "Día(s)": venc.setDate(venc.getDate() + valorVigencia); break;
+          case "Semana(s)": venc.setDate(venc.getDate() + 7 * valorVigencia); break;
+          case "Mes(es)": venc.setMonth(venc.getMonth() + valorVigencia); break;
+          case "Año(s)": venc.setFullYear(venc.getFullYear() + valorVigencia); break;
+        }
+        et.querySelector(".fechaVencimiento").textContent = 
+          venc.toLocaleDateString("es-CO");
+      }
+
+      contenedor.appendChild(et);
+    }
+  }
+  
+  if(statusEl) {
+      statusEl.textContent = "Etiquetas listas. Revisa los QRs y haz clic en 'Generar archivo DOCX'.";
+      statusEl.style.color = "blue";
+  }
+}
+
+cargarEtiquetas();
+
+/* =====================================================
+   GENERAR DOCX A PARTIR DE TODAS LAS ETIQUETAS
+===================================================== */
+const statusEl = document.getElementById("status");
+function setStatus(msg, err=false){
+  statusEl.textContent = msg;
+  statusEl.style.color = err ? "red" : "green";
+}
+
+document.getElementById("btnGenerarDOCX").addEventListener("click", async () => {
+    // 1. Obtener todos los elementos de etiqueta renderizados
+    const etiquetasDOM = [...document.querySelectorAll(".etiqueta")];
+
+    if (etiquetasDOM.length === 0) {
+      setStatus("No hay etiquetas para convertir.", true);
+      return;
+    }
+
+    setStatus("Procesando etiquetas…");
+    
+    // Asumo que 'window.datos' contiene el array de reactivos con 'envase' y 'copias'.
+    if (!window.datos) {
+        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true);
+        return;
+    }
+
+    const payloadEtiquetas = [];
+    let etiquetasIndex = 0;
+
+    // Recorrer los datos originales para obtener el 'envase' correcto
+    for (const item of window.datos) {
+        const copias = item.copias || 1;
+        
+        // Iterar por cada copia generada por este formulario
+        for (let c = 0; c < copias; c++) {
+            const et = etiquetasDOM[etiquetasIndex]; // Obtener el elemento DOM en el orden correcto
+            
+            if (!et) {
+                 console.error("Faltan elementos DOM para la etiqueta #", etiquetasIndex);
+                 break;
+            }
+
+            // 2. Usar html2canvas para tomar la 'foto' (screenshot)
+            const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
+            
+            // 3. Crear el objeto con la imagen y el envase para el backend
+            payloadEtiquetas.push({
+                base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
+                envase: item.envase 
+            });
+
+            etiquetasIndex++;
+        }
+    }
+    
+    // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
+    const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
+        body: JSON.stringify({ etiquetas: payloadEtiquetas })
+    });
+
+    const data = await res.json();
+
+    if (data.ok) {
+        window.__archivoFinal = data.archivo;
+        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.");
+    } else {
+        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true);
+    }
+});
+
+/* =====================================================
+   DESCARGAR ARCHIVO FINAL
+===================================================== */
+document.getElementById("btnDescargar").addEventListener("click", () => {
+  if (!window.__archivoFinal) {
+    setStatus("Primero genera el documento.", true);
+    return;
+  }
+
+  const a = document.createElement("a");
+  a.href = `${API_URL}/api/descargar/${window.__archivoFinal}`;
+  a.download = window.__archivoFinal;
+  a.click();
+
+  setStatus("Archivo descargado.");
+});
+
+</script>
+
+</body>
+</html>

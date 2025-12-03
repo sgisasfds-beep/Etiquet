@@ -1,0 +1,55 @@
+##############################
+#   ARCHIVOS SENSIBLES
+##############################
+
+# Claves, credenciales y datos privados
+credentials.json
+h_p_data.json
+
+# Cualquier archivo .env
+.env
+*.env
+
+##############################
+#   BACKEND (no subir)
+##############################
+
+# Archivo del servidor
+server.js
+
+# Controladores del backend
+controllers/
+
+# Scripts internos del backend
+procesar_frases_h.js
+limpiar_nombres.js
+
+##############################
+#   CARPETAS TEMPORALES
+##############################
+
+tmp/
+tmpDescargas/
+
+##############################
+#   DEPENDENCIAS
+##############################
+
+node_modules/
+
+##############################
+#   ARCHIVOS GENERALES QUE NO DEBEN SUBIRSE
+##############################
+
+*.log
+*.bak
+*.temp
+*.tmp
+
+##############################
+#   ARCHIVOS DEL SISTEMA
+##############################
+
+.DS_Store
+Thumbs.db
+desktop.ini

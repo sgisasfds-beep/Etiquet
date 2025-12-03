@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Etiqueta Generada</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eef2fb;
+    color: #1e1e1e;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #000000, #003d99);
+    color: #b7d9ff;
+    padding: 50px 40px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    border-bottom: 3px solid #007bff;
+  }
+  .hero h1 {
+    font-size: 40px;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 0 10px #008cff;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    border: 1px solid #dfe6f5;
+  }
+
+  h2 {
+    color: #004a99;
+    font-size: 26px;
+    margin-top: 0;
+    text-align: center;
+  }
+
+  .etiqueta-wrapper {
+    display:flex;
+    justify-content:center;
+    margin-bottom:20px;
+  }
+
+  #contenedorEtiqueta {
+    width: 820px;
+    border: 2px solid black;
+    padding: 20px;
+    font-family: Arial;
+    font-size: 15px;
+    background: white;
+  }
+
+  .img-pictograma {
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #c9c9c9;
+    background: #f9f9f9;
+  }
+
+  button {
+    background: #007bff;
+    padding: 12px 18px;
+    border: none;
+    color: #fff;
+    font-size: 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  button.secondary {
+    background: #6c757d;
+  }
+
+  .small {
+    font-size: 13px;
+    color: #444;
+  }
+
+  #status {
+    margin-top:10px;
+    font-size:14px;
+    color:#333;
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+<div class="hero"><h1>Etiqueta Generada</h1></div>
+
+<div class="container">
+<h2>Vista previa de la etiqueta</h2>
+
+<div class="etiqueta-wrapper">
+  <div id="contenedorEtiqueta">
+    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+      <div style="grid-column: 1;">
+        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
+      </div>
+      <div style="grid-column: 2;"></div>
+      <div style="grid-column: 3; text-align:center;">
+        <strong>Pictogramas de<br>Peligro</strong>
+      </div>
+      <div style="grid-column: 1; margin-top:14px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
+      <div style="grid-column: 1; margin-top:20px;">
+        <strong style="font-size: 17px;" id="nombreReactivo">NOMBRE DEL REACTIVO</strong>
+        <br><br>
+        <p><strong>Preparación:</strong></p>
+        <p id="preparacion">DESCRIPCIÓN DEL REACTIVO O PREPARACIÓN</p>
+        <p><strong>ADVERTENCIA: <span id="advertencia">ATENCIÓN</span></strong></p>
+        <div id="frasesHP"></div>
+      </div>
+      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+        <div id="zonaPictogramas"
+             style="min-height: 220px; display:flex; justify-content:center; align-items:center; margin-bottom:10px;"></div>
+        <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
+             style="width:150px; margin-top:10px; border: 1px solid #ccc;">
+      </div>
+      <div style="grid-column: 1; margin-top:20px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
+      <div style="grid-column: 1; margin-top:20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+          <div>
+            <strong>Fecha Preparado:</strong><br>
+            <span id="fechaPreparado">DD/MM/YYYY</span>
+          </div>
+          <div style="text-align: right;">
+            <strong>Fecha Vencimiento:</strong><br>
+            <span id="fechaVencimiento">DIA/MES/AÑO</span>
+          </div>
+        </div>
+        <div style="margin-top:18px;">
+          <strong>Preparado por:</strong><br>
+          <span id="analista">ANALISTA DE LABORATORIO</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="controls">
+  <div>
+    <label class="small">Cantidad de etiquetas a generar:</label>
+    <input id="inputCantidad" type="number" min="1" value="1" />
+  </div>
+
+  <div>
+    <label class="small">(Opcional) Nombre archivo:</label>
+    <input id="nombreArchivo" type="text" placeholder="etiquetas" />
+  </div>
+</div>
+
+<div style="display:flex; gap:10px; margin-top:12px;">
+  <button id="btnCapturar" type="button">Capturar etiqueta y generar documento</button>
+  <button id="btnPreview" class="secondary" type="button">Descargar archivo DOCX</button>
+</div>
+
+<div id="status"></div>
+</div>
+
+
+<script type="module">
+  import { API_URL } from "./config.js";
+
+document.addEventListener("DOMContentLoaded", () => {
+
+console.log("🔥 ARCHIVO etiqueta.js CARGADO");
+
+const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
+if (!datos.usuario || !datos.reactivo) {
+  alert("No se pudo cargar la información del reactivo.");
+}
+
+const {
+  nombreReactivo,
+  analista,
+  vigenciaValor,
+  vigenciaUnidad,
+  incluirFechas
+} = datos.usuario || {};
+const envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
+
+const {
+  preparación,
+  palabra_advertencia,
+  frases_h,
+  frases_p,
+  imagenPictograma
+} = datos.reactivo || {};
+
+document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
+document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
+document.getElementById("preparacion").textContent = preparación || "No aplica";
+document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
+
+const spanPreparado = document.getElementById("fechaPreparado");
+const spanVencimiento = document.getElementById("fechaVencimiento");
+
+if (incluirFechas) {
+  const hoy = new Date();
+  spanPreparado.textContent = hoy.toLocaleDateString("es-CO");
+
+  let venc = new Date(hoy);
+  switch (vigenciaUnidad) {
+    case "Día(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0)); break;
+    case "Semana(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0) * 7); break;
+    case "Mes(es)": venc.setMonth(venc.getMonth() + parseInt(vigenciaValor || 0)); break;
+    case "Año(s)": venc.setFullYear(venc.getFullYear() + parseInt(vigenciaValor || 0)); break;
+  }
+  spanVencimiento.textContent = venc.toLocaleDateString("es-CO");
+} else {
+  spanPreparado.style.display = "none";
+  spanVencimiento.style.display = "none";
+}
+
+let htmlHP = "";
+if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+document.getElementById("frasesHP").innerHTML = htmlHP;
+
+const zonaImg = document.getElementById("zonaPictogramas");
+if (imagenPictograma) {
+  zonaImg.innerHTML = `<img src="${imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
+}
+
+async function generarQRdeCarpeta(nombre, analista) {
+  const url = `${API_URL}/api/procesarCarpetaReactivo`;
+  const qrElemento = document.getElementById('qrCarpetaDrive');
+  qrElemento.alt = "Generando QR...";
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
+    });
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    if (data.qr) qrElemento.src = data.qr;
+
+  } catch (e) {
+    console.error("Fallo el QR:", e);
+  }
+}
+
+if (!window.__etiqueta_ejecutada) {
+  window.__etiqueta_ejecutada = true;
+  if (!sessionStorage.getItem("qr_generado")) {
+    sessionStorage.setItem("qr_generado","1");
+    if (nombreReactivo && analista) generarQRdeCarpeta(nombreReactivo, analista);
+  }
+}
+
+const statusEl = document.getElementById("status");
+const contenedor = document.getElementById("contenedorEtiqueta");
+const btn = document.getElementById("btnCapturar");
+const btnPreview = document.getElementById("btnPreview");
+
+function setStatus(msg, isError=false) {
+  statusEl.textContent = msg;
+  statusEl.style.color = isError ? "#b20000" : "#0b5";
+}
+
+btnPreview.addEventListener("click", async () => {
+  if (!window.__ultimoArchivoGenerado) {
+    setStatus("No hay archivo generado. Genera el documento primero.", true);
+    return;
+  }
+
+  const archivo = window.__ultimoArchivoGenerado;
+  const a = document.createElement("a");
+  a.href = `${API_URL}/api/descargar/${archivo}`;
+  console.log("🔗 URL generada para descarga:", a.href);
+  a.download = archivo;
+  a.click();
+
+  setStatus("Archivo DOCX descargado correctamente.");
+});
+
+btn.addEventListener("click", async (e) => {
+  e.preventDefault();
+  console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
+  setStatus("Capturando etiqueta...");
+
+  const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
+  if (!cantidad || cantidad <= 0) {
+    setStatus("Cantidad inválida.", true);
+    return;
+  }
+
+  try {
+    const canvas = await html2canvas(contenedor, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: "#ffffff"
+    });
+
+    const dataUrl = canvas.toDataURL("image/png");
+    const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
+
+    setStatus("Enviando imagen al servidor...");
+
+    const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        base64Imagen: base64,
+        cantidad,
+        envase
+      })
+    });
+
+    console.log("🟦 RES STATUS:", res.status);
+
+    if (!res.ok) {
+      const err = await res.json().catch(()=>({error:"Error desconocido"}));
+      setStatus("Error generando documento: " + (err.error || res.statusText), true);
+      return;
+    }
+
+    setStatus("Recibiendo documento...");
+
+    const respuesta = await res.json();
+
+    console.log("📦 Respuesta del backend:", respuesta);
+
+    if (!respuesta.ok || !respuesta.archivo) {
+       setStatus("Error: No se recibió nombre del archivo generado.", true);
+       return; 
+    }
+
+    window.__ultimoArchivoGenerado = respuesta.archivo;
+
+    setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
+
+  } catch (err) {
+    console.error(err);
+    setStatus("Error generando documento. Revisa la consola.", true);
+  }
+});
+
+});
+</script>
+
+</body>
+</html>
