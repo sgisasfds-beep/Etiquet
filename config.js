@@ -1,18 +1,23 @@
+// URL del backend expuesto con ngrok
 const API_NGROK = "https://48a2310b9a11.ngrok-free.app";
+
+// URL del backend local (solo para desarrollo en tu PC)
 const API_LOCAL = "http://localhost:4000";
 
 function getApiURL() {
-    // Si estás en Render, siempre usa ngrok
-    if (window.location.hostname.includes("onrender.com")) {
+    const host = window.location.hostname;
+
+    // ⭐ Si estás en Render → usar siempre ngrok
+    if (host.includes("onrender.com")) {
         return API_NGROK;
     }
 
-    // Si trabajas en local (útil para desarrollo)
-    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+    // ⭐ Si estás ejecutando el HTML directamente en tu PC
+    if (host === "localhost" || host === "127.0.0.1") {
         return API_LOCAL;
     }
 
-    // Otros (GitHub Pages, Netlify, etc.)
+    // ⭐ GitHub Pages, Netlify, dominio propio → usar ngrok
     return API_NGROK;
 }
 
