@@ -326,7 +326,7 @@
         });
 
         if (!res.ok) {
-             // Si el servidor responde con error (404, 500), leemos el mensaje
+             // Si el servidor responde con error (404, 500), leemos el mensaje.
              const errorData = await res.json();
              alert(errorData.error || "Error al generar etiqueta");
              return;
