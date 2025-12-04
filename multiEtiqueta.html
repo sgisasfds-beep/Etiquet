@@ -399,18 +399,53 @@ document.getElementById("btnGenerarDOCX").addEventListener("click", async () => 
 /* =====================================================
    DESCARGAR ARCHIVO FINAL
 ===================================================== */
-document.getElementById("btnDescargar").addEventListener("click", () => {
-  if (!window.__archivoFinal) {
-    setStatus("Primero genera el documento.", true);
-    return;
-  }
+document.getElementById("btnDescargar").addEventListener("click", async () => {
+    if (!window.__archivoFinal) {
+        setStatus("Primero genera el documento.", true);
+        return;
+    }
+    
+    setStatus("Iniciando descarga del archivo...");
 
-  const a = document.createElement("a");
-  a.href = `${API_URL}/api/descargar/${window.__archivoFinal}`;
-  a.download = window.__archivoFinal;
-  a.click();
+    const archivoADescargar = window.__archivoFinal;
+    const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
+    
+    try {
+        // 1. Usar FETCH para incluir el encabezado de ngrok
+        const response = await fetch(urlDescarga, {
+            method: 'GET',
+            headers: { 
+                // Encabezado CLAVE para evitar la página de advertencia de ngrok
+                'ngrok-skip-browser-warning': 'true' 
+            }
+        });
 
-  setStatus("Archivo descargado.");
+        if (!response.ok) {
+            setStatus(`Error ${response.status} al descargar el archivo.`, true);
+            return;
+        }
+
+        // 2. Procesar la respuesta binaria (Blob)
+        const blob = await response.blob();
+
+        // 3. Crear un enlace temporal para forzar la descarga en el navegador
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = archivoADescargar; // Usa el nombre de archivo final
+        document.body.appendChild(a);
+        a.click();
+        a.remove(); // Limpiar el elemento
+
+        // 4. Liberar el objeto URL creado
+        window.URL.revokeObjectURL(url);
+
+        setStatus("Archivo descargado.");
+
+    } catch (error) {
+        console.error("Error en la descarga:", error);
+        setStatus("Fallo la descarga. Revisa la consola.", true);
+    }
 });
 
 </script>
