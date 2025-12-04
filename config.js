@@ -1,29 +1,19 @@
-// ============================================
-//   CONFIGURACIÓN GLOBAL DEL FRONTEND
-//   (Compatible con TU server.js actual)
-// ============================================
+const API_NGROK = "https://48a2310b9a11.ngrok-free.app";
+const API_LOCAL = "http://localhost:4000";
 
-// 1. URL DEL BACKEND EN PRODUCCIÓN
-//    👉 Cámbiala por la de tu servidor real
-const API_BASE_URL = "https://48a2310b9a11.ngrok-free.app";
-
-// 2. URL DEL BACKEND EN DESARROLLO LOCAL
-const API_LOCAL_URL = "http://localhost:4000";
-
-// 3. Detección automática:
-//    Si corres desde GitHub Pages, File://, Netlify, etc.
-//    usará automáticamente el servidor en producción.
-function getApiUrl() {
-    const host = window.location.hostname;
-
-    // Ejecutando local (index.html abierto en el navegador)
-    if (host === "127.0.0.1" || host === "localhost") {
-        return API_LOCAL_URL;
+function getApiURL() {
+    // Si estás en Render, siempre usa ngrok
+    if (window.location.hostname.includes("onrender.com")) {
+        return API_NGROK;
     }
 
-    // Ejecutando en GitHub Pages, Vercel, Netlify, dominio propio, etc.
-    return API_BASE_URL;
+    // Si trabajas en local (útil para desarrollo)
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        return API_LOCAL;
+    }
+
+    // Otros (GitHub Pages, Netlify, etc.)
+    return API_NGROK;
 }
 
-// 4. Exportación para usarlo desde cualquier HTML/JS
-export const API_URL = getApiUrl();
+export const API_URL = getApiURL();
