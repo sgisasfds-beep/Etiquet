@@ -152,65 +152,125 @@ function setStatus(message, isError = false) {
    Plantilla HTML original de etiqueta (igual al index)
 ===================================================== */
 function crearPlantillaEtiqueta() {
-  const div = document.createElement("div");
-  div.className = "etiqueta";
-  div.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
-      <div style="grid-column: 1;">
-        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
-      </div>
 
-      <div style="grid-column: 3; text-align:center;">
-        <strong>Pictogramas de<br>Peligro</strong>
-      </div>
+  const div = document.createElement("div");
 
-      <div style="grid-column: 1; margin-top:14px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
+  div.className = "etiqueta";
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
-        <br><br>
+  div.innerHTML = `
 
-        <p><strong>Preparación:</strong></p>
-        <p class="preparacion">---</p>
+    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
 
-        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+      <div style="grid-column: 1;">
 
-        <div class="frasesHP"></div>
-      </div>
+        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
 
-      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
-        <div class="zonaPictogramas" style="min-height: 220px;"></div>
-        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
-      </div>
+      </div>
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
-          <div>
-            <strong>Fecha Preparado:</strong><br>
-            <span class="fechaPreparado">DD/MM/YYYY</span>
-          </div>
 
-          <div style="text-align: right;">
-            <strong>Fecha Vencimiento:</strong><br>
-            <span class="fechaVencimiento">DD/MM/YYYY</span>
-          </div>
-        </div>
+      <div style="grid-column: 3; text-align:center;">
 
-        <div style="margin-top:18px;">
-          <strong>Preparado por:</strong><br>
-          <span class="analista">---</span>
-        </div>
-      </div>
-    </div>
-  `;
-  return div;
+        <strong>Pictogramas de<br>Peligro</strong>
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:14px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
+
+        <br><br>
+
+
+
+        <p><strong>Preparación:</strong></p>
+
+        <p class="preparacion">---</p>
+
+
+
+        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+
+
+
+        <div class="frasesHP"></div>
+
+      </div>
+
+
+
+      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+
+        <div class="zonaPictogramas" style="min-height: 220px;"></div>
+
+        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+
+          <div>
+
+            <strong>Fecha Preparado:</strong><br>
+
+            <span class="fechaPreparado">DD/MM/YYYY</span>
+
+          </div>
+
+
+
+          <div style="text-align: right;">
+
+            <strong>Fecha Vencimiento:</strong><br>
+
+            <span class="fechaVencimiento">DD/MM/YYYY</span>
+
+          </div>
+
+        </div>
+
+
+
+        <div style="margin-top:18px;">
+
+          <strong>Preparado por:</strong><br>
+
+          <span class="analista">---</span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+  return div;
+
 }
+
 
 /* =====================================================
    Renderizar TODAS las etiquetas solicitadas
