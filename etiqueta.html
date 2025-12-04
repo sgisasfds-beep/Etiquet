@@ -292,21 +292,58 @@ function setStatus(msg, isError=false) {
   statusEl.style.color = isError ? "#b20000" : "#0b5";
 }
 
+// =======================================================
+// CÓDIGO FINAL CORREGIDO PARA EL BOTÓN DE DESCARGA DOCX
+// =======================================================
 btnPreview.addEventListener("click", async () => {
-  if (!window.__ultimoArchivoGenerado) {
-    setStatus("No hay archivo generado. Genera el documento primero.", true);
-    return;
-  }
+    if (!window.__ultimoArchivoGenerado) {
+        setStatus("No hay archivo generado. Genera el documento primero.", true);
+        return;
+    }
+    
+    setStatus("Iniciando descarga DOCX...");
 
-  const archivo = window.__ultimoArchivoGenerado;
-  const a = document.createElement("a");
-  a.href = `${API_URL}/api/descargar/${archivo}`;
-  console.log("🔗 URL generada para descarga:", a.href);
-  a.download = archivo;
-  a.click();
+    const archivo = window.__ultimoArchivoGenerado;
+    const urlDescarga = `${API_URL}/api/descargar/${archivo}`;
+    
+    try {
+        // Usamos FETCH para poder agregar el encabezado de ngrok
+        const response = await fetch(urlDescarga, {
+            method: 'GET',
+            headers: { 
+                // ESTA ES LA CLAVE PARA QUE LA DESCARGA NO MUESTRE LA ADVERTENCIA DE NGROK
+                'ngrok-skip-browser-warning': 'true' 
+            }
+        });
 
-  setStatus("Archivo DOCX descargado correctamente.");
+        if (!response.ok) {
+            setStatus("Error al descargar el archivo. Código: " + response.status, true);
+            return;
+        }
+
+        // Convertir la respuesta binaria a un objeto de tipo Blob
+        const blob = await response.blob();
+
+        // Crear un enlace temporal para forzar la descarga en el navegador
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = archivo; // Establecer el nombre del archivo
+        document.body.appendChild(a);
+        a.click();
+        a.remove(); // Limpiar el elemento
+
+        // Liberar el objeto URL
+        window.URL.revokeObjectURL(url);
+
+        setStatus("Archivo DOCX descargado correctamente.");
+
+    } catch (error) {
+        console.error("Error en la descarga:", error);
+        setStatus("Fallo la descarga. Revisa la conexión o consola.", true);
+    }
 });
+// =======================================================
 
 btn.addEventListener("click", async (e) => {
   e.preventDefault();
