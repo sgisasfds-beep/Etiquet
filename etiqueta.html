@@ -260,7 +260,7 @@ async function generarQRdeCarpeta(nombre, analista) {
   try {
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
       body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
     });
 
@@ -333,7 +333,7 @@ btn.addEventListener("click", async (e) => {
 
     const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json","ngrok-skip-browser-warning": "true" },
       body: JSON.stringify({
         base64Imagen: base64,
         cantidad,

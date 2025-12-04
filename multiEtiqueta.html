@@ -225,7 +225,7 @@ async function cargarEtiquetas() {
     // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
     const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
       method: "POST",
-      headers: {"Content-Type": "application/json"},
+      headers: {"Content-Type": "application/json","ngrok-skip-browser-warning": "true"},
       body: JSON.stringify({
         nombreReactivo: item.nombreReactivo,
         fabricante: item.fabricante,
@@ -240,7 +240,7 @@ async function cargarEtiquetas() {
     try {
         const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
             body: JSON.stringify({
                 nombreReactivo: item.nombreReactivo,
                 usuarioAnalista: item.analista
@@ -381,7 +381,7 @@ document.getElementById("btnGenerarDOCX").addEventListener("click", async () => 
     // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
     const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
         // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
         body: JSON.stringify({ etiquetas: payloadEtiquetas })
     });

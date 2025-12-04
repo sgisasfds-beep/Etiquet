@@ -240,7 +240,11 @@
   // ============================
   async function cargarReactivos() {
     try {
-      const res = await fetch(`${API_URL}/api/listaReactivos`);
+      const res = await fetch(`${API_URL}/api/listaReactivos`, {
+        headers: {
+           "ngrok-skip-browser-warning": "true"
+        }
+      });
       reactivos = await res.json(); // devuelve lista de strings
     } catch (e) {
       console.error("No se pudo cargar la lista de reactivos:", e);
@@ -313,11 +317,11 @@
     try {
         const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
           body: JSON.stringify({
             nombreReactivo: datosUsuario.nombreReactivo,
             fabricante: datosUsuario.fabricante,
-            volumen: datosUsuario.envase // <--- ¡AGREGAR ESTA LÍNEA!
+            volumen: datosUsuario.envase 
           })
         });
 
