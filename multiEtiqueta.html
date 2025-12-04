@@ -126,326 +126,326 @@
 import { API_URL } from "./config.js";
 
 /* =====================================================
-   Recuperar datos enviados desde multiIndex.html
+   Recuperar datos enviados desde multiIndex.html
 ===================================================== */
 const datosJSON = sessionStorage.getItem("multiEtiquetas_datos");
 const datos = datosJSON ? JSON.parse(datosJSON) : [];
 window.datos = datos; // Guardamos en window para que sea globalmente accesible
 
 if (datos.length === 0) {
-    console.error("No se encontraron datos de etiquetas en sessionStorage.");
-    // Podrías redirigir al usuario aquí o mostrar un mensaje
+    console.error("No se encontraron datos de etiquetas en sessionStorage.");
+    // Podrías redirigir al usuario aquí o mostrar un mensaje
 }
 
+// ⭐ CAMBIO 1 (CORRECCIÓN): Definición ÚNICA del elemento de estatus
+const statusEl = document.getElementById("status");
 
+// ⭐ CAMBIO 2 (CORRECCIÓN): Definición ÚNICA de la función setStatus
 function setStatus(message, isError = false) {
-    const statusDiv = document.getElementById("statusMessage");
-    if (!statusDiv) return;
-    statusDiv.textContent = message;
-    statusDiv.style.color = isError ? "red" : "green";
-    console.log(isError ? `[ERROR] ${message}` : `[STATUS] ${message}`);
+    if (!statusEl) return;
+    statusEl.textContent = message;
+    statusEl.style.color = isError ? "red" : "green";
+    console.log(isError ? `[ERROR] ${message}` : `[STATUS] ${message}`);
 }
 
 /* =====================================================
-   Plantilla HTML original de etiqueta (igual al index)
+   Plantilla HTML original de etiqueta (igual al index)
 ===================================================== */
 function crearPlantillaEtiqueta() {
-  const div = document.createElement("div");
-  div.className = "etiqueta";
-  div.innerHTML = `
-    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
-      <div style="grid-column: 1;">
-        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
-      </div>
+  const div = document.createElement("div");
+  div.className = "etiqueta";
+  div.innerHTML = `
+    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+      <div style="grid-column: 1;">
+        <strong>Proveedor:</strong> SGI SAS TEL: 6017423371
+      </div>
 
-      <div style="grid-column: 3; text-align:center;">
-        <strong>Pictogramas de<br>Peligro</strong>
-      </div>
+      <div style="grid-column: 3; text-align:center;">
+        <strong>Pictogramas de<br>Peligro</strong>
+      </div>
 
-      <div style="grid-column: 1; margin-top:14px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
+      <div style="grid-column: 1; margin-top:14px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
-        <br><br>
+      <div style="grid-column: 1; margin-top:20px;">
+        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
+        <br><br>
 
-        <p><strong>Preparación:</strong></p>
-        <p class="preparacion">---</p>
+        <p><strong>Preparación:</strong></p>
+        <p class="preparacion">---</p>
 
-        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
 
-        <div class="frasesHP"></div>
-      </div>
+        <div class="frasesHP"></div>
+      </div>
 
-      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
-        <div class="zonaPictogramas" style="min-height: 220px;"></div>
-        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
-      </div>
+      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+        <div class="zonaPictogramas" style="min-height: 220px;"></div>
+        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
+      </div>
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
+      <div style="grid-column: 1; margin-top:20px;">
+        <hr style="border:1px solid black; margin:0;">
+      </div>
 
-      <div style="grid-column: 1; margin-top:20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
-          <div>
-            <strong>Fecha Preparado:</strong><br>
-            <span class="fechaPreparado">DD/MM/YYYY</span>
-          </div>
+      <div style="grid-column: 1; margin-top:20px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+          <div>
+            <strong>Fecha Preparado:</strong><br>
+            <span class="fechaPreparado">DD/MM/YYYY</span>
+          </div>
 
-          <div style="text-align: right;">
-            <strong>Fecha Vencimiento:</strong><br>
-            <span class="fechaVencimiento">DD/MM/YYYY</span>
-          </div>
-        </div>
+          <div style="text-align: right;">
+            <strong>Fecha Vencimiento:</strong><br>
+            <span class="fechaVencimiento">DD/MM/YYYY</span>
+          </div>
+        </div>
 
-        <div style="margin-top:18px;">
-          <strong>Preparado por:</strong><br>
-          <span class="analista">---</span>
-        </div>
-      </div>
-    </div>
-  `;
-  return div;
+        <div style="margin-top:18px;">
+          <strong>Preparado por:</strong><br>
+          <span class="analista">---</span>
+        </div>
+      </div>
+    </div>
+  `;
+  return div;
 }
 
 /* =====================================================
-   Renderizar TODAS las etiquetas solicitadas
+   Renderizar TODAS las etiquetas solicitadas
 ===================================================== */
 async function cargarEtiquetas() {
-  const contenedor = document.getElementById("listaEtiquetas");
-  const statusEl = document.getElementById("status"); // Asegúrate de tener este elemento o usa console
+  const contenedor = document.getElementById("listaEtiquetas");
+  // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO ARRIBA
 
-  // Mostrar mensaje de carga porque esto tardará unos segundos creando carpetas
-  if(statusEl) statusEl.textContent = "Generando carpetas y QRs en Google Drive, por favor espera...";
+  // Mostrar mensaje de carga porque esto tardará unos segundos creando carpetas
+  setStatus("Generando carpetas y QRs en Google Drive, por favor espera...", false); // Usando setStatus
 
-  for (const item of datos) {
+  for (const item of datos) {
 
-    // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
-    const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
-      method: "POST",
-      headers: {"Content-Type": "application/json","ngrok-skip-browser-warning": "true"},
-      body: JSON.stringify({
-        nombreReactivo: item.nombreReactivo,
-        fabricante: item.fabricante,
-        volumen: item.envase
-      })
-    });
-    const info = await resVisual.json();
+    // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
+    const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
+      method: "POST",
+      headers: {"Content-Type": "application/json","ngrok-skip-browser-warning": "true"},
+      body: JSON.stringify({
+        nombreReactivo: item.nombreReactivo,
+        fabricante: item.fabricante,
+        volumen: item.envase
+      })
+    });
+    const info = await resVisual.json();
 
-    // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
-    // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
-    let qrBase64 = "";
-    try {
-        const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-            body: JSON.stringify({
-                nombreReactivo: item.nombreReactivo,
-                usuarioAnalista: item.analista
-            })
-        });
-        const dataQR = await resQR.json();
-        
-        if (dataQR.ok) {
-            qrBase64 = dataQR.qr; // Aquí recibimos el QR único de la nueva carpeta
-        } else {
-            console.error("Error generando QR:", dataQR.error);
-        }
-    } catch (err) {
-        console.error("Error conectando para QR:", err);
-    }
+    // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
+    // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
+    let qrBase64 = "";
+    try {
+        const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+            body: JSON.stringify({
+                nombreReactivo: item.nombreReactivo,
+                usuarioAnalista: item.analista
+            })
+        });
+        const dataQR = await resQR.json();
+        
+        if (dataQR.ok) {
+            qrBase64 = dataQR.qr; // Aquí recibimos el QR único de la nueva carpeta
+        } else {
+            console.error("Error generando QR:", dataQR.error);
+        }
+    } catch (err) {
+        console.error("Error conectando para QR:", err);
+    }
 
-    if (!resVisual.ok) continue;
+    if (!resVisual.ok) continue;
 
-    const copias = item.copias || 1;
+    const copias = item.copias || 1;
 
-    // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
-    for (let c = 0; c < copias; c++) {
+    // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
+    for (let c = 0; c < copias; c++) {
 
-      const et = crearPlantillaEtiqueta();
+      const et = crearPlantillaEtiqueta();
 
-      // Llenar datos visuales
-      et.querySelector(".nombreReactivo").textContent = info.nombre;
-      et.querySelector(".preparacion").textContent = info.preparación || "No aplica";
-      et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
-      et.querySelector(".analista").textContent = item.analista || "—";
+      // Llenar datos visuales
+      et.querySelector(".nombreReactivo").textContent = info.nombre;
+      et.querySelector(".preparacion").textContent = info.preparación || "No aplica";
+      et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
+      et.querySelector(".analista").textContent = item.analista || "—";
 
-      let htmlHP = "";
-      info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
-      info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
-      et.querySelector(".frasesHP").innerHTML = htmlHP;
+      let htmlHP = "";
+      info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
+      info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
+      et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-      if (info.imagenPictograma) {
-        et.querySelector(".zonaPictogramas")
-          .innerHTML = `<img src="${info.imagenPictograma}" class="img-pictograma">`;
-      }
+      if (info.imagenPictograma) {
+        et.querySelector(".zonaPictogramas")
+          .innerHTML = `<img src="${info.imagenPictograma}" class="img-pictograma">`;
+      }
 
-      // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
-      if (qrBase64) {
-          et.querySelector(".qr").src = qrBase64;
-      }
-      // ------------------------------------------------------
+      // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
+      if (qrBase64) {
+          et.querySelector(".qr").src = qrBase64;
+      }
+      // ------------------------------------------------------
 
-      // Fechas
-      if (!item.incluirFechas) {
-        et.querySelector(".fechaPreparado").style.display = "none";
-        et.querySelector(".fechaVencimiento").style.display = "none";
-      } else {
-        const hoy = new Date();
-        et.querySelector(".fechaPreparado").textContent =
-          hoy.toLocaleDateString("es-CO");
+      // Fechas
+      if (!item.incluirFechas) {
+        et.querySelector(".fechaPreparado").style.display = "none";
+        et.querySelector(".fechaVencimiento").style.display = "none";
+      } else {
+        const hoy = new Date();
+        et.querySelector(".fechaPreparado").textContent =
+          hoy.toLocaleDateString("es-CO");
 
-        let venc = new Date(hoy);
-        // Conversión segura a número
-        const valorVigencia = parseInt(item.vigenciaValor) || 0;
-        
-        switch (item.vigenciaUnidad) {
-          case "Día(s)": venc.setDate(venc.getDate() + valorVigencia); break;
-          case "Semana(s)": venc.setDate(venc.getDate() + 7 * valorVigencia); break;
-          case "Mes(es)": venc.setMonth(venc.getMonth() + valorVigencia); break;
-          case "Año(s)": venc.setFullYear(venc.getFullYear() + valorVigencia); break;
-        }
-        et.querySelector(".fechaVencimiento").textContent = 
-          venc.toLocaleDateString("es-CO");
-      }
+        let venc = new Date(hoy);
+        // Conversión segura a número
+        const valorVigencia = parseInt(item.vigenciaValor) || 0;
+        
+        switch (item.vigenciaUnidad) {
+          case "Día(s)": venc.setDate(venc.getDate() + valorVigencia); break;
+          case "Semana(s)": venc.setDate(venc.getDate() + 7 * valorVigencia); break;
+          case "Mes(es)": venc.setMonth(venc.getMonth() + valorVigencia); break;
+          case "Año(s)": venc.setFullYear(venc.getFullYear() + valorVigencia); break;
+        }
+        et.querySelector(".fechaVencimiento").textContent = 
+          venc.toLocaleDateString("es-CO");
+      }
 
-      contenedor.appendChild(et);
-    }
-  }
-  
-  if(statusEl) {
-      statusEl.textContent = "Etiquetas listas. Revisa los QRs y haz clic en 'Generar archivo DOCX'.";
-      statusEl.style.color = "blue";
-  }
+      contenedor.appendChild(et);
+    }
+  }
+  
+  setStatus("Etiquetas listas. Revisa los QRs y haz clic en 'Generar archivo DOCX'.", false); // Usando setStatus
 }
 
 cargarEtiquetas();
 
 /* =====================================================
-   GENERAR DOCX A PARTIR DE TODAS LAS ETIQUETAS
+   GENERAR DOCX A PARTIR DE TODAS LAS ETIQUETAS
 ===================================================== */
-const statusEl = document.getElementById("status");
-function setStatus(msg, err=false){
-  statusEl.textContent = msg;
-  statusEl.style.color = err ? "red" : "green";
-}
+// ❌ SE ELIMINÓ la declaración duplicada de 'const statusEl = document.getElementById("status");'
+// ❌ Y la redefinición duplicada de 'function setStatus(msg, err=false){...}'
+// Ambas ya están definidas al inicio del script.
 
 document.getElementById("btnGenerarDOCX").addEventListener("click", async () => {
-    // 1. Obtener todos los elementos de etiqueta renderizados
-    const etiquetasDOM = [...document.querySelectorAll(".etiqueta")];
+    // 1. Obtener todos los elementos de etiqueta renderizados
+    const etiquetasDOM = [...document.querySelectorAll(".etiqueta")];
 
-    if (etiquetasDOM.length === 0) {
-      setStatus("No hay etiquetas para convertir.", true);
-      return;
-    }
+    if (etiquetasDOM.length === 0) {
+      setStatus("No hay etiquetas para convertir.", true); // Usando setStatus
+      return;
+    }
 
-    setStatus("Procesando etiquetas…");
-    
-    // Asumo que 'window.datos' contiene el array de reactivos con 'envase' y 'copias'.
-    if (!window.datos) {
-        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true);
-        return;
-    }
+    setStatus("Procesando etiquetas…", false); // Usando setStatus
+    
+    // Asumo que 'window.datos' contiene el array de reactivos con 'envase' y 'copias'.
+    if (!window.datos) {
+        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true); // Usando setStatus
+        return;
+    }
 
-    const payloadEtiquetas = [];
-    let etiquetasIndex = 0;
+    const payloadEtiquetas = [];
+    let etiquetasIndex = 0;
 
-    // Recorrer los datos originales para obtener el 'envase' correcto
-    for (const item of window.datos) {
-        const copias = item.copias || 1;
-        
-        // Iterar por cada copia generada por este formulario
-        for (let c = 0; c < copias; c++) {
-            const et = etiquetasDOM[etiquetasIndex]; // Obtener el elemento DOM en el orden correcto
-            
-            if (!et) {
-                 console.error("Faltan elementos DOM para la etiqueta #", etiquetasIndex);
-                 break;
-            }
+    // Recorrer los datos originales para obtener el 'envase' correcto
+    for (const item of window.datos) {
+        const copias = item.copias || 1;
+        
+        // Iterar por cada copia generada por este formulario
+        for (let c = 0; c < copias; c++) {
+            const et = etiquetasDOM[etiquetasIndex]; // Obtener el elemento DOM en el orden correcto
+            
+            if (!et) {
+                 console.error("Faltan elementos DOM para la etiqueta #", etiquetasIndex);
+                 break;
+            }
 
-            // 2. Usar html2canvas para tomar la 'foto' (screenshot)
-            const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
-            
-            // 3. Crear el objeto con la imagen y el envase para el backend
-            payloadEtiquetas.push({
-                base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
-                envase: item.envase 
-            });
+            // 2. Usar html2canvas para tomar la 'foto' (screenshot)
+            const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
+            
+            // 3. Crear el objeto con la imagen y el envase para el backend
+            payloadEtiquetas.push({
+                base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
+                envase: item.envase 
+            });
 
-            etiquetasIndex++;
-        }
-    }
-    
-    // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
-    const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-        // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
-        body: JSON.stringify({ etiquetas: payloadEtiquetas })
-    });
+            etiquetasIndex++;
+        }
+    }
+    
+    // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
+    const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+        // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
+        body: JSON.stringify({ etiquetas: payloadEtiquetas })
+    });
 
-    const data = await res.json();
+    const data = await res.json();
 
-    if (data.ok) {
-        window.__archivoFinal = data.archivo;
-        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.");
-    } else {
-        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true);
-    }
+    if (data.ok) {
+        window.__archivoFinal = data.archivo;
+        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.", false); // Usando setStatus
+    } else {
+        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true); // Usando setStatus
+    }
 });
 
 /* =====================================================
-   DESCARGAR ARCHIVO FINAL
+   DESCARGAR ARCHIVO FINAL
 ===================================================== */
 document.getElementById("btnDescargar").addEventListener("click", async () => {
-    if (!window.__archivoFinal) {
-        setStatus("Primero genera el documento.", true);
-        return;
-    }
-    
-    setStatus("Iniciando descarga del archivo...");
+    // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO Y NO SE NECESITA REPETIR AQUÍ
 
-    const archivoADescargar = window.__archivoFinal;
-    const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
-    
-    try {
-        // 1. Usar FETCH para incluir el encabezado de ngrok
-        const response = await fetch(urlDescarga, {
-            method: 'GET',
-            headers: { 
-                // Encabezado CLAVE para evitar la página de advertencia de ngrok
-                'ngrok-skip-browser-warning': 'true' 
-            }
-        });
+    if (!window.__archivoFinal) {
+        setStatus("Primero genera el documento.", true); // Usando setStatus
+        return;
+    }
+    
+    setStatus("Iniciando descarga del archivo...", false); // Usando setStatus
 
-        if (!response.ok) {
-            setStatus(`Error ${response.status} al descargar el archivo.`, true);
-            return;
-        }
 
-        // 2. Procesar la respuesta binaria (Blob)
-        const blob = await response.blob();
+    const archivoADescargar = window.__archivoFinal;
+    const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
+    
+    try {
+        // 1. Usar FETCH para incluir el encabezado de ngrok
+        const response = await fetch(urlDescarga, {
+            method: 'GET',
+            headers: { 
+                // Encabezado CLAVE para evitar la página de advertencia de ngrok
+                'ngrok-skip-browser-warning': 'true' 
+            }
+        });
 
-        // 3. Crear un enlace temporal para forzar la descarga en el navegador
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = archivoADescargar; // Usa el nombre de archivo final
-        document.body.appendChild(a);
-        a.click();
-        a.remove(); // Limpiar el elemento
+        if (!response.ok) {
+            setStatus(`Error ${response.status} al descargar el archivo.`, true); // Usando setStatus
+            return;
+        }
 
-        // 4. Liberar el objeto URL creado
-        window.URL.revokeObjectURL(url);
+        // 2. Procesar la respuesta binaria (Blob)
+        const blob = await response.blob();
 
-        setStatus("Archivo descargado.");
+        // 3. Crear un enlace temporal para forzar la descarga en el navegador
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = archivoADescargar; // Usa el nombre de archivo final
+        document.body.appendChild(a);
+        a.click();
+        a.remove(); // Limpiar el elemento
 
-    } catch (error) {
-        console.error("Error en la descarga:", error);
-        setStatus("Fallo la descarga. Revisa la consola.", true);
-    }
+        // 4. Liberar el objeto URL creado
+        window.URL.revokeObjectURL(url);
+
+        setStatus("Archivo descargado.", false); // Usando setStatus
+
+    } catch (error) {
+        console.error("Error en la descarga:", error);
+        setStatus("Fallo la descarga. Revisa la consola.", true); // Usando setStatus
+    }
 });
 
 </script>
