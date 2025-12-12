@@ -326,7 +326,14 @@ async function cargarEtiquetas() {
     // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
     for (let c = 0; c < copias; c++) {
 
-      const et = crearPlantillaEtiqueta();
+      const envaseMini = ["30 mL", "40 mL", "60 mL"];
+
+      let et;
+      if (envaseMini.includes(item.envase)) {
+          et = crearPlantillaMiniEtiqueta();  // NUEVA PLANTILLA MINI
+      } else {
+          et = crearPlantillaEtiqueta();      // TU PLANTILLA NORMAL
+      }
 
       // Llenar datos visuales
       et.querySelector(".nombreReactivo").textContent = info.nombre;

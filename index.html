@@ -340,8 +340,17 @@
           reactivo: datosReactivo
         }));
 
+        const miniEnvases = ["30 mL", "40 mL", "60 mL"];
+
+        if (miniEnvases.includes(envase)) {
+            window.location.href = "miniet.html";
+        } else {
+            window.location.href = "etiqueta.html";
+        }
+
+
         // 3️⃣ Ir a etiqueta.html
-        window.location.href = "etiqueta.html";
+        
 
     } catch (error) {
         console.error(error);

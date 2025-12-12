@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Etiqueta Generada</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef2fb;
+            color: #1e1e1e;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #000000, #003d99);
+            color: #b7d9ff;
+            padding: 60px 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border-bottom: 3px solid #007bff;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #008cff;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            border: 1px solid #dfe6f5;
+            text-align: center;
+        }
+
+        h2 {
+            color: #004a99;
+            font-size: 26px;
+            margin-top: 0;
+        }
+
+        /* ===== ESTILOS DE LA ETIQUETA ===== */
+        .etiqueta {
+            width: 500px; 
+            height: 350px;
+            margin: 30px auto;
+            border: 3px solid black;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            background-color: white;
+        }
+
+        .etiqueta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 10px 0;
+            height: 100%;
+            align-items: start;
+        }
+
+        .header-left {
+            grid-column: 1 / 2;
+            text-align: left;
+            font-size: 10px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        .header-right {
+            grid-column: 2 / 3;
+            text-align: right;
+            font-size: 10px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
+        }
+
+        /* === NUEVA DISTRIBUCIÓN EXACTA === */
+        .content-row {
+            grid-column: 1 / 3; 
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding-top: 10px;
+        }
+
+        .reactivo-name {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #000;
+        }
+
+        .cajas-row {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 5px;
+        }
+
+        .box {
+            width: 150px;
+            height: 150px;
+            background-color: #4c90d2;
+            border: 1px solid #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            padding: 5px; /* Pequeño padding para evitar que la imagen toque el borde */
+        }
+        
+        /* Estilos para las imágenes dentro de las cajas */
+        .box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        button {
+            background: #6c757d;
+            padding: 14px 26px;
+            border: none;
+            width: 100%;
+            max-width: 300px;
+            color: #fff;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background: #5a6268;
+            transform: scale(1.03);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="hero">
+        <h1>Etiqueta Generada</h1>
+    </div>
+
+    <div class="container">
+        <h2>Vista previa de la etiqueta</h2>
+
+        <div class="etiqueta">
+            <div class="etiqueta-grid">
+
+                <div class="header-left">
+                    ADVERTENCIA: <span id="advertenciaTexto">ATENCION</span>
+                </div>
+
+                <div class="header-right">
+                    Proveedor: <span id="proveedorTexto">SGI SAS</span>
+                </div>
+
+                <div class="content-row">
+                    <div class="reactivo-name" id="nombreReactivo">REACTIVO</div>
+
+                    <div class="cajas-row">
+                        <div class="box" id="pictogramaBox">PICTOGRAMA</div>
+                        <div class="box" id="qrBox">CÓDIGO QR</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button onclick="window.location.href='index.html'">Volver al formulario</button>
+        <p id="status"></p>
+
+    </div>
+
+    <script type="module">
+        // Asegúrate de que tu archivo config.js tenga la variable API_URL exportada
+        import { API_URL } from "./config.js"; 
+
+        const statusEl = document.getElementById("status");
+
+        // =======================================================
+        // 1. CARGAR DATOS DE SESIÓN
+        // =======================================================
+        const datosJSON = sessionStorage.getItem("datosEtiqueta");
+        const datosEtiqueta = datosJSON ? JSON.parse(datosJSON) : null;
+
+        if (!datosEtiqueta) {
+            statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
+            statusEl.style.color = "red";
+            document.getElementById("nombreReactivo").textContent = "ERROR AL CARGAR DATOS";
+            
+        } else {
+            statusEl.textContent = "✅ Etiqueta cargada correctamente.";
+            statusEl.style.color = "green";
+
+            const {
+                nombreReactivo,
+                analista
+            } = datosEtiqueta.usuario;
+            
+            const {
+                palabra_advertencia,
+                imagenPictograma
+            } = datosEtiqueta.reactivo;
+
+            // Llenar campos de texto
+            document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
+            document.getElementById("proveedorTexto").textContent = "SGI SAS";
+            document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
+            
+            // =======================================================
+            // 2. MOSTRAR PICTOGRAMAS
+            // =======================================================
+            const pictogramaBox = document.getElementById("pictogramaBox");
+            if (imagenPictograma) {
+                // El servidor devuelve la imagenPictograma como data:image/png;base64,...
+                pictogramaBox.innerHTML = `<img src="${imagenPictograma}" alt="pictogramas">`;
+                pictogramaBox.style.backgroundColor = 'white'; // Fondo blanco para la imagen
+            } else {
+                // En caso de que no haya imagen 
+                pictogramaBox.textContent = 'NO PICTOGRAMA';
+                pictogramaBox.style.backgroundColor = '#ccc';
+                pictogramaBox.style.color = '#333';
+            }
+
+            // =======================================================
+            // 3. GENERAR Y MOSTRAR CÓDIGO QR
+            // =======================================================
+            const qrBox = document.getElementById('qrBox');
+            qrBox.textContent = "Generando QR...";
+            qrBox.style.fontSize = '12px';
+            qrBox.style.backgroundColor = '#4c90d2'; 
+
+            async function generarQRdeCarpeta(nombre, analista) {
+                const url = `${API_URL}/api/procesarCarpetaReactivo`;
+                
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
+                        body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({ error: "Error de servidor" }));
+                        throw new Error(errorData.error || response.statusText);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.qr) {
+                        // El servidor devuelve data.qr como data:image/png;base64,...
+                        qrBox.innerHTML = `<img src="${data.qr}" alt="Código QR Carpeta Drive">`;
+                        qrBox.style.backgroundColor = 'white'; // Fondo blanco para el QR
+                        sessionStorage.setItem("qr_generado_miniet", data.qr); // Guardar QR para evitar llamadas futuras
+                    } else {
+                        throw new Error("Respuesta del servidor no contiene QR.");
+                    }
+
+                } catch (e) {
+                    console.error("Fallo la generación de QR:", e);
+                    qrBox.textContent = 'Error QR';
+                    qrBox.style.backgroundColor = 'red';
+                    qrBox.style.color = 'white';
+                }
+            }
+
+            // Ejecutar la generación del QR si no está ya en la sesión
+            const qrGuardado = sessionStorage.getItem("qr_generado_miniet");
+            if (qrGuardado) {
+                qrBox.innerHTML = `<img src="${qrGuardado}" alt="Código QR Carpeta Drive">`;
+                qrBox.style.backgroundColor = 'white';
+            } else if (nombreReactivo && analista) {
+                generarQRdeCarpeta(nombreReactivo, analista);
+            }
+        }
+    </script>
+
+</body>
+</html>
