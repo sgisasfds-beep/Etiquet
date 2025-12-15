@@ -191,111 +191,131 @@
 <script type="module">
   import { API_URL } from "./config.js";
 
-document.addEventListener("DOMContentLoaded", () => {
+  // Variables globales
+  const statusEl = document.getElementById("status");
+  const contenedor = document.getElementById("contenedorEtiqueta");
+  const btn = document.getElementById("btnCapturar");
+  const btnPreview = document.getElementById("btnPreview");
+  let envase = ""; // Variable global para compartir entre cargarDatos y el botón
 
-console.log("🔥 ARCHIVO etiqueta.js CARGADO");
-
-const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
-if (!datos.usuario || !datos.reactivo) {
-  alert("No se pudo cargar la información del reactivo.");
-}
-
-const {
-  nombreReactivo,
-  analista,
-  vigenciaValor,
-  vigenciaUnidad,
-  incluirFechas
-} = datos.usuario || {};
-const envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
-
-const {
-  preparación,
-  palabra_advertencia,
-  frases_h,
-  frases_p,
-  imagenPictograma
-} = datos.reactivo || {};
-
-document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
-document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
-document.getElementById("preparacion").textContent = preparación || "No aplica";
-document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
-
-const spanPreparado = document.getElementById("fechaPreparado");
-const spanVencimiento = document.getElementById("fechaVencimiento");
-
-if (incluirFechas) {
-  const hoy = new Date();
-  spanPreparado.textContent = hoy.toLocaleDateString("es-CO");
-
-  let venc = new Date(hoy);
-  switch (vigenciaUnidad) {
-    case "Día(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0)); break;
-    case "Semana(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0) * 7); break;
-    case "Mes(es)": venc.setMonth(venc.getMonth() + parseInt(vigenciaValor || 0)); break;
-    case "Año(s)": venc.setFullYear(venc.getFullYear() + parseInt(vigenciaValor || 0)); break;
+  function setStatus(msg, isError=false) {
+    statusEl.textContent = msg;
+    statusEl.style.color = isError ? "#b20000" : "#0b5";
   }
-  spanVencimiento.textContent = venc.toLocaleDateString("es-CO");
-} else {
-  spanPreparado.style.display = "none";
-  spanVencimiento.style.display = "none";
-}
 
-let htmlHP = "";
-if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
-if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
-document.getElementById("frasesHP").innerHTML = htmlHP;
+  // =======================================================
+  // FUNCIÓN PRINCIPAL DE CARGA DE DATOS (CORREGIDA)
+  // =======================================================
+  async function cargarDatos() {
+    console.log("🔥 Ejecutando cargarDatos (Pageshow/Load)");
 
-const zonaImg = document.getElementById("zonaPictogramas");
-if (imagenPictograma) {
-  zonaImg.innerHTML = `<img src="${imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
-}
+    const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
+    if (!datos.usuario || !datos.reactivo) {
+      setStatus("No se pudo cargar la información del reactivo.", true);
+      return;
+    }
 
-async function generarQRdeCarpeta(nombre, analista) {
-  const url = `${API_URL}/api/procesarCarpetaReactivo`;
-  const qrElemento = document.getElementById('qrCarpetaDrive');
-  qrElemento.alt = "Generando QR...";
+    const { nombreReactivo, analista, vigenciaValor, vigenciaUnidad, incluirFechas } = datos.usuario || {};
+    envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
-      body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
-    });
+    const { preparación, palabra_advertencia, frases_h, frases_p, imagenPictograma } = datos.reactivo || {};
 
-    if (!response.ok) return;
+    // 1. Asignar Textos
+    document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
+    document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
+    document.getElementById("preparacion").textContent = preparación || "No aplica";
+    document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
 
-    const data = await response.json();
-    if (data.qr) qrElemento.src = data.qr;
+    // 2. Manejo de Fechas
+    const spanPreparado = document.getElementById("fechaPreparado");
+    const spanVencimiento = document.getElementById("fechaVencimiento");
 
-  } catch (e) {
-    console.error("Fallo el QR:", e);
+    if (incluirFechas) {
+      spanPreparado.style.display = "inline"; // Asegurar que se muestren
+      spanVencimiento.style.display = "inline";
+      
+      const hoy = new Date();
+      spanPreparado.textContent = hoy.toLocaleDateString("es-CO");
+
+      let venc = new Date(hoy);
+      switch (vigenciaUnidad) {
+        case "Día(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0)); break;
+        case "Semana(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0) * 7); break;
+        case "Mes(es)": venc.setMonth(venc.getMonth() + parseInt(vigenciaValor || 0)); break;
+        case "Año(s)": venc.setFullYear(venc.getFullYear() + parseInt(vigenciaValor || 0)); break;
+      }
+      spanVencimiento.textContent = venc.toLocaleDateString("es-CO");
+    } else {
+      spanPreparado.style.display = "none";
+      spanVencimiento.style.display = "none";
+    }
+
+    // 3. Frases H y P
+    let htmlHP = "";
+    if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+    if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+    document.getElementById("frasesHP").innerHTML = htmlHP;
+
+    // 4. IMÁGENES: REINICIO Y CARGA (Solución al bug visual)
+    const zonaImg = document.getElementById("zonaPictogramas");
+    const qrElemento = document.getElementById('qrCarpetaDrive');
+
+    // -- Paso Crítico: Limpiar fuentes primero para forzar repintado --
+    zonaImg.innerHTML = "";
+    qrElemento.src = "";
+    
+    // Usamos setTimeout para dar tiempo al navegador de limpiar el buffer gráfico
+    setTimeout(() => {
+        // Pintar Pictogramas
+        if (imagenPictograma) {
+           zonaImg.innerHTML = `<img src="${imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
+        }
+
+        // Generar/Pintar QR
+        if (nombreReactivo && analista) {
+            generarQRdeCarpeta(nombreReactivo, analista);
+        }
+    }, 50); // 50ms de retraso es imperceptible pero suficiente
   }
-}
 
-if (!window.__etiqueta_ejecutada) {
-  window.__etiqueta_ejecutada = true;
-  if (!sessionStorage.getItem("qr_generado")) {
-    sessionStorage.setItem("qr_generado","1");
-    if (nombreReactivo && analista) generarQRdeCarpeta(nombreReactivo, analista);
+  // Función auxiliar para el QR
+  async function generarQRdeCarpeta(nombre, analista) {
+    const url = `${API_URL}/api/procesarCarpetaReactivo`;
+    const qrElemento = document.getElementById('qrCarpetaDrive');
+    qrElemento.alt = "Generando QR...";
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
+        body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
+      });
+
+      if (!response.ok) return;
+
+      const data = await response.json();
+      // Asignar el QR una vez llegue
+      if (data.qr) qrElemento.src = data.qr;
+
+    } catch (e) {
+      console.error("Fallo el QR:", e);
+    }
   }
-}
 
-const statusEl = document.getElementById("status");
-const contenedor = document.getElementById("contenedorEtiqueta");
-const btn = document.getElementById("btnCapturar");
-const btnPreview = document.getElementById("btnPreview");
+  // =======================================================
+  // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
+  // =======================================================
+  window.addEventListener("pageshow", (event) => {
+      // Llamamos a cargarDatos cada vez que la página se muestra
+      // Esto sobreescribe cualquier estado visual corrupto del caché
+      cargarDatos();
+  });
 
-function setStatus(msg, isError=false) {
-  statusEl.textContent = msg;
-  statusEl.style.color = isError ? "#b20000" : "#0b5";
-}
 
-// =======================================================
-// CÓDIGO FINAL CORREGIDO PARA EL BOTÓN DE DESCARGA DOCX
-// =======================================================
-btnPreview.addEventListener("click", async () => {
+  // =======================================================
+  // BOTÓN DE DESCARGA DOCX
+  // =======================================================
+  btnPreview.addEventListener("click", async () => {
     if (!window.__ultimoArchivoGenerado) {
         setStatus("No hay archivo generado. Genera el documento primero.", true);
         return;
@@ -307,11 +327,9 @@ btnPreview.addEventListener("click", async () => {
     const urlDescarga = `${API_URL}/api/descargar/${archivo}`;
     
     try {
-        // Usamos FETCH para poder agregar el encabezado de ngrok
         const response = await fetch(urlDescarga, {
             method: 'GET',
             headers: { 
-                // ESTA ES LA CLAVE PARA QUE LA DESCARGA NO MUESTRE LA ADVERTENCIA DE NGROK
                 'ngrok-skip-browser-warning': 'true' 
             }
         });
@@ -321,19 +339,14 @@ btnPreview.addEventListener("click", async () => {
             return;
         }
 
-        // Convertir la respuesta binaria a un objeto de tipo Blob
         const blob = await response.blob();
-
-        // Crear un enlace temporal para forzar la descarga en el navegador
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = archivo; // Establecer el nombre del archivo
+        a.download = archivo; 
         document.body.appendChild(a);
         a.click();
-        a.remove(); // Limpiar el elemento
-
-        // Liberar el objeto URL
+        a.remove(); 
         window.URL.revokeObjectURL(url);
 
         setStatus("Archivo DOCX descargado correctamente.");
@@ -342,72 +355,67 @@ btnPreview.addEventListener("click", async () => {
         console.error("Error en la descarga:", error);
         setStatus("Fallo la descarga. Revisa la conexión o consola.", true);
     }
-});
-// =======================================================
+  });
 
-btn.addEventListener("click", async (e) => {
-  e.preventDefault();
-  console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
-  setStatus("Capturando etiqueta...");
+  // =======================================================
+  // BOTÓN GENERAR (Captura HTML2Canvas)
+  // =======================================================
+  btn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
+    setStatus("Capturando etiqueta...");
 
-  const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
-  if (!cantidad || cantidad <= 0) {
-    setStatus("Cantidad inválida.", true);
-    return;
-  }
-
-  try {
-    const canvas = await html2canvas(contenedor, {
-      scale: 2,
-      useCORS: true,
-      backgroundColor: "#ffffff"
-    });
-
-    const dataUrl = canvas.toDataURL("image/png");
-    const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
-
-    setStatus("Enviando imagen al servidor...");
-
-    const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json","ngrok-skip-browser-warning": "true" },
-      body: JSON.stringify({
-        base64Imagen: base64,
-        cantidad,
-        envase
-      })
-    });
-
-    console.log("🟦 RES STATUS:", res.status);
-
-    if (!res.ok) {
-      const err = await res.json().catch(()=>({error:"Error desconocido"}));
-      setStatus("Error generando documento: " + (err.error || res.statusText), true);
+    const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
+    if (!cantidad || cantidad <= 0) {
+      setStatus("Cantidad inválida.", true);
       return;
     }
 
-    setStatus("Recibiendo documento...");
+    try {
+      const canvas = await html2canvas(contenedor, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      });
 
-    const respuesta = await res.json();
+      const dataUrl = canvas.toDataURL("image/png");
+      const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
 
-    console.log("📦 Respuesta del backend:", respuesta);
+      setStatus("Enviando imagen al servidor...");
 
-    if (!respuesta.ok || !respuesta.archivo) {
-       setStatus("Error: No se recibió nombre del archivo generado.", true);
-       return; 
+      const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json","ngrok-skip-browser-warning": "true" },
+        body: JSON.stringify({
+          base64Imagen: base64,
+          cantidad,
+          envase
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(()=>({error:"Error desconocido"}));
+        setStatus("Error generando documento: " + (err.error || res.statusText), true);
+        return;
+      }
+
+      setStatus("Recibiendo documento...");
+
+      const respuesta = await res.json();
+      if (!respuesta.ok || !respuesta.archivo) {
+         setStatus("Error: No se recibió nombre del archivo generado.", true);
+         return; 
+      }
+
+      window.__ultimoArchivoGenerado = respuesta.archivo;
+      setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
+
+    } catch (err) {
+      console.error(err);
+      setStatus("Error generando documento. Revisa la consola.", true);
     }
+  });
 
-    window.__ultimoArchivoGenerado = respuesta.archivo;
-
-    setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
-
-  } catch (err) {
-    console.error(err);
-    setStatus("Error generando documento. Revisa la consola.", true);
-  }
-});
-
-});
 </script>
 
 </body>
