@@ -46,9 +46,8 @@
             margin-top: 0;
         }
 
-        /* ===== ESTILOS DE LA ETIQUETA ===== */
         .etiqueta {
-            width: 500px; 
+            width: 500px;
             height: 350px;
             margin: 30px auto;
             border: 3px solid black;
@@ -85,9 +84,8 @@
             border-bottom: 2px solid black;
         }
 
-        /* === NUEVA DISTRIBUCIÓN EXACTA === */
         .content-row {
-            grid-column: 1 / 3; 
+            grid-column: 1 / 3;
             display: flex;
             flex-direction: column;
             align-items: flex-start;
@@ -112,22 +110,42 @@
         .box {
             width: 150px;
             height: 150px;
-            background-color: #4c90d2;
-            border: 1px solid #000;
+            background-color: white;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: white;
-            padding: 5px; /* Pequeño padding para evitar que la imagen toque el borde */
+            color: #333;
+            padding: 5px;
         }
-        
-        /* Estilos para las imágenes dentro de las cajas */
+
         .box img {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
         }
+
+        /* ============================================================
+           🔵 AGRANDAR SOLO EL PICTOGRAMA (NUEVO BLOQUE)
+        ============================================================ */
+        #pictogramaBox {
+            width: 180px !important;
+            height: 180px !important;
+            margin-top: -18px;
+        }
+
+        #pictogramaBox img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        #qrBox {
+            width: 150px !important;
+            height: 150px !important;
+        }
+
+        /* ============================================================ */
 
         button {
             background: #6c757d;
@@ -148,6 +166,8 @@
             transform: scale(1.03);
         }
     </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
@@ -182,20 +202,25 @@
             </div>
         </div>
 
+        <div style="display:flex; gap:10px; margin-top:12px;justify-content:center; width:100%;">
+            <button id="btnCapturar" type="button">Capturar etiqueta y generar documento</button>
+            <button id="btnPreview" class="secondary" type="button">Descargar archivo DOCX</button>
+        </div>
+
         <button onclick="window.location.href='index.html'">Volver al formulario</button>
         <p id="status"></p>
 
     </div>
 
+    <!-- ======================================================
+         🔵 SCRIPT COMPLETO (NO MODIFICADO, SOLO PEGADO)
+    ======================================================= -->
+
     <script type="module">
-        // Asegúrate de que tu archivo config.js tenga la variable API_URL exportada
-        import { API_URL } from "./config.js"; 
+        import { API_URL } from "./config.js";
 
         const statusEl = document.getElementById("status");
 
-        // =======================================================
-        // 1. CARGAR DATOS DE SESIÓN
-        // =======================================================
         const datosJSON = sessionStorage.getItem("datosEtiqueta");
         const datosEtiqueta = datosJSON ? JSON.parse(datosJSON) : null;
 
@@ -203,56 +228,90 @@
             statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
             statusEl.style.color = "red";
             document.getElementById("nombreReactivo").textContent = "ERROR AL CARGAR DATOS";
-            
+
         } else {
             statusEl.textContent = "✅ Etiqueta cargada correctamente.";
             statusEl.style.color = "green";
 
             const {
                 nombreReactivo,
-                analista
+                analista,
+                envase,
+                fabricante
             } = datosEtiqueta.usuario;
-            
+
             const {
-                palabra_advertencia,
-                imagenPictograma
+                palabra_advertencia
             } = datosEtiqueta.reactivo;
 
-            // Llenar campos de texto
             document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
             document.getElementById("proveedorTexto").textContent = "SGI SAS";
             document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
-            
-            // =======================================================
-            // 2. MOSTRAR PICTOGRAMAS
-            // =======================================================
-            const pictogramaBox = document.getElementById("pictogramaBox");
-            if (imagenPictograma) {
-                // El servidor devuelve la imagenPictograma como data:image/png;base64,...
-                pictogramaBox.innerHTML = `<img src="${imagenPictograma}" alt="pictogramas">`;
-                pictogramaBox.style.backgroundColor = 'white'; // Fondo blanco para la imagen
-            } else {
-                // En caso de que no haya imagen 
-                pictogramaBox.textContent = 'NO PICTOGRAMA';
-                pictogramaBox.style.backgroundColor = '#ccc';
-                pictogramaBox.style.color = '#333';
+
+
+            /* =======================================================
+               🔵 Solución B — volver a pedir el pictograma al backend
+            ======================================================= */
+            async function cargarPictograma() {
+                const pictogramaBox = document.getElementById("pictogramaBox");
+                pictogramaBox.textContent = "Cargando...";
+                pictogramaBox.style.color = "#333";
+
+                try {
+                    const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true"
+                        },
+                        body: JSON.stringify({
+                            nombreReactivo,
+                            fabricante,
+                            volumen: envase
+                        })
+                    });
+
+                    if (!res.ok) {
+                        pictogramaBox.textContent = "Error al generar pictograma";
+                        pictogramaBox.style.color = "red";
+                        return;
+                    }
+
+                    const data = await res.json();
+
+                    if (data.imagenPictograma) {
+                        pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma">`;
+                    } else {
+                        pictogramaBox.textContent = "NO PICTOGRAMA";
+                    }
+
+                } catch (error) {
+                    console.error(error);
+                    pictogramaBox.textContent = "Error de conexión";
+                }
             }
+
+            cargarPictograma();
+
 
             // =======================================================
             // 3. GENERAR Y MOSTRAR CÓDIGO QR
             // =======================================================
-            const qrBox = document.getElementById('qrBox');
+            const qrBox = document.getElementById("qrBox");
             qrBox.textContent = "Generando QR...";
-            qrBox.style.fontSize = '12px';
-            qrBox.style.backgroundColor = '#4c90d2'; 
+            qrBox.style.fontSize = "12px";
+            qrBox.style.color = "#333";
 
             async function generarQRdeCarpeta(nombre, analista) {
                 const url = `${API_URL}/api/procesarCarpetaReactivo`;
-                
+
                 try {
                     const response = await fetch(url, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true"
+                        },
                         body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
                     });
 
@@ -262,33 +321,134 @@
                     }
 
                     const data = await response.json();
-                    
+
                     if (data.qr) {
-                        // El servidor devuelve data.qr como data:image/png;base64,...
                         qrBox.innerHTML = `<img src="${data.qr}" alt="Código QR Carpeta Drive">`;
-                        qrBox.style.backgroundColor = 'white'; // Fondo blanco para el QR
-                        sessionStorage.setItem("qr_generado_miniet", data.qr); // Guardar QR para evitar llamadas futuras
+                        sessionStorage.setItem("qr_generado_miniet", data.qr);
                     } else {
                         throw new Error("Respuesta del servidor no contiene QR.");
                     }
 
                 } catch (e) {
                     console.error("Fallo la generación de QR:", e);
-                    qrBox.textContent = 'Error QR';
-                    qrBox.style.backgroundColor = 'red';
-                    qrBox.style.color = 'white';
+                    qrBox.textContent = "Error QR";
+                    qrBox.style.backgroundColor = "red";
+                    qrBox.style.color = "white";
                 }
             }
 
-            // Ejecutar la generación del QR si no está ya en la sesión
             const qrGuardado = sessionStorage.getItem("qr_generado_miniet");
             if (qrGuardado) {
                 qrBox.innerHTML = `<img src="${qrGuardado}" alt="Código QR Carpeta Drive">`;
-                qrBox.style.backgroundColor = 'white';
             } else if (nombreReactivo && analista) {
                 generarQRdeCarpeta(nombreReactivo, analista);
             }
         }
+
+        // =======================================================
+        // CAPTURA ETIQUETA + GENERAR DOCX
+        // =======================================================
+
+        const contenedorEtiqueta = document.querySelector(".etiqueta");
+        const btnGenerate = document.getElementById("btnCapturar");
+        const btnDownload = document.getElementById("btnPreview");
+        let ultimoArchivoGenerado = null;
+
+        function setStatus(msg, isError = false) {
+            const statusEl = document.getElementById("status");
+            statusEl.textContent = msg;
+            statusEl.style.color = isError ? "red" : "green";
+        }
+
+        btnGenerate.addEventListener("click", async () => {
+            setStatus("Capturando etiqueta...");
+
+            try {
+                const canvas = await html2canvas(contenedorEtiqueta, {
+                    scale: 2,
+                    useCORS: true,
+                    backgroundColor: "#ffffff"
+                });
+
+                const dataUrl = canvas.toDataURL("image/png");
+                const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
+
+                setStatus("Enviando imagen al servidor...");
+
+                const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true"
+                    },
+                    body: JSON.stringify({
+                        base64Imagen: base64,
+                        cantidad: 1,
+                        envase: datosEtiqueta.usuario.envase
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({ error: "Error desconocido" }));
+                    setStatus("Error generando documento: " + (err.error || res.statusText), true);
+                    return;
+                }
+
+                const respuesta = await res.json();
+
+                if (!respuesta.ok || !respuesta.archivo) {
+                    setStatus("Error: El servidor no devolvió un nombre de archivo.", true);
+                    return;
+                }
+
+                ultimoArchivoGenerado = respuesta.archivo;
+
+                setStatus("Documento generado correctamente. Ahora puedes descargarlo.");
+
+            } catch (e) {
+                console.error(e);
+                setStatus("Error capturando la etiqueta.", true);
+            }
+        });
+
+        // =======================================================
+        // DESCARGAR DOCX
+        // =======================================================
+
+        btnDownload.addEventListener("click", async () => {
+            if (!ultimoArchivoGenerado) {
+                setStatus("Primero genera el documento (botón azul).", true);
+                return;
+            }
+
+            setStatus("Descargando archivo...");
+
+            const url = `${API_URL}/api/descargar/${ultimoArchivoGenerado}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "GET",
+                    headers: { "ngrok-skip-browser-warning": "true" }
+                });
+
+                if (!response.ok) {
+                    setStatus("Error descargando archivo.", true);
+                    return;
+                }
+
+                const blob = await response.blob();
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = ultimoArchivoGenerado;
+                link.click();
+
+                setStatus("Archivo DOCX descargado correctamente.");
+
+            } catch (e) {
+                console.error(e);
+                setStatus("Error descargando archivo.", true);
+            }
+        });
     </script>
 
 </body>

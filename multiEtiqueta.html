@@ -151,6 +151,68 @@ function setStatus(message, isError = false) {
 /* =====================================================
    Plantilla HTML original de etiqueta (igual al index)
 ===================================================== */
+
+function crearPlantillaMiniEtiqueta() {
+    const div = document.createElement("div");
+
+    // Estilos del contenedor principal (igual a miniet.html .etiqueta)
+    div.className = "etiqueta";
+    div.style.width = "500px";
+    div.style.height = "350px";
+    div.style.margin = "30px auto"; // Margen para visualización en pantalla
+    div.style.border = "3px solid black";
+    div.style.padding = "15px";
+    div.style.boxSizing = "border-box";
+    div.style.backgroundColor = "white";
+    div.style.fontFamily = "Arial, sans-serif";
+    div.style.position = "relative"; // Para posicionamiento seguro
+
+    // Inyectamos el HTML con estilos en línea para asegurar que html2canvas los capture bien
+    div.innerHTML = `
+        <div class="etiqueta-grid" style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 10px 0; height: 100%; align-items: start;">
+
+            <div class="header-left" style="grid-column: 1 / 2; text-align: left; font-size: 10px; font-weight: bold; padding-bottom: 10px; border-bottom: 2px solid black;">
+                ADVERTENCIA: <span class="advertencia">ATENCIÓN</span>
+            </div>
+
+            <div class="header-right" style="grid-column: 2 / 3; text-align: right; font-size: 10px; font-weight: bold; padding-bottom: 10px; border-bottom: 2px solid black;">
+                Proveedor: <span class="proveedor">SGI SAS</span>
+            </div>
+
+            <div class="content-row" style="grid-column: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; padding-top: 10px; width: 100%;">
+                
+                <div class="reactivo-name nombreReactivo" style="font-size: 26px; font-weight: bold; margin-bottom: 15px; color: #000; word-break: break-word;">
+                    REACTIVO
+                </div>
+
+                <div class="cajas-row" style="width: 100%; display: flex; justify-content: center; gap: 40px; margin-top: 5px;">
+                    
+                    <div class="box zonaPictogramas" style="width: 180px; height: 180px; margin-top: -18px; display: flex; align-items: center; justify-content: center;">
+                        PICTOGRAMA
+                    </div>
+
+                    <div class="box" style="width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;">
+                        <img class="qr" src="" alt="QR" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div style="display: none;">
+            <span class="preparacion"></span>
+            <span class="analista"></span>
+            <span class="fechaPreparado"></span>
+            <span class="fechaVencimiento"></span>
+            <div class="frasesHP"></div>
+        </div>
+    `;
+
+    return div;
+}
+
+
 function crearPlantillaEtiqueta() {
 
   const div = document.createElement("div");
@@ -326,7 +388,7 @@ async function cargarEtiquetas() {
     // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
     for (let c = 0; c < copias; c++) {
 
-      const envaseMini = ["30 mL", "40 mL", "60 mL"];
+      const envaseMini = ["30","30 mL","40", "40 mL","60", "60 mL"];
 
       let et;
       if (envaseMini.includes(item.envase)) {
