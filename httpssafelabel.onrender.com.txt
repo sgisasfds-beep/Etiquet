@@ -1,0 +1,2 @@
+https://safelabel.onrender.com
+ngrok http 4000
