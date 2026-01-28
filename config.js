@@ -1,5 +1,5 @@
 // URL del backend expuesto con ngrok
-const API_NGROK = "https://5bc9558d3db5.ngrok-free.app";
+const API_NGROK = "https://3a87ba35b557.ngrok-free.app";
 
 // URL del backend local (solo para desarrollo en tu PC)
 const API_LOCAL = "http://localhost:4000";
