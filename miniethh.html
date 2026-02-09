@@ -60,14 +60,14 @@
         .etiqueta-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto auto auto;
+            grid-template-rows: auto auto;
             gap: 10px 0;
             height: 100%;
             align-items: start;
         }
 
         .header-left {
-            grid-column: 1 / 3;
+            grid-column: 1 / 2;
             text-align: left;
             font-size: 10px;
             font-weight: bold;
@@ -76,14 +76,19 @@
         }
 
         .header-right {
-            display: none;
+            grid-column: 2 / 3;
+            text-align: right;
+            font-size: 10px;
+            font-weight: bold;
+            padding-bottom: 10px;
+            border-bottom: 2px solid black;
         }
 
         .content-row {
             grid-column: 1 / 3;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             padding-top: 10px;
         }
 
@@ -142,20 +147,6 @@
 
         /* ============================================================ */
 
-        .footer-line {
-            grid-column: 1 / 3;
-            border-top: 2px solid black;
-            margin-top: 10px;
-        }
-
-        .footer-proveedor {
-            grid-column: 1 / 3;
-            font-size: 10px;
-            font-weight: bold;
-            text-align: center;
-            padding-top: 4px;
-        }
-
         button {
             background: #6c757d;
             padding: 14px 26px;
@@ -195,7 +186,9 @@
                     ADVERTENCIA: <span id="advertenciaTexto">ATENCION</span>
                 </div>
 
-                <div class="header-right"></div>
+                <div class="header-right">
+                    Proveedor: <span id="proveedorTexto">SGI SAS</span>
+                </div>
 
                 <div class="content-row">
                     <div class="reactivo-name" id="nombreReactivo">REACTIVO</div>
@@ -204,12 +197,6 @@
                         <div class="box" id="pictogramaBox">PICTOGRAMA</div>
                         <div class="box" id="qrBox">CÓDIGO QR</div>
                     </div>
-                </div>
-
-                <div class="footer-line"></div>
-
-                <div class="footer-proveedor">
-                    Proveedor: <span id="proveedorTexto">SGI SAS Cra. 32B #22B-29 TEL: 3142742383</span>
                 </div>
 
             </div>
@@ -264,10 +251,11 @@
             // =======================================================
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
+                // Solo ponemos "Cargando..." si está vacío, para evitar parpadeo feo al volver
                 if (!pictogramaBox.innerHTML.includes('img')) {
                      pictogramaBox.textContent = "Cargando...";
                 }
-
+               
                 try {
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
@@ -290,6 +278,7 @@
                     const data = await res.json();
 
                     if (data.imagenPictograma) {
+                        // Forzamos repintado de imagen
                         pictogramaBox.innerHTML = "";
                         setTimeout(() => {
                             pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma">`;
@@ -332,7 +321,7 @@
                     if (data.qr) {
                         sessionStorage.setItem("qr_generado_miniet", data.qr);
                         pintarQR(data.qr);
-                    }
+                    } 
 
                 } catch (e) {
                     console.error("Fallo la generación de QR:", e);
@@ -343,7 +332,8 @@
             }
 
             function pintarQR(qrUrl) {
-                qrBox.innerHTML = "";
+                // Truco para repintar imagen en cache
+                qrBox.innerHTML = ""; 
                 setTimeout(() => {
                     qrBox.innerHTML = `<img src="${qrUrl}" alt="Código QR Carpeta Drive">`;
                 }, 50);
@@ -363,9 +353,11 @@
             // 🔥 SOLUCIÓN AL PROBLEMA DE "ATRÁS" (PAGESHOW EVENT)
             // ===================================================================
             window.addEventListener("pageshow", (event) => {
+                // Si la página se muestra desde la caché (botón atrás)
                 if (event.persisted) {
                     console.log("♻️ Restaurando imágenes tras volver...");
-
+                    
+                    // Repintar Pictograma si existe en memoria, si no, se recarga solo
                     const boxPic = document.getElementById("pictogramaBox");
                     const imgPic = boxPic.querySelector('img');
                     if (imgPic) {
@@ -374,6 +366,7 @@
                         setTimeout(() => imgPic.src = src, 10);
                     }
 
+                    // Repintar QR
                     const qrG = sessionStorage.getItem("qr_generado_miniet");
                     if (qrG) {
                         pintarQR(qrG);
