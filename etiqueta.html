@@ -121,7 +121,9 @@
   <div id="contenedorEtiqueta">
     <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
       <div style="grid-column: 1;">
-        <strong>Proveedor:</strong> SGI SAS Cra. 32B #22B - 29  TEL: 3142742383
+        <div id="proveedorInfo" style="font-size:14px;">
+            <strong>Proveedor:</strong> Cargando...
+        </div>
       </div>
       <div style="grid-column: 2;"></div>
       <div style="grid-column: 3; text-align:center;">
@@ -219,6 +221,34 @@
     envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
 
     const { preparación, palabra_advertencia, frases_h, frases_p, imagenPictograma } = datos.reactivo || {};
+
+
+    const proveedorEl = document.getElementById("proveedorInfo");
+
+    if (datos.usuario.modoReactivosPuros) {
+
+        const proveedor = datos.reactivo.proveedor || "";
+        const direccion = datos.reactivo.direccion || "";
+        const telefono = datos.reactivo.telefono || "";
+
+        let textoProveedor = `Proveedor: ${proveedor} ${direccion} Tel: ${telefono}`;
+        proveedorEl.textContent = textoProveedor;
+
+        // Ajustar tamaño de fuente según longitud
+        if (textoProveedor.length > 90) {
+            proveedorEl.style.fontSize = "11px";
+        } else if (textoProveedor.length > 60) {
+            proveedorEl.style.fontSize = "12px";
+        } else {
+            proveedorEl.style.fontSize = "14px";
+        }
+    } else {
+
+    // SOLUCIONES NORMALES → proveedor fijo
+    proveedorEl.textContent = "Proveedor: SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+    }
+
+
 
     // 1. Asignar Textos
     document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";

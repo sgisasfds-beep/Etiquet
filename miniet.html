@@ -251,7 +251,33 @@
             const palabra_advertencia = datosEtiqueta.reactivo.palabra_advertencia;
 
             document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
-            document.getElementById("proveedorTexto").textContent = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+            const proveedorSpan = document.getElementById("proveedorTexto");
+
+            if (datosEtiqueta.usuario.modoReactivosPuros) {
+
+                const proveedor = datosEtiqueta.reactivo.proveedor || "";
+                const direccion = datosEtiqueta.reactivo.direccion || "";
+                const telefono = datosEtiqueta.reactivo.telefono || "";
+
+                let textoProveedor = `${proveedor} ${direccion} Tel: ${telefono}`.trim();
+
+                proveedorSpan.textContent = textoProveedor;
+
+                // Ajustar tamaño si es muy largo (igual que etiqueta grande)
+                if (textoProveedor.length > 90) {
+                    proveedorSpan.style.fontSize = "9px";
+                } else if (textoProveedor.length > 70) {
+                    proveedorSpan.style.fontSize = "10px";
+                } else {
+                    proveedorSpan.style.fontSize = "11px";
+                }
+
+            } else {
+
+                proveedorSpan.textContent =
+                "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+            }
+
             document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
 
             async function cargarPictograma() {

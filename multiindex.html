@@ -214,6 +214,12 @@
             card.innerHTML = `
                 <h3 style="margin-top:0;">Etiqueta #${i + 1}</h3>
 
+                <label style="display:flex;align-items:center; gap:8px; margin-bottom:8px;">
+                    <input type="checkbox" class="fld soloPuros">
+                    Solo Reactivos Puros
+                </label>
+
+
                 <label>Nombre del reactivo:</label>
                 <div style="position:relative;">
                     <input id="${idInput}" class="fld nombreReactivo" autocomplete="off">
@@ -303,6 +309,10 @@
             const lista = card.querySelector(`#${idLista}`);
             // ❗ NUEVO: REFERENCIA AL LABEL DINÁMICO ❗
             const labelFabricante = card.querySelector(`#${idLabelFabricante}`); 
+
+            const soloPurosCheckbox = card.querySelector(".soloPuros");
+            let listaReactivosLocal = [];
+
             
             /**
              * ❗ NUEVO: FUNCIÓN LOCAL PARA ACTUALIZAR EL LABEL ❗
@@ -312,6 +322,38 @@
                     labelFabricante.textContent = `Seleccione el fabricante para "${codigo}":`;
                 }
             }
+
+            async function cargarReactivosLocal() {
+                try {
+                    const endpoint = soloPurosCheckbox.checked
+                        ? "/api/listaReactivosPuros"
+                        : "/api/listaReactivos";
+
+                    const res = await fetch(`${API_URL}${endpoint}`, {
+                        headers: { "ngrok-skip-browser-warning": "true" }
+                    });
+
+                    listaReactivosLocal = await res.json();
+                } catch (err) {
+                    console.error("Error cargando reactivos locales:", err);
+                }
+            }
+
+            cargarReactivosLocal();
+
+            soloPurosCheckbox.addEventListener("change", async () => {
+            inputReactivo.value = "";
+            lista.innerHTML = "";
+            lista.style.display = "none";
+            card.dataset.codigoReactivo = null;
+            actualizarLabelFabricante("código");
+
+            await cargarReactivosLocal();
+        });
+
+
+
+
 
 
             /* ============================  
@@ -331,7 +373,7 @@
                 }
 
                 // ❗ CAMBIO: FILTRAR USANDO LA PROPIEDAD 'nombre' del objeto reactivo ❗
-                const filtrados = listaReactivosGlobal.filter(r =>
+                const filtrados = listaReactivosLocal.filter(r =>
                     r.nombre.toLowerCase().includes(texto)
                 );
 
@@ -422,6 +464,7 @@
                     fabricante: c.querySelector(".fabricante").value.trim(),
                     envase: c.querySelector(".envase").value.trim(),
                     incluirFechas: c.querySelector(".incluirFechas").checked,
+                    soloPuros: c.querySelector(".soloPuros").checked,
                     copias: parseInt(c.querySelector(".copias").value || "1")
                 });
             }
