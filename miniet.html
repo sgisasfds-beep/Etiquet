@@ -291,31 +291,11 @@
 
             // --- FUNCIONES DE CARGA DE IMÁGENES ---
 
-            // --- UBICACIÓN: Reemplaza la función completa en la línea 214 ---
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
                 pictogramaBox.textContent = "Cargando...";
 
                 try {
-                    // Si ya identificamos el nombre arriba, lo cargamos directamente
-                    if (pictogramaNombre) {
-                       // Aseguramos que tenga la extensión .png
-                        const archivo = pictogramaNombre.toLowerCase().endsWith('.png') ? pictogramaNombre : `${pictogramaNombre}.png`;
-                        const urlDirecta = `${API_URL}/api/pictograma/${archivo}`;
-            
-                        const resDirecta = await fetch(urlDirecta);
-                        if (resDirecta.ok) {
-                            const blob = await resDirecta.blob();
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                                pictogramaBox.innerHTML = `<img src="${reader.result}" alt="pictograma" crossorigin="anonymous">`;
-                            };
-                            reader.readAsDataURL(blob);
-                            return; // Finaliza con éxito
-                        }
-                    }
-
-                    // Si no hay nombre previo, hace la petición normal al servidor (respaldo)
                     const payload = {
                         nombreReactivo: nombreParaBusqueda,
                         fabricante: fabricanteParaBusqueda,
@@ -332,19 +312,26 @@
                         body: JSON.stringify(payload)
                     });
 
-                    if (!res.ok) throw new Error("Error en respuesta del servidor");
+                    if (!res.ok) {
+                        const errorData = await res.json().catch(() => ({}));
+                        throw new Error(errorData.error || "Error en respuesta del servidor");
+                    }
 
                     const data = await res.json();
+
                     if (data.imagenPictograma) {
-                        pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
+                        pictogramaBox.innerHTML =
+                            `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
                     } else {
                         pictogramaBox.textContent = "NO PICTOGRAMA";
                     }
+
                 } catch (error) {
                     console.error("🚨 Fallo cargarPictograma:", error);
                     pictogramaBox.textContent = "Error: " + error.message;
                 }
             }
+
 
             
             async function generarQRdeCarpeta() {
