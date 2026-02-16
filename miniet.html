@@ -319,7 +319,8 @@
                     const payload = {
                         nombreReactivo: nombreParaBusqueda,
                         fabricante: fabricanteParaBusqueda,
-                        volumen: envaseParaBusqueda
+                        volumen: envaseParaBusqueda,
+                        modoReactivosPuros: datosEtiqueta.usuario.modoReactivosPuros
                     };
 
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
