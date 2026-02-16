@@ -418,13 +418,6 @@ async function cargarEtiquetas() {
     console.log("INFO BACKEND:", info);
 
 
-    let textoProveedor = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
-
-    if (info.proveedor) {
-        textoProveedor = `Proveedor: ${info.proveedor} ${info.direccion || ""} Tel: ${info.telefono || ""}`.trim();
-    }
-
-
     // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
     // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
     let qrBase64 = "";
@@ -476,15 +469,26 @@ async function cargarEtiquetas() {
       // 🔥 PROVEEDOR DINÁMICO REAL POR ETIQUETA
       // =======================================
 
-      let textoProveedor = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
-
-      
-
-      // Insertar proveedor en la etiqueta
       const proveedorSpan = et.querySelector(".proveedor");
-      if (proveedorSpan) {
-        proveedorSpan.textContent = textoProveedor;
+
+      if (item.soloPuros) {
+
+          const fabricante = info.proveedor || "";
+          const direccion = info.direccion || "";
+          const telefono = info.telefono || "";
+
+          let infoCompleta = fabricante;
+
+          if (direccion) infoCompleta += " - " + direccion;
+          if (telefono) infoCompleta += " - Tel: " + telefono;
+
+          proveedorSpan.textContent = infoCompleta || "Proveedor no definido";
+
+      } else {
+
+          proveedorSpan.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
       }
+
 
 
       let htmlHP = "";
