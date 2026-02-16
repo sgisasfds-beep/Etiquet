@@ -409,10 +409,18 @@ async function cargarEtiquetas() {
       body: JSON.stringify({
         nombreReactivo: item.nombreReactivo,
         fabricante: item.fabricante,
-        volumen: item.envase
+        volumen: item.envase,
+        modoReactivosPuros: item.soloPuros
       })
     });
     const info = await resVisual.json();
+
+    let textoProveedor = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+
+    if (info.proveedor) {
+        textoProveedor = `Proveedor: ${info.proveedor} ${info.direccion || ""} Tel: ${info.telefono || ""}`.trim();
+    }
+
 
     // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
     // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
@@ -465,34 +473,7 @@ async function cargarEtiquetas() {
 
       let textoProveedor = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
 
-      if (item.soloPuros) {
-        try {
-            const resProveedor = await fetch(`${API_URL}/api/generarEtiqueta`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "ngrok-skip-browser-warning": "true"
-                },
-                body: JSON.stringify({
-                    nombreReactivo: item.nombreReactivo,
-                    fabricante: item.fabricante,
-                    volumen: item.envase,
-                    modoReactivosPuros: true
-                })
-            });
-
-            const datosProveedor = await resProveedor.json();
-
-            const proveedor = datosProveedor.proveedor || "";
-            const direccion = datosProveedor.direccion || "";
-            const telefono = datosProveedor.telefono || "";
-
-            textoProveedor = `Proveedor: ${proveedor} ${direccion} Tel: ${telefono}`.trim();
-
-        } catch (err) {
-            console.error("Error obteniendo proveedor dinámico:", err);
-        }
-      }
+      
 
       // Insertar proveedor en la etiqueta
       const proveedorSpan = et.querySelector(".proveedor");
