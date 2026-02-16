@@ -473,7 +473,7 @@ async function cargarEtiquetas() {
 
       if (item.soloPuros) {
 
-          const fabricante = info.proveedor || "";
+          const fabricante = info.fabricanteFiltrado || "";
           const direccion = info.direccion || "";
           const telefono = info.telefono || "";
 
@@ -483,6 +483,17 @@ async function cargarEtiquetas() {
           if (telefono) infoCompleta += " - Tel: " + telefono;
 
           proveedorSpan.textContent = infoCompleta || "Proveedor no definido";
+
+          // Ajuste dinámico de tamaño para mantener una sola línea
+          proveedorSpan.style.whiteSpace = "nowrap";
+
+          let fontSize = 12; // tamaño inicial
+          proveedorSpan.style.fontSize = fontSize + "px";
+
+          while (proveedorSpan.scrollWidth > proveedorSpan.offsetWidth && fontSize > 7) {
+              fontSize--;
+              proveedorSpan.style.fontSize = fontSize + "px";
+          }
 
       } else {
 
