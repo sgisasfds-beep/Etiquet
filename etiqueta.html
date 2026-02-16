@@ -122,7 +122,7 @@
     <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
       <div style="grid-column: 1;">
         <div id="proveedorInfo" style="font-size:14px;">
-            <strong>Proveedor:</strong> Cargando...
+            <strong>Proveedor:</strong> <span id="displayFabricante"></span></p>
         </div>
       </div>
       <div style="grid-column: 2;"></div>
@@ -223,29 +223,22 @@
     const { preparación, palabra_advertencia, frases_h, frases_p, imagenPictograma } = datos.reactivo || {};
 
 
-    const proveedorEl = document.getElementById("proveedorInfo");
-
+    
+    const proveedorEl = document.getElementById("displayFabricante"); 
     if (datos.usuario.modoReactivosPuros) {
-
-        const proveedor = datos.reactivo.proveedor || "";
+        // Si es reactivo puro, usamos lo que el usuario escribió en el campo "fabricante"
+        const fabricanteUsuario = datos.usuario.fabricante || "No especificado";
         const direccion = datos.reactivo.direccion || "";
         const telefono = datos.reactivo.telefono || "";
 
-        let textoProveedor = `Proveedor: ${proveedor} ${direccion} Tel: ${telefono}`;
+        let textoProveedor = `Proveedor: ${fabricanteUsuario} ${direccion} ${telefono}`;
+        proveedorEl.textContent = fabricanteUsuario; // Aquí mostramos el nombre del fabricante
+    
         proveedorEl.textContent = textoProveedor;
 
-        // Ajustar tamaño de fuente según longitud
-        if (textoProveedor.length > 90) {
-            proveedorEl.style.fontSize = "11px";
-        } else if (textoProveedor.length > 60) {
-            proveedorEl.style.fontSize = "12px";
-        } else {
-            proveedorEl.style.fontSize = "14px";
-        }
     } else {
-
-    // SOLUCIONES NORMALES → proveedor fijo
-    proveedorEl.textContent = "Proveedor: SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+        // SOLUCIONES PREPARADAS → Proveedor fijo de la empresa
+        proveedorEl.textContent = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
     }
 
 
@@ -309,28 +302,39 @@
   }
 
   // Función auxiliar para el QR
-  async function generarQRdeCarpeta(nombre, analista) {
-    const url = `${API_URL}/api/procesarCarpetaReactivo`;
-    const qrElemento = document.getElementById('qrCarpetaDrive');
-    qrElemento.alt = "Generando QR...";
+  // Busca la función generarQRdeCarpeta (alrededor de la línea 275) y reemplázala:
+async function generarQRdeCarpeta(nombre, analista) {
+  const url = `${API_URL}/api/procesarCarpetaReactivo`;
+  const qrElemento = document.getElementById('qrCarpetaDrive');
+  
+  // Obtenemos los datos guardados para saber el modo y fabricante
+  const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
+  const { modoReactivosPuros, fabricante } = datos.usuario || {};
 
-    try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
-        body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
-      });
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
+      body: JSON.stringify({ 
+        nombreReactivo: nombre, 
+        usuarioAnalista: analista,
+        modoReactivosPuros: modoReactivosPuros, // <--- AHORA EL SERVIDOR SABRÁ DÓNDE BUSCAR
+        fabricante: fabricante 
+      })
+    });
 
-      if (!response.ok) return;
-
-      const data = await response.json();
-      // Asignar el QR una vez llegue
-      if (data.qr) qrElemento.src = data.qr;
-
-    } catch (e) {
-      console.error("Fallo el QR:", e);
+    if (!response.ok) {
+        console.error("Error en servidor al generar QR:", response.status);
+        return;
     }
+
+    const data = await response.json();
+    if (data.qr) qrElemento.src = data.qr;
+
+  } catch (e) {
+    console.error("Fallo la conexión para el QR:", e);
   }
+}
 
   // =======================================================
   // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
