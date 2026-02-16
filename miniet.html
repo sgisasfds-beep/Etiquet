@@ -283,36 +283,47 @@
             // --- FUNCIONES DE CARGA DE IMÁGENES ---
 
             async function cargarPictograma() {
-                const pictogramaBox = document.getElementById("pictogramaBox");
-                pictogramaBox.textContent = "Cargando...";
+            const pictogramaBox = document.getElementById("pictogramaBox");
+            pictogramaBox.textContent = "Cargando...";
 
-                try {
-                    const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "ngrok-skip-browser-warning": "true"
-                        },
-                        body: JSON.stringify({
-                            nombreReactivo: nombreParaBusqueda, // Usamos la variable procesada
-                            fabricante: fabricanteParaBusqueda, // Usamos la variable procesada
-                            volumen: envaseParaBusqueda
-                        })
-                    });
+            // --- DEPURACIÓN: Mira esto en la consola (F12) ---
+            const payload = {
+                nombreReactivo: nombreParaBusqueda,
+                fabricante: fabricanteParaBusqueda,
+                volumen: envaseParaBusqueda
+            };
+            console.log("🚀 Enviando a /api/generarEtiqueta:", payload);
+            // ------------------------------------------------
 
-                    if (!res.ok) throw new Error("Error en respuesta");
+            try {
+                const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "ngrok-skip-browser-warning": "true"
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-                    const data = await res.json();
-                    if (data.imagenPictograma) {
-                        pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
-                    } else {
-                        pictogramaBox.textContent = "NO PICTOGRAMA";
-                    }
-                } catch (error) {
-                    console.error(error);
-                    pictogramaBox.textContent = "Error Pictograma";
+                if (!res.ok) {
+                    // Intentamos leer el mensaje de error del servidor
+                    const errorData = await res.json().catch(() => ({}));
+                    console.error("❌ Error del servidor:", errorData);
+                    throw new Error(errorData.error || `Error servidor: ${res.status}`);
                 }
+
+                const data = await res.json();
+                if (data.imagenPictograma) {
+                    pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
+                } else {
+                    pictogramaBox.textContent = "NO PICTOGRAMA";
+                }
+            } catch (error) {
+                console.error("🚨 Fallo cargarPictograma:", error);
+                pictogramaBox.textContent = "Error: " + error.message;
+                pictogramaBox.style.fontSize = "10px"; // Para que quepa el mensaje de error
             }
+        }
 
             async function generarQRdeCarpeta() {
                 const qrBox = document.getElementById("qrBox");
