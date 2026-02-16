@@ -431,7 +431,9 @@ async function cargarEtiquetas() {
             headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
             body: JSON.stringify({
                 nombreReactivo: item.nombreReactivo,
-                usuarioAnalista: item.analista
+                usuarioAnalista: item.analista, 
+                fabricante: item.fabricante,
+                modoReactivosPuros: item.soloPuros
             })
         });
         const dataQR = await resQR.json();
