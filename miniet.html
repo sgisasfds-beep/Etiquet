@@ -228,13 +228,16 @@
         import { API_URL } from "./config.js";
 
         const statusEl = document.getElementById("status");
-
         const datosJSON = sessionStorage.getItem("datosEtiqueta");
         const datosEtiqueta = datosJSON ? JSON.parse(datosJSON) : null;
 
-        let nombreReactivo = "";
-        let analista = "";
         let ultimoArchivoGenerado = null;
+
+        // Variables que usaremos para las peticiones a la API
+        let nombreParaBusqueda = "";
+        let fabricanteParaBusqueda = "";
+        let analistaParaBusqueda = "";
+        let envaseParaBusqueda = "";
 
         if (!datosEtiqueta) {
             statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
@@ -244,47 +247,44 @@
             statusEl.textContent = "✅ Etiqueta cargada correctamente.";
             statusEl.style.color = "green";
 
-            nombreReactivo = datosEtiqueta.usuario.nombreReactivo;
-            analista = datosEtiqueta.usuario.analista;
-            const envase = datosEtiqueta.usuario.envase;
-            const fabricante = datosEtiqueta.usuario.fabricante;
-            const palabra_advertencia = datosEtiqueta.reactivo.palabra_advertencia;
+            // --- ASIGNACIÓN DE DATOS SEGÚN EL MODO ---
+            analistaParaBusqueda = datosEtiqueta.usuario.analista;
+            envaseParaBusqueda = datosEtiqueta.usuario.envase;
 
-            document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
             const proveedorSpan = document.getElementById("proveedorTexto");
+            const advertenciaSpan = document.getElementById("advertenciaTexto");
 
             if (datosEtiqueta.usuario.modoReactivosPuros) {
-
+               // MODO PURO: Priorizamos la info de la base de datos (objeto reactivo)
+                nombreParaBusqueda = datosEtiqueta.reactivo.nombre || datosEtiqueta.usuario.nombreReactivo;
+                fabricanteParaBusqueda = datosEtiqueta.reactivo.fabricante || datosEtiqueta.usuario.fabricante;
+            
+                // Construir texto de proveedor dinámico
                 const proveedor = datosEtiqueta.reactivo.proveedor || "";
                 const direccion = datosEtiqueta.reactivo.direccion || "";
                 const telefono = datosEtiqueta.reactivo.telefono || "";
-
                 let textoProveedor = `${proveedor} ${direccion} Tel: ${telefono}`.trim();
-
+            
                 proveedorSpan.textContent = textoProveedor;
-
-                // Ajustar tamaño si es muy largo (igual que etiqueta grande)
-                if (textoProveedor.length > 90) {
-                    proveedorSpan.style.fontSize = "9px";
-                } else if (textoProveedor.length > 70) {
-                    proveedorSpan.style.fontSize = "10px";
-                } else {
-                    proveedorSpan.style.fontSize = "11px";
-                }
+                // Ajuste de tamaño de fuente
+                proveedorSpan.style.fontSize = textoProveedor.length > 90 ? "9px" : (textoProveedor.length > 70 ? "10px" : "11px");
 
             } else {
-
-                proveedorSpan.textContent =
-                "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
+                 // MODO NORMAL: Usamos lo que el usuario escribió
+                nombreParaBusqueda = datosEtiqueta.usuario.nombreReactivo;
+                fabricanteParaBusqueda = datosEtiqueta.usuario.fabricante;
+                proveedorSpan.textContent = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
             }
 
-            document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
+            // Mostrar nombre y advertencia en la etiqueta
+            document.getElementById("nombreReactivo").textContent = nombreParaBusqueda.toUpperCase();
+            advertenciaSpan.textContent = (datosEtiqueta.reactivo.palabra_advertencia || "ATENCIÓN").toUpperCase();
+
+            // --- FUNCIONES DE CARGA DE IMÁGENES ---
 
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
-                if (!pictogramaBox.innerHTML.includes('img')) {
-                    pictogramaBox.textContent = "Cargando...";
-                }
+                pictogramaBox.textContent = "Cargando...";
 
                 try {
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
@@ -294,104 +294,74 @@
                             "ngrok-skip-browser-warning": "true"
                         },
                         body: JSON.stringify({
-                            nombreReactivo,
-                            fabricante,
-                            volumen: envase
+                            nombreReactivo: nombreParaBusqueda, // Usamos la variable procesada
+                            fabricante: fabricanteParaBusqueda, // Usamos la variable procesada
+                            volumen: envaseParaBusqueda
                         })
                     });
 
-                    if (!res.ok) {
-                        pictogramaBox.textContent = "Error al generar pictograma";
-                        return;
-                    }
+                    if (!res.ok) throw new Error("Error en respuesta");
 
                     const data = await res.json();
-
                     if (data.imagenPictograma) {
-                        pictogramaBox.innerHTML = "";
-                        setTimeout(() => {
-                            pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma">`;
-                        }, 50);
+                        pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
                     } else {
                         pictogramaBox.textContent = "NO PICTOGRAMA";
                     }
-
                 } catch (error) {
                     console.error(error);
-                    pictogramaBox.textContent = "Error de conexión";
+                    pictogramaBox.textContent = "Error Pictograma";
                 }
             }
 
-            const qrBox = document.getElementById("qrBox");
-
-            async function generarQRdeCarpeta(nombre, analista) {
-                if (!qrBox.innerHTML.includes('img')) {
-                    qrBox.textContent = "Generando QR...";
-                }
-                const url = `${API_URL}/api/procesarCarpetaReactivo`;
+            async function generarQRdeCarpeta() {
+                const qrBox = document.getElementById("qrBox");
+                qrBox.textContent = "Generando QR...";
 
                 try {
-                    const response = await fetch(url, {
+                    const response = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                             "ngrok-skip-browser-warning": "true"
                         },
-                        body: JSON.stringify({ nombreReactivo: nombre, usuarioAnalista: analista })
+                        body: JSON.stringify({ 
+                            nombreReactivo: nombreParaBusqueda, 
+                            usuarioAnalista: analistaParaBusqueda 
+                        })
                     });
 
                     if (!response.ok) throw new Error("Error servidor QR");
 
                     const data = await response.json();
-
                     if (data.qr) {
                         sessionStorage.setItem("qr_generado_miniet", data.qr);
                         pintarQR(data.qr);
                     }
-
                 } catch (e) {
-                    console.error("Fallo la generación de QR:", e);
+                    console.error(e);
                     qrBox.textContent = "Error QR";
-                    qrBox.style.backgroundColor = "red";
-                    qrBox.style.color = "white";
+                    qrBox.style.backgroundColor = "#fee";
                 }
             }
 
             function pintarQR(qrUrl) {
-                qrBox.innerHTML = "";
-                setTimeout(() => {
-                    qrBox.innerHTML = `<img src="${qrUrl}" alt="Código QR Carpeta Drive">`;
-                }, 50);
+                const qrBox = document.getElementById("qrBox");
+                qrBox.innerHTML = `<img src="${qrUrl}" alt="Código QR" crossorigin="anonymous">`;
             }
 
+        
             cargarPictograma();
-
+        
             const qrGuardado = sessionStorage.getItem("qr_generado_miniet");
             if (qrGuardado) {
                 pintarQR(qrGuardado);
-            } else if (nombreReactivo && analista) {
-                generarQRdeCarpeta(nombreReactivo, analista);
+            } else {
+                generarQRdeCarpeta();
             }
-
-            window.addEventListener("pageshow", (event) => {
-                if (event.persisted) {
-                    console.log("♻️ Restaurando imágenes tras volver...");
-
-                    const boxPic = document.getElementById("pictogramaBox");
-                    const imgPic = boxPic.querySelector('img');
-                    if (imgPic) {
-                        const src = imgPic.src;
-                        imgPic.src = "";
-                        setTimeout(() => imgPic.src = src, 10);
-                    }
-
-                    const qrG = sessionStorage.getItem("qr_generado_miniet");
-                    if (qrG) {
-                        pintarQR(qrG);
-                    }
-                }
-            });
         }
+
+        // --- LÓGICA DE CAPTURA Y DESCARGA ---
 
         const contenedorEtiqueta = document.querySelector(".etiqueta");
         const btnGenerate = document.getElementById("btnCapturar");
@@ -406,7 +376,7 @@
             setStatus("Capturando etiqueta...");
             try {
                 const canvas = await html2canvas(contenedorEtiqueta, {
-                    scale: 2,
+                    scale: 3, // Mejoramos calidad
                     useCORS: true,
                     backgroundColor: "#ffffff"
                 });
@@ -414,7 +384,7 @@
                 const dataUrl = canvas.toDataURL("image/png");
                 const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
 
-                setStatus("Enviando imagen al servidor...");
+                setStatus("Generando documento...");
 
                 const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
                     method: "POST",
@@ -425,63 +395,30 @@
                     body: JSON.stringify({
                         base64Imagen: base64,
                         cantidad: 1,
-                        envase: datosEtiqueta.usuario.envase
+                        envase: envaseParaBusqueda
                     })
                 });
 
-                if (!res.ok) {
-                    const err = await res.json().catch(() => ({ error: "Error desconocido" }));
-                    setStatus("Error generando documento: " + (err.error || res.statusText), true);
-                    return;
-                }
-
                 const respuesta = await res.json();
-                if (!respuesta.ok || !respuesta.archivo) {
-                    setStatus("Error: El servidor no devolvió un nombre de archivo.", true);
-                    return;
+                if (respuesta.ok) {
+                    ultimoArchivoGenerado = respuesta.archivo;
+                    setStatus("✅ Documento listo para descargar.");
+                } else {
+                    throw new Error(respuesta.error);
                 }
-
-                ultimoArchivoGenerado = respuesta.archivo;
-                setStatus("Documento generado correctamente. Ahora puedes descargarlo.");
-
             } catch (e) {
                 console.error(e);
-                setStatus("Error capturando la etiqueta.", true);
+                setStatus("❌ Error al generar: " + e.message, true);
             }
         });
 
         btnDownload.addEventListener("click", async () => {
             if (!ultimoArchivoGenerado) {
-                setStatus("Primero genera el documento (botón azul).", true);
+                setStatus("⚠️ Primero genera el documento.", true);
                 return;
             }
-
-            setStatus("Descargando archivo...");
-            const url = `${API_URL}/api/descargar/${ultimoArchivoGenerado}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: { "ngrok-skip-browser-warning": "true" }
-                });
-
-                if (!response.ok) {
-                    setStatus("Error descargando archivo.", true);
-                    return;
-                }
-
-                const blob = await response.blob();
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = ultimoArchivoGenerado;
-                link.click();
-                setStatus("Archivo DOCX descargado correctamente.");
-            } catch (e) {
-                console.error(e);
-                setStatus("Error descargando archivo.", true);
-            }
+            window.open(`${API_URL}/api/descargar/${ultimoArchivoGenerado}`, '_blank');
+            setStatus("Archivo enviado a descargas.");
         });
     </script>
-
-</body>
-</html>
+    
