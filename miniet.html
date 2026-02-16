@@ -238,6 +238,7 @@
         let fabricanteParaBusqueda = "";
         let analistaParaBusqueda = "";
         let envaseParaBusqueda = "";
+        let pictogramaNombre = null
 
         if (!datosEtiqueta) {
             statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
@@ -258,6 +259,14 @@
                // MODO PURO: Priorizamos la info de la base de datos (objeto reactivo)
                 nombreParaBusqueda = datosEtiqueta.reactivo.nombre || datosEtiqueta.usuario.nombreReactivo;
                 fabricanteParaBusqueda = datosEtiqueta.reactivo.fabricante || datosEtiqueta.usuario.fabricante;
+
+                const p = datosEtiqueta.reactivo.pictogramas;
+                if (Array.isArray(p) && p.length > 0) {
+                    pictogramaNombre = p[0]; // Es un array, tomamos el primer elemento
+                } else if (typeof p === 'string' && p.trim() !== "") {
+                    pictogramaNombre = p.split(',')[0].trim(); // Es un string, tomamos el texto completo
+                }
+    
             
                 // Construir texto de proveedor dinámico
                 const proveedor = datosEtiqueta.reactivo.proveedor || "";
@@ -282,49 +291,61 @@
 
             // --- FUNCIONES DE CARGA DE IMÁGENES ---
 
+            // --- UBICACIÓN: Reemplaza la función completa en la línea 214 ---
             async function cargarPictograma() {
-            const pictogramaBox = document.getElementById("pictogramaBox");
-            pictogramaBox.textContent = "Cargando...";
+                const pictogramaBox = document.getElementById("pictogramaBox");
+                pictogramaBox.textContent = "Cargando...";
 
-            // --- DEPURACIÓN: Mira esto en la consola (F12) ---
-            const payload = {
-                nombreReactivo: nombreParaBusqueda,
-                fabricante: fabricanteParaBusqueda,
-                volumen: envaseParaBusqueda
-            };
-            console.log("🚀 Enviando a /api/generarEtiqueta:", payload);
-            // ------------------------------------------------
+                try {
+                    // Si ya identificamos el nombre arriba, lo cargamos directamente
+                    if (pictogramaNombre) {
+                       // Aseguramos que tenga la extensión .png
+                        const archivo = pictogramaNombre.toLowerCase().endsWith('.png') ? pictogramaNombre : `${pictogramaNombre}.png`;
+                        const urlDirecta = `${API_URL}/api/pictograma/${archivo}`;
+            
+                        const resDirecta = await fetch(urlDirecta);
+                        if (resDirecta.ok) {
+                            const blob = await resDirecta.blob();
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                pictogramaBox.innerHTML = `<img src="${reader.result}" alt="pictograma" crossorigin="anonymous">`;
+                            };
+                            reader.readAsDataURL(blob);
+                            return; // Finaliza con éxito
+                        }
+                    }
 
-            try {
-                const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "ngrok-skip-browser-warning": "true"
-                    },
-                    body: JSON.stringify(payload)
-                });
+                    // Si no hay nombre previo, hace la petición normal al servidor (respaldo)
+                    const payload = {
+                        nombreReactivo: nombreParaBusqueda,
+                        fabricante: fabricanteParaBusqueda,
+                        volumen: envaseParaBusqueda
+                    };
 
-                if (!res.ok) {
-                    // Intentamos leer el mensaje de error del servidor
-                    const errorData = await res.json().catch(() => ({}));
-                    console.error("❌ Error del servidor:", errorData);
-                    throw new Error(errorData.error || `Error servidor: ${res.status}`);
+                    const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!res.ok) throw new Error("Error en respuesta del servidor");
+
+                    const data = await res.json();
+                    if (data.imagenPictograma) {
+                        pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
+                    } else {
+                        pictogramaBox.textContent = "NO PICTOGRAMA";
+                    }
+                } catch (error) {
+                    console.error("🚨 Fallo cargarPictograma:", error);
+                    pictogramaBox.textContent = "Error: " + error.message;
                 }
-
-                const data = await res.json();
-                if (data.imagenPictograma) {
-                    pictogramaBox.innerHTML = `<img src="${data.imagenPictograma}" alt="pictograma" crossorigin="anonymous">`;
-                } else {
-                    pictogramaBox.textContent = "NO PICTOGRAMA";
-                }
-            } catch (error) {
-                console.error("🚨 Fallo cargarPictograma:", error);
-                pictogramaBox.textContent = "Error: " + error.message;
-                pictogramaBox.style.fontSize = "10px"; // Para que quepa el mensaje de error
             }
-        }
 
+            
             async function generarQRdeCarpeta() {
                 const qrBox = document.getElementById("qrBox");
                 qrBox.textContent = "Generando QR...";
