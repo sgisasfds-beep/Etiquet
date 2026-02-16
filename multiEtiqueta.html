@@ -415,6 +415,9 @@ async function cargarEtiquetas() {
     });
     const info = await resVisual.json();
 
+    console.log("INFO BACKEND:", info);
+
+
     let textoProveedor = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
 
     if (info.proveedor) {
