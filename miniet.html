@@ -238,7 +238,7 @@
         let fabricanteParaBusqueda = "";
         let analistaParaBusqueda = "";
         let envaseParaBusqueda = "";
-        let pictogramaNombre = null
+        
 
         if (!datosEtiqueta) {
             statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
@@ -260,14 +260,8 @@
                 nombreParaBusqueda = datosEtiqueta.reactivo.nombre || datosEtiqueta.usuario.nombreReactivo;
                 fabricanteParaBusqueda = datosEtiqueta.reactivo.fabricante || datosEtiqueta.usuario.fabricante;
 
-                const p = datosEtiqueta.reactivo.pictogramas;
-                if (Array.isArray(p) && p.length > 0) {
-                    pictogramaNombre = p[0]; // Es un array, tomamos el primer elemento
-                } else if (typeof p === 'string' && p.trim() !== "") {
-                    pictogramaNombre = p.split(',')[0].trim(); // Es un string, tomamos el texto completo
-                }
-    
-            
+                
+                            
                 // Construir texto de proveedor dinámico
                 const proveedor = datosEtiqueta.reactivo.proveedor || "";
                 const direccion = datosEtiqueta.reactivo.direccion || "";
