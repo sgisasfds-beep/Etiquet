@@ -298,89 +298,40 @@ function crearPlantillaMiniEtiqueta() {
 function crearPlantillaEtiqueta() {
   const div = document.createElement("div");
   div.className = "etiqueta";
-  
-  // Agregamos box-sizing para que los 820px sean exactos
+
+  // Forzamos que el tamaño total incluya el padding y no se pase de 820px
   div.style.boxSizing = "border-box";
+  div.style.width = "820px";
+  div.style.overflow = "hidden"; // Evita que cualquier cosa sobresalga
 
   div.innerHTML = `
-    <div style="display:grid; 
-                grid-template-columns: 1fr 30px 35%; 
-                column-gap:0; 
-                width: 100%;">
+    <div style="display:grid;
+                grid-template-columns: 480px 20px 280px;
+                column-gap:0;
+                width: 100%;
+                box-sizing: border-box;">
 
-      <div style="grid-column:1; min-width: 0;">
-        <div style="display:flex; align-items:center; width:100%;">
-          <strong style="margin-right:6px; white-space:nowrap;">
-            Fabricante:
-          </strong>
+      <div style="grid-column:1; width: 480px; overflow: hidden;">
+        <div style="display:flex; align-items:center; width:100%; margin-bottom: 10px;">
+          <strong style="margin-right:6px; white-space:nowrap;">Fabricante:</strong>
           <div class="fabricante-wrapper" style="flex:1; overflow:hidden;">
-            <span class="fabricante-text"
-                  style="display:inline-block;
-                         white-space:nowrap;
-                         transform-origin:left center;">
-            </span>
+            <span class="fabricante-text" style="display:inline-block; white-space:nowrap; transform-origin:left center;"></span>
           </div>
         </div>
-      </div>
 
-      <div style="grid-column:3; text-align:center; min-width: 0;">
-        <strong>Pictogramas de<br>Peligro</strong>
-      </div>
+        <hr style="border:1px solid black; margin: 0 0 15px 0;">
 
-      <div style="grid-column:1; margin-top:14px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
+        <strong style="font-size:18px; display: block; margin-bottom: 10px;" class="nombreReactivo">NOMBRE</strong>
 
-      <div style="grid-column:1; margin-top:20px; min-width: 0;">
-        <strong style="font-size:17px;" class="nombreReactivo">NOMBRE</strong>
-        <br><br>
-        <p><strong>Preparación:</strong></p>
-        <p class="preparacion" style="word-break: break-word;">---</p>
-        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
-        <div class="frasesHP" style="font-size: 13px;"></div>
-      </div>
+        <p style="margin: 5px 0;"><strong>Preparación:</strong></p>
+        <p class="preparacion" style="word-break: break-word; font-size: 13px; margin-bottom: 10px;">---</p>
 
-      <div style="
-            grid-column:3;
-            text-align:center;
-            min-height:300px;
-            display:flex;
-            flex-direction:column;
-            align-items:center;
-            justify-content:flex-start;
-            min-width: 0; /* CRÍTICO: Evita que la columna crezca de más */
-          ">
+        <p style="margin: 5px 0;"><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+        <div class="frasesHP" style="font-size: 12px; line-height: 1.2;"></div>
 
-        <div class="zonaPictogramas"
-             style="
-                width:100%;
-                max-width:100%;
-                min-height:180px;
-                display:flex;
-                justify-content:center;
-                align-items:center;
-                overflow:hidden;
-             ">
-        </div>
+        <hr style="border:1px solid black; margin: 15px 0;">
 
-        <img class="qr"
-             src=""
-             style="
-                width:130px;
-                max-width:100%;
-                height:auto;
-                border:1px solid #ccc;
-                margin-top:10px;
-                object-fit:contain;
-             ">
-      </div>
-
-      <div style="grid-column:1; margin-top:20px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
-
-      <div style="grid-column:1; margin-top:20px; min-width: 0;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; column-gap:40px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; font-size: 13px;">
           <div>
             <strong>Fecha Preparado:</strong><br>
             <span class="fechaPreparado">DD/MM/YYYY</span>
@@ -390,9 +341,38 @@ function crearPlantillaEtiqueta() {
             <span class="fechaVencimiento">DD/MM/YYYY</span>
           </div>
         </div>
-        <div style="margin-top:18px;">
-          <strong>Preparado por:</strong><br>
-          <span class="analista">---</span>
+        <div style="margin-top:10px; font-size: 13px;">
+          <strong>Preparado por:</strong> <span class="analista">---</span>
+        </div>
+      </div>
+
+      <div style="grid-column:2;"></div>
+
+      <div style="grid-column:3;
+                  width: 280px;
+                  display:flex;
+                  flex-direction:column;
+                  align-items:center;
+                  justify-content: flex-start;
+                  overflow: hidden;">
+
+        <strong style="text-align:center; display:block; margin-bottom: 10px;">Pictogramas de Peligro</strong>
+
+        <div class="zonaPictogramas"
+             style="width: 280px;
+                    height: 200px;
+                    display:flex;
+                    justify-content:center;
+                    align-items:center;
+                    overflow:hidden;">
+          </div>
+
+        <div style="margin-top: 20px; text-align: center;">
+            <img class="qr" src=""
+                 style="width: 140px;
+                        height: 140px;
+                        object-fit: contain;
+                        border: 1px solid #eee;">
         </div>
       </div>
     </div>
