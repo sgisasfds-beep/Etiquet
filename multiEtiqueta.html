@@ -486,58 +486,59 @@ async function cargarEtiquetas() {
 
 
 
-           // =======================================
-            // 🔥 ASIGNACIÓN DE PROVEEDOR / FABRICANTE COMPLETO
-            // =======================================
+      // =======================================
+      // 🔥 ASIGNACIÓN DE PROVEEDOR / FABRICANTE COMPLETO
+      // =======================================
 
-            const proveedorNormal = et.querySelector(".proveedor");       // Para CrearPlantillaEtiqueta()
-            const fabricanteTextMini = et.querySelector(".fabricante-text"); // Para CrearPlantillaMiniEtiqueta()
-            const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
+      const proveedorNormal = et.querySelector(".proveedor");
+      const fabricanteTextMini = et.querySelector(".fabricante-text");
+      const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
 
-            // 1. Construir la cadena de texto con Dirección y Teléfono
-            let infoCompleta = "";
+      // 1. Lógica de decisión: ¿Es Puro O es Reenvasado?
+      const nombreUpper = (info.nombre || "").toUpperCase();
+      const esReenvasado = nombreUpper.includes("REENVASADO") || nombreUpper.includes("REENVASADA");
 
-            if (item.soloPuros) {
-                const fabricante = info.fabricanteFiltrado || "Fabricante no definido";
-                const direccion = info.direccion || "";
-                const telefono = info.telefono || "";
+      let infoCompleta = "";
 
-                infoCompleta = fabricante;
-                if (direccion) infoCompleta += " - " + direccion;
-                if (telefono) infoCompleta += " - Tel: " + telefono;
-            } else {
-                // Datos por defecto para mezclas/preparaciones
-                infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
-            }
+      // Si es puro O si el nombre indica que es reenvasado, usamos datos del proveedor
+      if (item.soloPuros || esReenvasado) {
+          const fabricante = info.fabricanteFiltrado || "Fabricante no definido";
+          const direccion = info.direccion || "";
+          const telefono = info.telefono || "";
 
-            // 2. Inyectar en la Etiqueta Normal (La que no quieres modificar)
-            if (proveedorNormal) {
-                proveedorNormal.textContent = infoCompleta;
-                // Opcional: Ajuste de fuente pequeño si el texto es muy largo para que no rompa el diseño
-                if (infoCompleta.length > 50) {
-                    proveedorNormal.style.fontSize = "12px";
-                }
-            }
+          infoCompleta = fabricante;
+          if (direccion) infoCompleta += " - " + direccion;
+          if (telefono) infoCompleta += " - Tel: " + telefono;
+      } else {
+          // Datos por defecto para soluciones preparadas internamente
+          infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
+      }
 
-            // 3. Inyectar en la Etiqueta Mini (Si aplica)
-            if (fabricanteTextMini && fabricanteWrapper) {
-                fabricanteTextMini.textContent = infoCompleta;
+      // 2. Inyectar en la Etiqueta Normal (La que no quieres modificar)
+      if (proveedorNormal) {
+          proveedorNormal.textContent = infoCompleta;
+          // Ajuste de fuente para que quepa la dirección y el teléfono
+          proveedorNormal.style.fontSize = "11px";
+          proveedorNormal.style.display = "inline-block";
+          proveedorNormal.style.lineHeight = "1.1";
+      }
 
-                requestAnimationFrame(() => {
-                    const textWidth = fabricanteTextMini.scrollWidth;
-                    const containerWidth = fabricanteWrapper.offsetWidth;
-                    if (textWidth > containerWidth) {
-                        let scale = containerWidth / textWidth;
-                        if (scale < 0.65) scale = 0.65;
-                        fabricanteTextMini.style.transform = `scale(${scale})`;
-                    } else {
-                        fabricanteTextMini.style.transform = "scale(1)";
-                    }
-                });
-            }
+      // 3. Inyectar en la Etiqueta Mini (Si aplica)
+      if (fabricanteTextMini && fabricanteWrapper) {
+          fabricanteTextMini.textContent = infoCompleta;
 
-
-
+          requestAnimationFrame(() => {
+              const textWidth = fabricanteTextMini.scrollWidth;
+              const containerWidth = fabricanteWrapper.offsetWidth;
+              if (textWidth > containerWidth) {
+                  let scale = containerWidth / textWidth;
+                  if (scale < 0.6) scale = 0.6; // Un poco más pequeño para info larga
+                  fabricanteTextMini.style.transform = `scale(${scale})`;
+              } else {
+                  fabricanteTextMini.style.transform = "scale(1)";
+              }
+          });
+      }
 
       let htmlHP = "";
       info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
