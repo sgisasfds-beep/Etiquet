@@ -241,17 +241,36 @@ function crearPlantillaMiniEtiqueta() {
                         margin-top:6px;">
             </div>
 
-            <!-- FOOTER PROVEEDOR -->
+            <!-- FOOTER FABRICANTE -->
             <div class="footer-proveedor"
-                 style="grid-column:1/3;
-                        font-size:11px;
-                        font-weight:bold;
-                        text-align:center;
-                        padding-top:4px;
-                        line-height:1.2;
-                        word-break:break-word;">
-                Proveedor: <span class="proveedor"></span>
+                style="grid-column:1/3;
+                padding-top:6px;">
+
+                <div style="display:flex;
+                    align-items:center;
+                    width:100%;
+                    font-size:11px;
+                    font-weight:bold;">
+
+                  <span style="margin-right:6px; white-space:nowrap;">
+                      Fabricante:
+                  </span>
+
+                  <div class="fabricante-wrapper"
+                        style="flex:1; overflow:hidden;">
+
+                        <span class="fabricante-text"
+                              style="display:inline-block;
+                                    white-space:nowrap;
+                                    transform-origin:left center;">
+                        </span>
+
+                  </div>
+
+                </div>
+
             </div>
+
 
         </div>
 
@@ -465,40 +484,58 @@ async function cargarEtiquetas() {
       et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
       et.querySelector(".analista").textContent = item.analista || "—";
 
+
       // =======================================
-      // 🔥 PROVEEDOR DINÁMICO REAL POR ETIQUETA
+      // 🔥 FABRICANTE DINÁMICO PROFESIONAL
       // =======================================
 
-      const proveedorSpan = et.querySelector(".proveedor");
+      const fabricanteText = et.querySelector(".fabricante-text");
+      const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
 
-      if (item.soloPuros) {
+      if (fabricanteText && fabricanteWrapper) {
 
-          const fabricante = info.fabricanteFiltrado || "";
-          const direccion = info.direccion || "";
-          const telefono = info.telefono || "";
+          if (item.soloPuros) {
 
-          let infoCompleta = fabricante;
+              const fabricante = info.fabricanteFiltrado || "";
+              const direccion = info.direccion || "";
+              const telefono = info.telefono || "";
 
-          if (direccion) infoCompleta += " - " + direccion;
-          if (telefono) infoCompleta += " - Tel: " + telefono;
+              let infoCompleta = fabricante;
 
-          proveedorSpan.textContent = infoCompleta || "Proveedor no definido";
+              if (direccion) infoCompleta += " - " + direccion;
+              if (telefono) infoCompleta += " - Tel: " + telefono;
 
-          // Ajuste dinámico de tamaño para mantener una sola línea
-          proveedorSpan.style.whiteSpace = "nowrap";
+              fabricanteText.textContent = infoCompleta || "Fabricante no definido";
 
-          let fontSize = 12; // tamaño inicial
-          proveedorSpan.style.fontSize = fontSize + "px";
+          } else {
 
-          while (proveedorSpan.scrollWidth > proveedorSpan.offsetWidth && fontSize > 7) {
-              fontSize--;
-              proveedorSpan.style.fontSize = fontSize + "px";
+              fabricanteText.textContent =
+                  "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
           }
 
-      } else {
+          // 🔥 Escalado proporcional automático (sin cortar texto)
+          requestAnimationFrame(() => {
 
-          proveedorSpan.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
-      }
+          const textWidth = fabricanteText.scrollWidth;
+          const containerWidth = fabricanteWrapper.offsetWidth;
+
+          if (textWidth > containerWidth) {
+
+              let scale = containerWidth / textWidth;
+
+              if (scale < 0.65) scale = 0.65; // límite mínimo elegante
+
+              fabricanteText.style.transform = `scale(${scale})`;
+
+          } else {
+
+              fabricanteText.style.transform = "scale(1)";
+          }
+
+      });
+
+}
+
 
 
 
