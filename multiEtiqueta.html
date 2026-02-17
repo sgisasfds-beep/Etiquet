@@ -508,24 +508,48 @@ async function cargarEtiquetas() {
 
       if (fabricanteText && fabricanteWrapper) {
 
-          if (item.soloPuros) {
+          const nombreNormalizado = (item.nombreReactivo || "")
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .toLowerCase();
 
-              const fabricante = info.fabricanteFiltrado || "";
+          const esReenvasado =
+              nombreNormalizado.includes("reenvasado") ||
+              nombreNormalizado.includes("reenvasada");
+
+          let infoCompleta = "";
+
+
+          if (esReenvasado) {
+
+              const fabricante = info.fabricanteFiltrado || item.fabricante || "";
               const direccion = info.direccion || "";
               const telefono = info.telefono || "";
 
-              let infoCompleta = fabricante;
-
+              infoCompleta = fabricante;
               if (direccion) infoCompleta += " - " + direccion;
               if (telefono) infoCompleta += " - Tel: " + telefono;
 
-              fabricanteText.textContent = infoCompleta || "Fabricante no definido";
-
-          } else {
-
-              fabricanteText.textContent =
-                  "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
           }
+
+          else if (item.soloPuros) {
+
+                const fabricante = info.fabricanteFiltrado || "";
+                const direccion = info.direccion || "";
+                const telefono = info.telefono || "";
+
+                infoCompleta = fabricante;
+                if (direccion) infoCompleta += " - " + direccion;
+                if (telefono) infoCompleta += " - Tel: " + telefono;
+
+          } 
+          else {
+
+              infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
+          }
+
+          fabricanteText.textContent = infoCompleta || "Proveedor no definido";
+
 
           // 🔥 Escalado proporcional automático (sin cortar texto)
           requestAnimationFrame(() => {
