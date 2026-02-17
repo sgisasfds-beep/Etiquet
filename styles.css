@@ -77,13 +77,3 @@ select:focus {
 .btn:hover {
     background: #c4db7f;
 }
-
-.zonaPictogramas img {
-  max-width: 90px;
-  max-height: 90px;
-  width: auto;
-  height: auto;
-  object-fit: contain;
-  display: block;
-}
-
