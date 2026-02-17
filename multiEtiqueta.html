@@ -296,60 +296,50 @@ function crearPlantillaMiniEtiqueta() {
 
 
 function crearPlantillaEtiqueta() {
-
   const div = document.createElement("div");
   div.className = "etiqueta";
+  
+  // Agregamos box-sizing para que los 820px sean exactos
+  div.style.boxSizing = "border-box";
 
   div.innerHTML = `
+    <div style="display:grid; 
+                grid-template-columns: 1fr 30px 35%; 
+                column-gap:0; 
+                width: 100%;">
 
-    <div style="display:grid; grid-template-columns: 1fr 30px 35%; column-gap:0;">
-
-      <!-- FABRICANTE -->
-      <div style="grid-column:1;">
+      <div style="grid-column:1; min-width: 0;">
         <div style="display:flex; align-items:center; width:100%;">
-
           <strong style="margin-right:6px; white-space:nowrap;">
             Fabricante:
           </strong>
-
-          <div class="fabricante-wrapper"
-                style="flex:1; overflow:hidden;">
-
+          <div class="fabricante-wrapper" style="flex:1; overflow:hidden;">
             <span class="fabricante-text"
                   style="display:inline-block;
                          white-space:nowrap;
                          transform-origin:left center;">
             </span>
-
           </div>
-
         </div>
       </div>
 
-      <!-- TÍTULO PICTOGRAMAS -->
-      <div style="grid-column:3; text-align:center;">
+      <div style="grid-column:3; text-align:center; min-width: 0;">
         <strong>Pictogramas de<br>Peligro</strong>
       </div>
 
-      <!-- LINEA -->
       <div style="grid-column:1; margin-top:14px;">
         <hr style="border:1px solid black; margin:0;">
       </div>
 
-      <!-- INFORMACIÓN REACTIVO -->
-      <div style="grid-column:1; margin-top:20px;">
+      <div style="grid-column:1; margin-top:20px; min-width: 0;">
         <strong style="font-size:17px;" class="nombreReactivo">NOMBRE</strong>
         <br><br>
-
         <p><strong>Preparación:</strong></p>
-        <p class="preparacion">---</p>
-
+        <p class="preparacion" style="word-break: break-word;">---</p>
         <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
-
-        <div class="frasesHP"></div>
+        <div class="frasesHP" style="font-size: 13px;"></div>
       </div>
 
-      <!-- ZONA DERECHA (PICTOGRAMAS + QR) -->
       <div style="
             grid-column:3;
             text-align:center;
@@ -358,27 +348,25 @@ function crearPlantillaEtiqueta() {
             flex-direction:column;
             align-items:center;
             justify-content:flex-start;
+            min-width: 0; /* CRÍTICO: Evita que la columna crezca de más */
           ">
 
-        <!-- 🔒 ZONA BLINDADA DE PICTOGRAMAS -->
         <div class="zonaPictogramas"
              style="
                 width:100%;
                 max-width:100%;
-                min-height:220px;
-                overflow:hidden;
+                min-height:180px;
                 display:flex;
                 justify-content:center;
                 align-items:center;
-  
+                overflow:hidden;
              ">
         </div>
 
-        <!-- QR -->
         <img class="qr"
              src=""
              style="
-                width:150px;
+                width:130px;
                 max-width:100%;
                 height:auto;
                 border:1px solid #ccc;
@@ -387,35 +375,26 @@ function crearPlantillaEtiqueta() {
              ">
       </div>
 
-      <!-- LINEA -->
       <div style="grid-column:1; margin-top:20px;">
         <hr style="border:1px solid black; margin:0;">
       </div>
 
-      <!-- FECHAS -->
-      <div style="grid-column:1; margin-top:20px;">
-
+      <div style="grid-column:1; margin-top:20px; min-width: 0;">
         <div style="display:grid; grid-template-columns:1fr 1fr; column-gap:40px;">
-
           <div>
             <strong>Fecha Preparado:</strong><br>
             <span class="fechaPreparado">DD/MM/YYYY</span>
           </div>
-
           <div style="text-align:right;">
             <strong>Fecha Vencimiento:</strong><br>
             <span class="fechaVencimiento">DD/MM/YYYY</span>
           </div>
-
         </div>
-
         <div style="margin-top:18px;">
           <strong>Preparado por:</strong><br>
           <span class="analista">---</span>
         </div>
-
       </div>
-
     </div>
   `;
 
