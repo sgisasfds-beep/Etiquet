@@ -71,13 +71,6 @@
     object-fit: contain;
   }
 
-  .zonaPictogramas img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-  }
-
-
   button {
     background: #007bff;
     padding: 12px 20px;
@@ -173,7 +166,7 @@ function crearPlantillaMiniEtiqueta() {
     div.style.fontFamily = "Arial, sans-serif";
 
     div.innerHTML = `
-        <div class="etiqueta-grid"
+        <div class="etiqueta-grid" 
              style="display:grid;
                     grid-template-columns:1fr 1fr;
                     grid-template-rows:auto auto auto auto;
@@ -296,89 +289,123 @@ function crearPlantillaMiniEtiqueta() {
 
 
 function crearPlantillaEtiqueta() {
+
   const div = document.createElement("div");
+
   div.className = "etiqueta";
 
-  // Forzamos que el tamaño total incluya el padding y no se pase de 820px
-  div.style.boxSizing = "border-box";
-  div.style.width = "820px";
-  div.style.overflow = "hidden"; // Evita que cualquier cosa sobresalga
-
   div.innerHTML = `
-    <div style="display:grid;
-                grid-template-columns: 480px 20px 280px;
-                column-gap:0;
-                width: 100%;
-                box-sizing: border-box;">
 
-      <div style="grid-column:1; width: 480px; overflow: hidden;">
-        <div style="display:flex; align-items:center; width:100%; margin-bottom: 10px;">
-          <strong style="margin-right:6px; white-space:nowrap;">Fabricante:</strong>
-          <div class="fabricante-wrapper" style="flex:1; overflow:hidden;">
-            <span class="fabricante-text" style="display:inline-block; white-space:nowrap; transform-origin:left center;"></span>
-          </div>
-        </div>
+    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
 
-        <hr style="border:1px solid black; margin: 0 0 15px 0;">
+      <div style="grid-column: 1;">
 
-        <strong style="font-size:18px; display: block; margin-bottom: 10px;" class="nombreReactivo">NOMBRE</strong>
+        <strong>Proveedor:</strong> <span class="proveedor"></span>
 
-        <p style="margin: 5px 0;"><strong>Preparación:</strong></p>
-        <p class="preparacion" style="word-break: break-word; font-size: 13px; margin-bottom: 10px;">---</p>
+      </div>
 
-        <p style="margin: 5px 0;"><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
-        <div class="frasesHP" style="font-size: 12px; line-height: 1.2;"></div>
 
-        <hr style="border:1px solid black; margin: 15px 0;">
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; font-size: 13px;">
+      <div style="grid-column: 3; text-align:center;">
+
+        <strong>Pictogramas de<br>Peligro</strong>
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:14px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
+
+        <br><br>
+
+
+
+        <p><strong>Preparación:</strong></p>
+
+        <p class="preparacion">---</p>
+
+
+
+        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+
+
+
+        <div class="frasesHP"></div>
+
+      </div>
+
+
+
+      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+
+        <div class="zonaPictogramas" style="min-height: 220px;"></div>
+
+        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+
           <div>
+
             <strong>Fecha Preparado:</strong><br>
+
             <span class="fechaPreparado">DD/MM/YYYY</span>
+
           </div>
-          <div style="text-align:right;">
+
+
+
+          <div style="text-align: right;">
+
             <strong>Fecha Vencimiento:</strong><br>
+
             <span class="fechaVencimiento">DD/MM/YYYY</span>
-          </div>
-        </div>
-        <div style="margin-top:10px; font-size: 13px;">
-          <strong>Preparado por:</strong> <span class="analista">---</span>
-        </div>
-      </div>
 
-      <div style="grid-column:2;"></div>
-
-      <div style="grid-column:3;
-                  width: 280px;
-                  display:flex;
-                  flex-direction:column;
-                  align-items:center;
-                  justify-content: flex-start;
-                  overflow: hidden;">
-
-        <strong style="text-align:center; display:block; margin-bottom: 10px;">Pictogramas de Peligro</strong>
-
-        <div class="zonaPictogramas"
-             style="width: 280px;
-                    height: 200px;
-                    display:flex;
-                    justify-content:center;
-                    align-items:center;
-                    overflow:hidden;">
           </div>
 
-        <div style="margin-top: 20px; text-align: center;">
-            <img class="qr" src=""
-                 style="width: 140px;
-                        height: 140px;
-                        object-fit: contain;
-                        border: 1px solid #eee;">
         </div>
+
+
+
+        <div style="margin-top:18px;">
+
+          <strong>Preparado por:</strong><br>
+
+          <span class="analista">---</span>
+
+        </div>
+
       </div>
+
     </div>
+
   `;
 
   return div;
+
 }
 
 
@@ -419,7 +446,7 @@ async function cargarEtiquetas() {
             headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
             body: JSON.stringify({
                 nombreReactivo: item.nombreReactivo,
-                usuarioAnalista: item.analista,
+                usuarioAnalista: item.analista, 
                 fabricante: item.fabricante,
                 modoReactivosPuros: item.soloPuros
             })
@@ -467,48 +494,24 @@ async function cargarEtiquetas() {
 
       if (fabricanteText && fabricanteWrapper) {
 
-          const nombreNormalizado = (item.nombreReactivo || "")
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .toLowerCase();
+          if (item.soloPuros) {
 
-          const esReenvasado =
-              nombreNormalizado.includes("reenvasado") ||
-              nombreNormalizado.includes("reenvasada");
-
-          let infoCompleta = "";
-
-
-          if (esReenvasado) {
-
-              const fabricante = info.fabricanteFiltrado || item.fabricante || "";
+              const fabricante = info.fabricanteFiltrado || "";
               const direccion = info.direccion || "";
               const telefono = info.telefono || "";
 
-              infoCompleta = fabricante;
+              let infoCompleta = fabricante;
+
               if (direccion) infoCompleta += " - " + direccion;
               if (telefono) infoCompleta += " - Tel: " + telefono;
 
+              fabricanteText.textContent = infoCompleta || "Fabricante no definido";
+
+          } else {
+
+              fabricanteText.textContent =
+                  "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
           }
-
-          else if (item.soloPuros) {
-
-                const fabricante = info.fabricanteFiltrado || "";
-                const direccion = info.direccion || "";
-                const telefono = info.telefono || "";
-
-                infoCompleta = fabricante;
-                if (direccion) infoCompleta += " - " + direccion;
-                if (telefono) infoCompleta += " - Tel: " + telefono;
-
-          }
-          else {
-
-              infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
-          }
-
-          fabricanteText.textContent = infoCompleta || "Proveedor no definido";
-
 
           // 🔥 Escalado proporcional automático (sin cortar texto)
           requestAnimationFrame(() => {
@@ -533,24 +536,18 @@ async function cargarEtiquetas() {
 
 }
 
+
+
+
       let htmlHP = "";
       info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
       info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
       et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-      const zonaImg = et.querySelector(".zonaPictogramas");
-      zonaImg.innerHTML = ""; // limpiar siempre
-
-      if (info.imagenPictograma) {
-        const img = document.createElement("img");
-        img.src = info.imagenPictograma;
-        img.className = "img-pictograma";
-        img.alt = "pictogramas";
-
-        zonaImg.appendChild(img);
-      }
-
-
+      if (info.imagenPictograma) {
+        et.querySelector(".zonaPictogramas")
+          .innerHTML = `<img src="${info.imagenPictograma}" class="img-pictograma">`;
+      }
 
       // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
       if (qrBase64) {
