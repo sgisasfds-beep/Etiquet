@@ -225,33 +225,52 @@
 
     
     const proveedorEl = document.getElementById("displayFabricante");
+    
+    const nombreNormalizado = (nombreReactivo || "").toLowerCase();
 
-    if (datos.usuario.modoReactivosPuros) {
-        // 1. Extraemos los datos (si no existen, ponemos texto vacío)
+    const esReenvasado = 
+      nombreNormalizado.includes("reenvasado") || 
+      nombreNormalizado.includes("reenvasada");
+
+    if (esReenvasado) {
+
+        // 🔵 Si es reenvasado → usar proveedor seleccionado por el usuario
         const fabricante = datos.usuario.fabricante || "";
         const direccion = datos.reactivo.direccion || "";
         const telefono = datos.reactivo.telefono || "";
 
-        // 2. Armamos la cadena completa con separadores
-        // Usamos el operador "&&" para solo añadir comas/espacios si el dato existe
         let infoCompleta = fabricante;
         if (direccion) infoCompleta += " - " + direccion;
         if (telefono) infoCompleta += " - Tel: " + telefono;
 
-        // 3. Lo inyectamos en el HTML
-        proveedorEl.textContent = infoCompleta;
+        proveedorEl.textContent = infoCompleta || "Proveedor no definido";
 
-        // 4. Ajuste automático de tamaño para que no se desborde si el texto es largo
-        if (infoCompleta.length > 80) {
-            proveedorEl.parentElement.style.fontSize = "10px";
-        } else if (infoCompleta.length > 50) {
-            proveedorEl.parentElement.style.fontSize = "12px";
+    } else {    
+
+        if (datos.usuario.modoReactivosPuros) {
+        // 1. Extraemos los datos (si no existen, ponemos texto vacío)
+          const fabricante = datos.usuario.fabricante || "";
+          const direccion = datos.reactivo.direccion || "";
+          const telefono = datos.reactivo.telefono || "";
+
+          let infoCompleta = fabricante;
+          if (direccion) infoCompleta += " - " + direccion;
+          if (telefono) infoCompleta += " - Tel: " + telefono;
+
+          // 3. Lo inyectamos en el HTML
+          proveedorEl.textContent = infoCompleta;
+
+          // 4. Ajuste automático de tamaño para que no se desborde si el texto es largo
+          if (infoCompleta.length > 80) {
+              proveedorEl.parentElement.style.fontSize = "10px";
+          } else if (infoCompleta.length > 50) {
+              proveedorEl.parentElement.style.fontSize = "12px";
+          }
+        } else {
+           // Modo soluciones preparadas (Proveedor de la casa)
+            proveedorEl.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
         }
-    } else {
-        // Modo soluciones preparadas (Proveedor de la casa)
-        proveedorEl.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
     }
-
 
 
     // 1. Asignar Textos
