@@ -299,11 +299,25 @@ function crearPlantillaEtiqueta() {
     <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
 
       <div style="grid-column: 1;">
+        <div style="display:flex; align-items:center; width:100%;">
+    
+          <strong style="margin-right:6px; white-space:nowrap;">
+            Fabricante:
+          </strong>
 
-        <strong>Proveedor:</strong> <span class="proveedor"></span>
+          <div class="fabricante-wrapper"
+                style="flex:1; overflow:hidden;">
+      
+            <span class="fabricante-text"
+                  style="display:inline-block;
+                          white-space:nowrap;
+                          transform-origin:left center;">
+            </span>
 
+          </div>
+
+        </div>
       </div>
-
 
 
       <div style="grid-column: 3; text-align:center;">
