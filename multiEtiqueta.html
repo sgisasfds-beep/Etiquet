@@ -578,7 +578,7 @@ async function cargarEtiquetas() {
       info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
       et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-      iconst zonaImg = et.querySelector(".zonaPictogramas");
+      const zonaImg = et.querySelector(".zonaPictogramas");
 
       // 1. limpiar SIEMPRE
       zonaImg.innerHTML = "";
