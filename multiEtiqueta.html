@@ -71,7 +71,6 @@
     object-fit: contain;
   }
 
-
   button {
     background: #007bff;
     padding: 12px 20px;
@@ -579,10 +578,17 @@ async function cargarEtiquetas() {
       info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
       et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-      if (info.imagenPictograma) {
-        et.querySelector(".zonaPictogramas")
-          .innerHTML = `<img src="${info.imagenPictograma}" class="img-pictograma">`;
-      }
+      iconst zonaImg = et.querySelector(".zonaPictogramas");
+
+      // 1. limpiar SIEMPRE
+      zonaImg.innerHTML = "";
+
+      // 2. insertar
+      if (info.imagenPictograma) {
+        zonaImg.innerHTML =
+          `<img src="${info.imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
+      }
+
 
       // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
       if (qrBase64) {
