@@ -579,15 +579,17 @@ async function cargarEtiquetas() {
       et.querySelector(".frasesHP").innerHTML = htmlHP;
 
       const zonaImg = et.querySelector(".zonaPictogramas");
+      zonaImg.innerHTML = ""; // limpiar siempre
 
-      // 1. limpiar SIEMPRE
-      zonaImg.innerHTML = "";
-
-      // 2. insertar
       if (info.imagenPictograma) {
-        zonaImg.innerHTML =
-          `<img src="${info.imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
+        const img = document.createElement("img");
+        img.src = info.imagenPictograma;
+        img.className = "img-pictograma";
+        img.alt = "pictogramas";
+
+        zonaImg.appendChild(img);
       }
+
 
 
       // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
