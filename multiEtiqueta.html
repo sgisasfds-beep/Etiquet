@@ -166,7 +166,7 @@ function crearPlantillaMiniEtiqueta() {
     div.style.fontFamily = "Arial, sans-serif";
 
     div.innerHTML = `
-        <div class="etiqueta-grid" 
+        <div class="etiqueta-grid"
              style="display:grid;
                     grid-template-columns:1fr 1fr;
                     grid-template-rows:auto auto auto auto;
@@ -291,27 +291,27 @@ function crearPlantillaMiniEtiqueta() {
 function crearPlantillaEtiqueta() {
 
   const div = document.createElement("div");
-
   div.className = "etiqueta";
 
   div.innerHTML = `
 
-    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+    <div style="display:grid; grid-template-columns: 1fr 30px 35%; column-gap:0;">
 
-      <div style="grid-column: 1;">
+      <!-- FABRICANTE -->
+      <div style="grid-column:1;">
         <div style="display:flex; align-items:center; width:100%;">
-    
+
           <strong style="margin-right:6px; white-space:nowrap;">
             Fabricante:
           </strong>
 
           <div class="fabricante-wrapper"
                 style="flex:1; overflow:hidden;">
-      
+
             <span class="fabricante-text"
                   style="display:inline-block;
-                          white-space:nowrap;
-                          transform-origin:left center;">
+                         white-space:nowrap;
+                         transform-origin:left center;">
             </span>
 
           </div>
@@ -319,108 +319,103 @@ function crearPlantillaEtiqueta() {
         </div>
       </div>
 
-
-      <div style="grid-column: 3; text-align:center;">
-
+      <!-- TÍTULO PICTOGRAMAS -->
+      <div style="grid-column:3; text-align:center;">
         <strong>Pictogramas de<br>Peligro</strong>
-
       </div>
 
-
-
-      <div style="grid-column: 1; margin-top:14px;">
-
+      <!-- LINEA -->
+      <div style="grid-column:1; margin-top:14px;">
         <hr style="border:1px solid black; margin:0;">
-
       </div>
 
-
-
-      <div style="grid-column: 1; margin-top:20px;">
-
-        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
-
+      <!-- INFORMACIÓN REACTIVO -->
+      <div style="grid-column:1; margin-top:20px;">
+        <strong style="font-size:17px;" class="nombreReactivo">NOMBRE</strong>
         <br><br>
 
-
-
         <p><strong>Preparación:</strong></p>
-
         <p class="preparacion">---</p>
-
-
 
         <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
 
-
-
         <div class="frasesHP"></div>
-
       </div>
 
+      <!-- ZONA DERECHA (PICTOGRAMAS + QR) -->
+      <div style="
+            grid-column:3;
+            text-align:center;
+            min-height:300px;
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            justify-content:flex-start;
+          ">
 
+        <!-- 🔥 ZONA BLINDADA DE PICTOGRAMAS -->
+        <div class="zonaPictogramas"
+             style="
+                width:100%;
+                max-width:100%;
+                min-height:220px;
+                max-height:220px;
+                overflow:hidden;
+                display:flex;
+                flex-wrap:wrap;
+                justify-content:center;
+                align-items:center;
+                gap:6px;
+             ">
+        </div>
 
-      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
-
-        <div class="zonaPictogramas" style="min-height: 220px;"></div>
-
-        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
-
+        <!-- QR -->
+        <img class="qr"
+             src=""
+             style="
+                width:150px;
+                max-width:100%;
+                height:auto;
+                border:1px solid #ccc;
+                margin-top:10px;
+             ">
       </div>
 
-
-
-      <div style="grid-column: 1; margin-top:20px;">
-
+      <!-- LINEA -->
+      <div style="grid-column:1; margin-top:20px;">
         <hr style="border:1px solid black; margin:0;">
-
       </div>
 
+      <!-- FECHAS -->
+      <div style="grid-column:1; margin-top:20px;">
 
-
-      <div style="grid-column: 1; margin-top:20px;">
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; column-gap:40px;">
 
           <div>
-
             <strong>Fecha Preparado:</strong><br>
-
             <span class="fechaPreparado">DD/MM/YYYY</span>
-
           </div>
 
-
-
-          <div style="text-align: right;">
-
+          <div style="text-align:right;">
             <strong>Fecha Vencimiento:</strong><br>
-
             <span class="fechaVencimiento">DD/MM/YYYY</span>
-
           </div>
 
         </div>
 
-
-
         <div style="margin-top:18px;">
-
           <strong>Preparado por:</strong><br>
-
           <span class="analista">---</span>
-
         </div>
 
       </div>
 
     </div>
-
   `;
 
   return div;
-
 }
+
 
 
 /* =====================================================
@@ -460,7 +455,7 @@ async function cargarEtiquetas() {
             headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
             body: JSON.stringify({
                 nombreReactivo: item.nombreReactivo,
-                usuarioAnalista: item.analista, 
+                usuarioAnalista: item.analista,
                 fabricante: item.fabricante,
                 modoReactivosPuros: item.soloPuros
             })
@@ -542,7 +537,7 @@ async function cargarEtiquetas() {
                 if (direccion) infoCompleta += " - " + direccion;
                 if (telefono) infoCompleta += " - Tel: " + telefono;
 
-          } 
+          }
           else {
 
               infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
