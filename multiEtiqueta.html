@@ -166,7 +166,7 @@ function crearPlantillaMiniEtiqueta() {
     div.style.fontFamily = "Arial, sans-serif";
 
     div.innerHTML = `
-        <div class="etiqueta-grid" 
+        <div class="etiqueta-grid"
              style="display:grid;
                     grid-template-columns:1fr 1fr;
                     grid-template-rows:auto auto auto auto;
@@ -446,7 +446,7 @@ async function cargarEtiquetas() {
             headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
             body: JSON.stringify({
                 nombreReactivo: item.nombreReactivo,
-                usuarioAnalista: item.analista, 
+                usuarioAnalista: item.analista,
                 fabricante: item.fabricante,
                 modoReactivosPuros: item.soloPuros
             })
@@ -485,56 +485,56 @@ async function cargarEtiquetas() {
       et.querySelector(".analista").textContent = item.analista || "—";
 
 
-      // =======================================
-      // 🔥 FABRICANTE DINÁMICO PROFESIONAL
-      // =======================================
 
-      const fabricanteText = et.querySelector(".fabricante-text");
-      const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
+           // =======================================
+            // 🔥 ASIGNACIÓN DE PROVEEDOR / FABRICANTE COMPLETO
+            // =======================================
 
-      if (fabricanteText && fabricanteWrapper) {
+            const proveedorNormal = et.querySelector(".proveedor");       // Para CrearPlantillaEtiqueta()
+            const fabricanteTextMini = et.querySelector(".fabricante-text"); // Para CrearPlantillaMiniEtiqueta()
+            const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
 
-          if (item.soloPuros) {
+            // 1. Construir la cadena de texto con Dirección y Teléfono
+            let infoCompleta = "";
 
-              const fabricante = info.fabricanteFiltrado || "";
-              const direccion = info.direccion || "";
-              const telefono = info.telefono || "";
+            if (item.soloPuros) {
+                const fabricante = info.fabricanteFiltrado || "Fabricante no definido";
+                const direccion = info.direccion || "";
+                const telefono = info.telefono || "";
 
-              let infoCompleta = fabricante;
+                infoCompleta = fabricante;
+                if (direccion) infoCompleta += " - " + direccion;
+                if (telefono) infoCompleta += " - Tel: " + telefono;
+            } else {
+                // Datos por defecto para mezclas/preparaciones
+                infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
+            }
 
-              if (direccion) infoCompleta += " - " + direccion;
-              if (telefono) infoCompleta += " - Tel: " + telefono;
+            // 2. Inyectar en la Etiqueta Normal (La que no quieres modificar)
+            if (proveedorNormal) {
+                proveedorNormal.textContent = infoCompleta;
+                // Opcional: Ajuste de fuente pequeño si el texto es muy largo para que no rompa el diseño
+                if (infoCompleta.length > 50) {
+                    proveedorNormal.style.fontSize = "12px";
+                }
+            }
 
-              fabricanteText.textContent = infoCompleta || "Fabricante no definido";
+            // 3. Inyectar en la Etiqueta Mini (Si aplica)
+            if (fabricanteTextMini && fabricanteWrapper) {
+                fabricanteTextMini.textContent = infoCompleta;
 
-          } else {
-
-              fabricanteText.textContent =
-                  "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
-          }
-
-          // 🔥 Escalado proporcional automático (sin cortar texto)
-          requestAnimationFrame(() => {
-
-          const textWidth = fabricanteText.scrollWidth;
-          const containerWidth = fabricanteWrapper.offsetWidth;
-
-          if (textWidth > containerWidth) {
-
-              let scale = containerWidth / textWidth;
-
-              if (scale < 0.65) scale = 0.65; // límite mínimo elegante
-
-              fabricanteText.style.transform = `scale(${scale})`;
-
-          } else {
-
-              fabricanteText.style.transform = "scale(1)";
-          }
-
-      });
-
-}
+                requestAnimationFrame(() => {
+                    const textWidth = fabricanteTextMini.scrollWidth;
+                    const containerWidth = fabricanteWrapper.offsetWidth;
+                    if (textWidth > containerWidth) {
+                        let scale = containerWidth / textWidth;
+                        if (scale < 0.65) scale = 0.65;
+                        fabricanteTextMini.style.transform = `scale(${scale})`;
+                    } else {
+                        fabricanteTextMini.style.transform = "scale(1)";
+                    }
+                });
+            }
 
 
 
