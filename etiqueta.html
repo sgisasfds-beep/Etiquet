@@ -372,6 +372,41 @@
       return map[ghsCode] || "noaplica";
     }
 
+    // Función auxiliar para el QR
+    // Busca la función generarQRdeCarpeta (alrededor de la línea 275) y reemplázala:
+    async function generarQRdeCarpeta(nombre, analista) {
+      const url = `${API_URL}/api/procesarCarpetaReactivo`;
+      const qrElemento = document.getElementById('qrCarpetaDrive');
+
+      // Obtenemos los datos guardados para saber el modo y fabricante
+      const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
+      const { modoReactivosPuros, fabricante } = datos.usuario || {};
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true" },
+          body: JSON.stringify({
+            nombreReactivo: nombre,
+            usuarioAnalista: analista,
+            modoReactivosPuros: modoReactivosPuros, // <--- AHORA EL SERVIDOR SABRÁ DÓNDE BUSCAR
+            fabricante: fabricante
+          })
+        });
+
+        if (!response.ok) {
+          console.error("Error en servidor al generar QR:", response.status);
+          return;
+        }
+
+        const data = await response.json();
+        if (data.qr) qrElemento.src = data.qr;
+
+      } catch (e) {
+        console.error("Fallo la conexión para el QR:", e);
+      }
+    }
+
     // =======================================================
     // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
     // =======================================================
