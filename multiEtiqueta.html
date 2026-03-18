@@ -67,14 +67,18 @@
     }
 
     .img-pictograma {
-      max-width: 100%;
-      height: auto;
+      position: absolute !important;
+      width: 180px !important;
+      height: 180px !important;
       object-fit: contain;
     }
 
     .zonaPictogramas {
-      position: relative;
-      margin: 0 auto;
+      position: relative !important;
+      /* Permite posicionamiento interno */
+      margin: 10px auto;
+      /* Centra el bloque de pictogramas */
+      display: block !important;
     }
 
     button {
@@ -555,7 +559,7 @@
           et.querySelector(".frasesHP").innerHTML = htmlHP;
 
           // ======================================================
-          // RENDERIZADO DE PICTOGRAMAS CON MAPEO DE NOMBRES
+          // LÓGICA DE PICTOGRAMAS CON DISEÑOS Y DIMENSIONES EXACTAS
           // ======================================================
           const zonaImg = et.querySelector(".zonaPictogramas");
           if (zonaImg) {
@@ -569,6 +573,7 @@
             let htmlPictos = "";
             const count = listaFinal.length;
 
+            // DISEÑOS SEGÚN TU LÓGICA ORIGINAL
             if (count === 1) {
               zonaImg.style.width = "180px";
               zonaImg.style.height = "180px";
@@ -603,7 +608,7 @@
 
             } else if (count === 5) {
               zonaImg.style.width = "540px";
-              zonaImg.style.height = "310px";
+              zonaImg.style.height = "307px";
               htmlPictos = `
                 <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
                 <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
@@ -613,6 +618,20 @@
               `;
             }
 
+            zonaImg.innerHTML = htmlPictos;
+
+            // ESCALADO PARA QUE EL DISEÑO QUE MIDE 300px-540px QUEPA EN LA ETIQUETA
+            // Sin esto, el diseño se desborda de la etiqueta física
+            if (esMini) {
+                zonaImg.style.transform = "scale(0.4)"; 
+                zonaImg.style.transformOrigin = "center top";
+                zonaImg.style.marginBottom = "-120px"; // Ajuste visual por el espacio del transform
+            } else {
+                zonaImg.style.transform = "scale(0.75)"; 
+                zonaImg.style.transformOrigin = "center top";
+                zonaImg.style.marginBottom = "-50px";
+            }
+          
             zonaImg.innerHTML = htmlPictos;
 
             // Ajuste de escala para el diseño en etiquetas pequeñas
