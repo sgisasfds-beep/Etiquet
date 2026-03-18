@@ -555,14 +555,11 @@
           et.querySelector(".frasesHP").innerHTML = htmlHP;
 
           // ======================================================
-          // NUEVA LÓGICA DE PICTOGRAMAS (IDÉNTICA A ETIQUETA.HTML)
+          // RENDERIZADO DE PICTOGRAMAS CON MAPEO DE NOMBRES
           // ======================================================
           const zonaImg = et.querySelector(".zonaPictogramas");
           if (zonaImg) {
-            const getPictogramName = (name) => (name || "").replace('.png', '').trim();
             const picos = info.pictogramas || [];
-
-            // Obtener volumen numérico para la regla de < 100ml
             const volNumerico = parseInt(item.envase) || 0;
             const esMini = envaseMini.includes(item.envase);
 
@@ -572,7 +569,6 @@
             let htmlPictos = "";
             const count = listaFinal.length;
 
-            // Aplicar diseños por coordenadas exactas
             if (count === 1) {
               zonaImg.style.width = "180px";
               zonaImg.style.height = "180px";
@@ -619,14 +615,11 @@
 
             zonaImg.innerHTML = htmlPictos;
 
-            // Ajuste de escala para que el diseño de 180px quepa en la etiqueta MINI
+            // Ajuste de escala para el diseño en etiquetas pequeñas
             if (esMini) {
               zonaImg.style.transform = "scale(0.48)";
               zonaImg.style.transformOrigin = "center top";
-              zonaImg.style.marginBottom = "-50px"; // Compensa el espacio vacío del escalado
-            } else {
-              zonaImg.style.transform = "scale(0.8)"; // Ajuste ligero para etiquetas normales si es necesario
-              zonaImg.style.transformOrigin = "center top";
+              zonaImg.style.marginBottom = "-40px";
             }
           }
 
@@ -789,6 +782,22 @@
         setStatus("Fallo la descarga. Revisa la consola.", true); // Usando setStatus
       }
     });
+
+    // Función para mapear códigos GHS a nombres de archivo reales
+    function getPictogramName(ghsCode) {
+      const map = {
+        "GHS01": "explosivo",
+        "GHS02": "inflamable",
+        "GHS03": "comburente",
+        "GHS04": "gas",
+        "GHS05": "corrosivo",
+        "GHS06": "toxico",
+        "GHS07": "irritacion",
+        "GHS08": "salud",
+        "GHS09": "medioambiente"
+      };
+      return map[ghsCode] || "noaplica";
+    }
 
   </script>
 
