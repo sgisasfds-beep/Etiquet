@@ -54,7 +54,12 @@
       flex-direction: column;
       gap: 35px;
       align-items: center;
+      /* Centra las etiquetas horizontalmente */
       margin-top: 25px;
+      width: 100%;
+      /* Ocupa todo el ancho del .container */
+      overflow: visible;
+      /* Permite que los pictogramas se vean si sobresalen */
     }
 
     /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
@@ -627,15 +632,15 @@
             // ESCALADO PARA QUE EL DISEÑO QUE MIDE 300px-540px QUEPA EN LA ETIQUETA
             // Sin esto, el diseño se desborda de la etiqueta física
             if (esMini) {
-                zonaImg.style.transform = "scale(0.4)"; 
-                zonaImg.style.transformOrigin = "center top";
-                zonaImg.style.marginBottom = "-120px"; // Ajuste visual por el espacio del transform
+              zonaImg.style.transform = "scale(0.4)";
+              zonaImg.style.transformOrigin = "center top";
+              zonaImg.style.marginBottom = "-120px"; // Ajuste visual por el espacio del transform
             } else {
-                zonaImg.style.transform = "scale(0.75)"; 
-                zonaImg.style.transformOrigin = "center top";
-                zonaImg.style.marginBottom = "-50px";
+              zonaImg.style.transform = "scale(0.75)";
+              zonaImg.style.transformOrigin = "center top";
+              zonaImg.style.marginBottom = "-50px";
             }
-          
+
             zonaImg.innerHTML = htmlPictos;
 
             // Ajuste de escala para el diseño en etiquetas pequeñas
