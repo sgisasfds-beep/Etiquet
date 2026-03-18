@@ -64,15 +64,13 @@
       padding: 25px;
       font-family: Arial, sans-serif;
       background: white;
-      height: auto !important;
-      width: auto !important;
       overflow: visible;
       box-sizing: border-box;
     }
 
     #zonaPictogramas {
       position: relative;
-      display: block;
+      display:inline-block;
       margin: 20px auto;
       /* El ancho y alto se definen dinámicamente por JS según la cantidad */
     }
@@ -162,9 +160,9 @@
           </div>
           <div
             style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
-            <div id="zonaPictogramas"
-              style="display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
-            </div>
+            <div id="zonaPictogramas"></div>
+            
+            
             <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
               style="width:150px; margin-top:10px; border: 1px solid #ccc;">
           </div>
