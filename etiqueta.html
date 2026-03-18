@@ -55,37 +55,31 @@
 
     #contenedorEtiqueta {
       display: inline-block;
-      /* Hace que el ancho se ajuste al contenido */
+      /* Permite que el ancho se ajuste al contenido interno */
       min-width: 400px;
-      /* Ancho mínimo para que no se vea colapsada */
-      max-width: 95%;
-      /* Evita que se salga de la pantalla en móviles */
-      border: 2px solid black;
-      padding: 20px;
-      font-family: Arial;
-      font-size: 15px;
+      border: 4px solid black;
+      /* Un poco más grueso para que resalte */
+      padding: 25px;
+      font-family: Arial, sans-serif;
       background: white;
       height: auto !important;
+      width: auto !important;
       overflow: visible;
+      box-sizing: border-box;
     }
 
-    /* Busca y reemplaza la clase .img-pictograma */
-    .img-pictograma {
-      width: 180px;
-      /* Tamaño fijo del rombo */
-      height: 180px;
-      object-fit: contain;
-      position: absolute;
-      /* Permite moverlos por coordenadas */
-    }
-
-    /* Agrega o modifica el contenedor de los pictogramas */
     #zonaPictogramas {
       position: relative;
-      /* Base para las coordenadas de los hijos */
-      margin: 0 auto;
-      /* Centra el bloque de pictogramas en la etiqueta */
       display: block;
+      margin: 20px auto;
+      /* El ancho y alto se definen dinámicamente por JS según la cantidad */
+    }
+
+    .img-pictograma {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
     }
 
     .controls {
@@ -369,7 +363,7 @@
         } else if (count === 5) {
           // DISEÑO 5: 3 arriba y 2 abajo centrados (540x307px)
           zonaImg.style.width = "540px";
-          zonaImg.style.height = "307px";
+          zonaImg.style.height = "310px";
           htmlPictos = `
         <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
         <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
@@ -391,14 +385,14 @@
     function getPictogramName(ghsCode) {
       const map = {
         "GHS01": "explosivo",
-        "GHS02": "Inflamable",
+        "GHS02": "inflamable",
         "GHS03": "comburente",
         "GHS04": "gas",
         "GHS05": "corrosivo",
         "GHS06": "toxico",
         "GHS07": "irritacion",
         "GHS08": "salud",
-        "GHS09": "Medioambiente"
+        "GHS09": "medioambiente"
       };
       return map[ghsCode] || "noaplica";
     }
