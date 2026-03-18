@@ -508,8 +508,8 @@
           backgroundColor: "#ffffff",
           logging: false,
           // Forzamos al canvas a usar el ancho total real del contenido
-          width: contenedor.scrollWidth,
-          windowWidth: contenedor.scrollWidth
+          width: contenedor.offsetWidth,
+          windowWidth: contenedor.offsetWidth
         });
 
         const dataUrl = canvas.toDataURL("image/png");
