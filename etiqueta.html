@@ -54,12 +54,19 @@
     }
 
     #contenedorEtiqueta {
-      width: 820px;
+      display: inline-block;
+      /* Hace que el ancho se ajuste al contenido */
+      min-width: 400px;
+      /* Ancho mínimo para que no se vea colapsada */
+      max-width: 95%;
+      /* Evita que se salga de la pantalla en móviles */
       border: 2px solid black;
       padding: 20px;
       font-family: Arial;
       font-size: 15px;
       background: white;
+      height: auto !important;
+      overflow: visible;
     }
 
     /* Busca y reemplaza la clase .img-pictograma */
@@ -345,6 +352,30 @@
         <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:102.5px;">
         <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:127px; left:0;">
         <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:205px;">
+      `;
+
+
+        } else if (count === 4) {
+          // DISEÑO 4: Cuadrado 2x2 (360x307px)
+          zonaImg.style.width = "360px";
+          zonaImg.style.height = "307px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:180px;">
+      `;
+
+        } else if (count === 5) {
+          // DISEÑO 5: 3 arriba y 2 abajo centrados (540x307px)
+          zonaImg.style.width = "540px";
+          zonaImg.style.height = "307px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:0; left:360px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:90px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[4])}.png" class="img-pictograma" style="top:127px; left:270px;">
       `;
         }
 
