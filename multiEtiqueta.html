@@ -58,12 +58,15 @@
 
     /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
     .etiqueta {
-      width: 820px;
-      border: 2px solid black;
-      padding: 20px;
-      font-family: Arial;
-      font-size: 15px;
-      background: white;
+      width: fit-content;
+      /* Se ajusta al ancho real de la etiqueta */
+      min-width: 900px;
+      margin: 40px auto;
+      padding: 28px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border: 1px solid #dfe6f5;
     }
 
     .img-pictograma {
@@ -76,9 +79,9 @@
     .zonaPictogramas {
       position: relative !important;
       /* Permite posicionamiento interno */
-      margin: 10px auto;
+      margin: 20px auto;
       /* Centra el bloque de pictogramas */
-      display: block !important;
+      display: inline-block;
     }
 
     button {
@@ -309,7 +312,7 @@
 
       div.innerHTML = `
 
-    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+    <div style="display: grid; grid-template-columns: 450px 30px auto; column-gap: 0;">
 
       <div style="grid-column: 1;">
 
@@ -359,7 +362,7 @@
 
 
 
-      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+      <div style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
 
         <div class="zonaPictogramas" style="min-height: 220px;"></div>
 
