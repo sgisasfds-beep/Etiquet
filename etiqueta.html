@@ -506,6 +506,10 @@
           scale: 2,
           useCORS: true,
           backgroundColor: "#ffffff"
+          logging: false,
+          // Forzamos al canvas a usar el ancho total real del contenido
+          width: contenedor.scrollWidth,
+          windowWidth: contenedor.scrollWidth
         });
 
         const dataUrl = canvas.toDataURL("image/png");
