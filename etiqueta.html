@@ -137,7 +137,7 @@
 
     <div class="etiqueta-wrapper">
       <div id="contenedorEtiqueta">
-        <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+        <div style="display: grid; grid-template-columns: 1fr 30px auto; column-gap: 0;">
           <div style="grid-column: 1;">
             <div id="proveedorInfo" style="font-size:14px;">
               <strong>Proveedor:</strong> <span id="displayFabricante"></span></p>
@@ -159,9 +159,9 @@
             <div id="frasesHP"></div>
           </div>
           <div
-            style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+            style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
             <div id="zonaPictogramas"
-              style="min-height: 220px; display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
+              style="display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
             </div>
             <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
               style="width:150px; margin-top:10px; border: 1px solid #ccc;">
