@@ -1,486 +1,493 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Etiqueta Generada</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Etiqueta Generada</title>
 
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #eef2fb;
-    color: #1e1e1e;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #eef2fb;
+      color: #1e1e1e;
+    }
 
-  .hero {
-    background: linear-gradient(135deg, #000000, #003d99);
-    color: #b7d9ff;
-    padding: 50px 40px;
-    text-align: center;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
-    border-bottom: 3px solid #007bff;
-  }
-  .hero h1 {
-    font-size: 40px;
-    font-weight: bold;
-    margin: 0;
-    text-shadow: 0 0 10px #008cff;
-  }
+    .hero {
+      background: linear-gradient(135deg, #000000, #003d99);
+      color: #b7d9ff;
+      padding: 50px 40px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      border-bottom: 3px solid #007bff;
+    }
 
-  .container {
-    max-width: 900px;
-    margin: 40px auto;
-    background: #ffffff;
-    padding: 28px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    border: 1px solid #dfe6f5;
-  }
+    .hero h1 {
+      font-size: 40px;
+      font-weight: bold;
+      margin: 0;
+      text-shadow: 0 0 10px #008cff;
+    }
 
-  h2 {
-    color: #004a99;
-    font-size: 26px;
-    margin-top: 0;
-    text-align: center;
-  }
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border: 1px solid #dfe6f5;
+    }
 
-  .etiqueta-wrapper {
-    display:flex;
-    justify-content:center;
-    margin-bottom:20px;
-  }
+    h2 {
+      color: #004a99;
+      font-size: 26px;
+      margin-top: 0;
+      text-align: center;
+    }
 
-  #contenedorEtiqueta {
-    width: 820px;
-    border: 2px solid black;
-    padding: 20px;
-    font-family: Arial;
-    font-size: 15px;
-    background: white;
-  }
+    .etiqueta-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
 
-  .img-pictograma {
-    max-width: 100%;
-    height: auto;
-    object-fit: contain;
-  }
+    #contenedorEtiqueta {
+      width: 820px;
+      border: 2px solid black;
+      padding: 20px;
+      font-family: Arial;
+      font-size: 15px;
+      background: white;
+    }
 
-  .controls {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-top: 12px;
-  }
+    /* Busca y reemplaza la clase .img-pictograma */
+    .img-pictograma {
+      width: 180px;
+      /* Tamaño fijo del rombo */
+      height: 180px;
+      object-fit: contain;
+      position: absolute;
+      /* Permite moverlos por coordenadas */
+    }
 
-  input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #c9c9c9;
-    background: #f9f9f9;
-  }
+    /* Agrega o modifica el contenedor de los pictogramas */
+    #zonaPictogramas {
+      position: relative;
+      /* Base para las coordenadas de los hijos */
+      margin: 0 auto;
+      /* Centra el bloque de pictogramas en la etiqueta */
+      display: block;
+    }
 
-  button {
-    background: #007bff;
-    padding: 12px 18px;
-    border: none;
-    color: #fff;
-    font-size: 15px;
-    border-radius: 6px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-  }
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
 
-  button.secondary {
-    background: #6c757d;
-  }
+    input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #c9c9c9;
+      background: #f9f9f9;
+    }
 
-  .small {
-    font-size: 13px;
-    color: #444;
-  }
+    button {
+      background: #007bff;
+      padding: 12px 18px;
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
 
-  #status {
-    margin-top:10px;
-    font-size:14px;
-    color:#333;
-  }
-</style>
+    button.secondary {
+      background: #6c757d;
+    }
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    .small {
+      font-size: 13px;
+      color: #444;
+    }
+
+    #status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
-<div class="hero"><h1>Etiqueta Generada</h1></div>
+  <div class="hero">
+    <h1>Etiqueta Generada</h1>
+  </div>
 
-<div class="container">
-<h2>Vista previa de la etiqueta</h2>
+  <div class="container">
+    <h2>Vista previa de la etiqueta</h2>
 
-<div class="etiqueta-wrapper">
-  <div id="contenedorEtiqueta">
-    <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
-      <div style="grid-column: 1;">
-        <div id="proveedorInfo" style="font-size:14px;">
-            <strong>Proveedor:</strong> <span id="displayFabricante"></span></p>
-        </div>
-      </div>
-      <div style="grid-column: 2;"></div>
-      <div style="grid-column: 3; text-align:center;">
-        <strong>Pictogramas de<br>Peligro</strong>
-      </div>
-      <div style="grid-column: 1; margin-top:14px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
-      <div style="grid-column: 1; margin-top:20px;">
-        <strong style="font-size: 17px;" id="nombreReactivo">NOMBRE DEL REACTIVO</strong>
-        <br><br>
-        <p><strong>Preparación:</strong></p>
-        <p id="preparacion">DESCRIPCIÓN DEL REACTIVO O PREPARACIÓN</p>
-        <p><strong>ADVERTENCIA: <span id="advertencia">ATENCIÓN</span></strong></p>
-        <div id="frasesHP"></div>
-      </div>
-      <div style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
-        <div id="zonaPictogramas"
-             style="min-height: 220px; display:flex; justify-content:center; align-items:center; margin-bottom:10px;"></div>
-        <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
-             style="width:150px; margin-top:10px; border: 1px solid #ccc;">
-      </div>
-      <div style="grid-column: 1; margin-top:20px;">
-        <hr style="border:1px solid black; margin:0;">
-      </div>
-      <div style="grid-column: 1; margin-top:20px;">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
-          <div>
-            <strong>Fecha Preparado:</strong><br>
-            <span id="fechaPreparado">DD/MM/YYYY</span>
+    <div class="etiqueta-wrapper">
+      <div id="contenedorEtiqueta">
+        <div style="display: grid; grid-template-columns: 1fr 30px 35%; column-gap: 0;">
+          <div style="grid-column: 1;">
+            <div id="proveedorInfo" style="font-size:14px;">
+              <strong>Proveedor:</strong> <span id="displayFabricante"></span></p>
+            </div>
           </div>
-          <div style="text-align: right;">
-            <strong>Fecha Vencimiento:</strong><br>
-            <span id="fechaVencimiento">DIA/MES/AÑO</span>
+          <div style="grid-column: 2;"></div>
+          <div style="grid-column: 3; text-align:center;">
+            <strong>Pictogramas de<br>Peligro</strong>
           </div>
-        </div>
-        <div style="margin-top:18px;">
-          <strong>Preparado por:</strong><br>
-          <span id="analista">ANALISTA DE LABORATORIO</span>
+          <div style="grid-column: 1; margin-top:14px;">
+            <hr style="border:1px solid black; margin:0;">
+          </div>
+          <div style="grid-column: 1; margin-top:20px;">
+            <strong style="font-size: 17px;" id="nombreReactivo">NOMBRE DEL REACTIVO</strong>
+            <br><br>
+            <p><strong>Preparación:</strong></p>
+            <p id="preparacion">DESCRIPCIÓN DEL REACTIVO O PREPARACIÓN</p>
+            <p><strong>ADVERTENCIA: <span id="advertencia">ATENCIÓN</span></strong></p>
+            <div id="frasesHP"></div>
+          </div>
+          <div
+            style="grid-column: 3; text-align: center; min-height: 300px; display:flex; flex-direction:column; align-items:center;">
+            <div id="zonaPictogramas"
+              style="min-height: 220px; display:flex; justify-content:center; align-items:center; margin-bottom:10px;">
+            </div>
+            <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
+              style="width:150px; margin-top:10px; border: 1px solid #ccc;">
+          </div>
+          <div style="grid-column: 1; margin-top:20px;">
+            <hr style="border:1px solid black; margin:0;">
+          </div>
+          <div style="grid-column: 1; margin-top:20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+              <div>
+                <strong>Fecha Preparado:</strong><br>
+                <span id="fechaPreparado">DD/MM/YYYY</span>
+              </div>
+              <div style="text-align: right;">
+                <strong>Fecha Vencimiento:</strong><br>
+                <span id="fechaVencimiento">DIA/MES/AÑO</span>
+              </div>
+            </div>
+            <div style="margin-top:18px;">
+              <strong>Preparado por:</strong><br>
+              <span id="analista">ANALISTA DE LABORATORIO</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <div class="controls">
+      <div>
+        <label class="small">Cantidad de etiquetas a generar:</label>
+        <input id="inputCantidad" type="number" min="1" value="1" />
+      </div>
+
+      <div>
+        <label class="small">(Opcional) Nombre archivo:</label>
+        <input id="nombreArchivo" type="text" placeholder="etiquetas" />
+      </div>
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:12px;">
+      <button id="btnCapturar" type="button">Capturar etiqueta y generar documento</button>
+      <button id="btnPreview" class="secondary" type="button">Descargar archivo DOCX</button>
+    </div>
+
+    <div id="status"></div>
   </div>
-</div>
-
-<div class="controls">
-  <div>
-    <label class="small">Cantidad de etiquetas a generar:</label>
-    <input id="inputCantidad" type="number" min="1" value="1" />
-  </div>
-
-  <div>
-    <label class="small">(Opcional) Nombre archivo:</label>
-    <input id="nombreArchivo" type="text" placeholder="etiquetas" />
-  </div>
-</div>
-
-<div style="display:flex; gap:10px; margin-top:12px;">
-  <button id="btnCapturar" type="button">Capturar etiqueta y generar documento</button>
-  <button id="btnPreview" class="secondary" type="button">Descargar archivo DOCX</button>
-</div>
-
-<div id="status"></div>
-</div>
 
 
-<script type="module">
-  import { API_URL } from "./config.js";
+  <script type="module">
+    import { API_URL } from "./config.js";
 
-  // Variables globales
-  const statusEl = document.getElementById("status");
-  const contenedor = document.getElementById("contenedorEtiqueta");
-  const btn = document.getElementById("btnCapturar");
-  const btnPreview = document.getElementById("btnPreview");
-  let envase = ""; // Variable global para compartir entre cargarDatos y el botón
+    // Variables globales
+    const statusEl = document.getElementById("status");
+    const contenedor = document.getElementById("contenedorEtiqueta");
+    const btn = document.getElementById("btnCapturar");
+    const btnPreview = document.getElementById("btnPreview");
+    let envase = ""; // Variable global para compartir entre cargarDatos y el botón
 
-  function setStatus(msg, isError=false) {
-    statusEl.textContent = msg;
-    statusEl.style.color = isError ? "#b20000" : "#0b5";
-  }
-
-  // =======================================================
-  // FUNCIÓN PRINCIPAL DE CARGA DE DATOS (CORREGIDA)
-  // =======================================================
-  async function cargarDatos() {
-    console.log("🔥 Ejecutando cargarDatos (Pageshow/Load)");
-
-    const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
-    if (!datos.usuario || !datos.reactivo) {
-      setStatus("No se pudo cargar la información del reactivo.", true);
-      return;
+    function setStatus(msg, isError = false) {
+      statusEl.textContent = msg;
+      statusEl.style.color = isError ? "#b20000" : "#0b5";
     }
 
-    const { nombreReactivo, analista, vigenciaValor, vigenciaUnidad, incluirFechas } = datos.usuario || {};
-    envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
+    // =======================================================
+    // FUNCIÓN PRINCIPAL DE CARGA DE DATOS (CORREGIDA)
+    // =======================================================
+    async function cargarDatos() {
+      console.log("🔥 Ejecutando cargarDatos (Pageshow/Load)");
 
-    const { preparación, palabra_advertencia, frases_h, frases_p, imagenPictograma } = datos.reactivo || {};
+      const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
+      if (!datos.usuario || !datos.reactivo) {
+        setStatus("No se pudo cargar la información del reactivo.", true);
+        return;
+      }
 
+      const { nombreReactivo, analista, vigenciaValor, vigenciaUnidad, incluirFechas } = datos.usuario || {};
+      envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
 
-    
-    const proveedorEl = document.getElementById("displayFabricante");
-    
-    const nombreNormalizado = (nombreReactivo || "").toLowerCase();
+      // IMPORTANTE: Ahora usamos 'pictogramas' (el array) en lugar de 'imagenPictograma'
+      const { preparación, palabra_advertencia, frases_h, frases_p, pictogramas } = datos.reactivo || {};
 
-    const esReenvasado = 
-      nombreNormalizado.includes("reenvasado") || 
-      nombreNormalizado.includes("reenvasada");
+      const proveedorEl = document.getElementById("displayFabricante");
+      const nombreNormalizado = (nombreReactivo || "").toLowerCase();
+      const esReenvasado = nombreNormalizado.includes("reenvasado") || nombreNormalizado.includes("reenvasada");
 
-    if (esReenvasado) {
-
-        // 🔵 Si es reenvasado → usar proveedor seleccionado por el usuario
+      if (esReenvasado) {
         const fabricante = datos.usuario.fabricante || "";
         const direccion = datos.reactivo.direccion || "";
         const telefono = datos.reactivo.telefono || "";
-
         let infoCompleta = fabricante;
         if (direccion) infoCompleta += " - " + direccion;
         if (telefono) infoCompleta += " - Tel: " + telefono;
-
         proveedorEl.textContent = infoCompleta || "Proveedor no definido";
-
-    } else {    
-
+      } else {
         if (datos.usuario.modoReactivosPuros) {
-        // 1. Extraemos los datos (si no existen, ponemos texto vacío)
           const fabricante = datos.usuario.fabricante || "";
           const direccion = datos.reactivo.direccion || "";
           const telefono = datos.reactivo.telefono || "";
-
           let infoCompleta = fabricante;
           if (direccion) infoCompleta += " - " + direccion;
           if (telefono) infoCompleta += " - Tel: " + telefono;
-
-          // 3. Lo inyectamos en el HTML
           proveedorEl.textContent = infoCompleta;
-
-          // 4. Ajuste automático de tamaño para que no se desborde si el texto es largo
           if (infoCompleta.length > 80) {
-              proveedorEl.parentElement.style.fontSize = "10px";
+            proveedorEl.parentElement.style.fontSize = "10px";
           } else if (infoCompleta.length > 50) {
-              proveedorEl.parentElement.style.fontSize = "12px";
+            proveedorEl.parentElement.style.fontSize = "12px";
           }
         } else {
-           // Modo soluciones preparadas (Proveedor de la casa)
-            proveedorEl.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
+          proveedorEl.textContent = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
         }
-    }
-
-
-    // 1. Asignar Textos
-    document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
-    document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
-    document.getElementById("preparacion").textContent = preparación || "No aplica";
-    document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
-
-    // 2. Manejo de Fechas
-    const spanPreparado = document.getElementById("fechaPreparado");
-    const spanVencimiento = document.getElementById("fechaVencimiento");
-
-    if (incluirFechas) {
-      spanPreparado.style.display = "inline"; // Asegurar que se muestren
-      spanVencimiento.style.display = "inline";
-      
-      const hoy = new Date();
-      spanPreparado.textContent = hoy.toLocaleDateString("es-CO");
-
-      let venc = new Date(hoy);
-      switch (vigenciaUnidad) {
-        case "Día(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0)); break;
-        case "Semana(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0) * 7); break;
-        case "Mes(es)": venc.setMonth(venc.getMonth() + parseInt(vigenciaValor || 0)); break;
-        case "Año(s)": venc.setFullYear(venc.getFullYear() + parseInt(vigenciaValor || 0)); break;
       }
-      spanVencimiento.textContent = venc.toLocaleDateString("es-CO");
-    } else {
-      spanPreparado.style.display = "none";
-      spanVencimiento.style.display = "none";
-    }
 
-    // 3. Frases H y P
-    let htmlHP = "";
-    if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
-    if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
-    document.getElementById("frasesHP").innerHTML = htmlHP;
+      // 1. Asignar Textos
+      document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
+      document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
+      document.getElementById("preparacion").textContent = preparación || "No aplica";
+      document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
 
-    // 4. IMÁGENES: REINICIO Y CARGA (Solución al bug visual)
-    const zonaImg = document.getElementById("zonaPictogramas");
-    const qrElemento = document.getElementById('qrCarpetaDrive');
+      // 2. Manejo de Fechas
+      const spanPreparado = document.getElementById("fechaPreparado");
+      const spanVencimiento = document.getElementById("fechaVencimiento");
 
-    // -- Paso Crítico: Limpiar fuentes primero para forzar repintado --
-    zonaImg.innerHTML = "";
-    qrElemento.src = "";
-    
-    // Usamos setTimeout para dar tiempo al navegador de limpiar el buffer gráfico
-    setTimeout(() => {
-        // Pintar Pictogramas
-        if (imagenPictograma) {
-           zonaImg.innerHTML = `<img src="${imagenPictograma}" class="img-pictograma" alt="pictogramas">`;
+      if (incluirFechas) {
+        spanPreparado.style.display = "inline";
+        spanVencimiento.style.display = "inline";
+        const hoy = new Date();
+        spanPreparado.textContent = hoy.toLocaleDateString("es-CO");
+        let venc = new Date(hoy);
+        switch (vigenciaUnidad) {
+          case "Día(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0)); break;
+          case "Semana(s)": venc.setDate(venc.getDate() + parseInt(vigenciaValor || 0) * 7); break;
+          case "Mes(es)": venc.setMonth(venc.getMonth() + parseInt(vigenciaValor || 0)); break;
+          case "Año(s)": venc.setFullYear(venc.getFullYear() + parseInt(vigenciaValor || 0)); break;
+        }
+        spanVencimiento.textContent = venc.toLocaleDateString("es-CO");
+      } else {
+        spanPreparado.style.display = "none";
+        spanVencimiento.style.display = "none";
+      }
+
+      // 3. Frases H y P
+      let htmlHP = "";
+      if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+      if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
+      document.getElementById("frasesHP").innerHTML = htmlHP;
+
+      // 4. IMÁGENES: Lógica de Pictogramas Dinámicos
+      const zonaImg = document.getElementById("zonaPictogramas");
+      const qrElemento = document.getElementById('qrCarpetaDrive');
+
+      zonaImg.innerHTML = "";
+      qrElemento.src = "";
+
+      setTimeout(() => {
+        const picos = pictogramas || [];
+        const volNumerico = parseInt(envase);
+
+        // Regla de volumen: < 100ml solo muestra el primero
+        const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
+
+        let htmlPictos = "";
+        const count = listaFinal.length;
+
+        if (count === 1) {
+          zonaImg.style.width = "180px";
+          zonaImg.style.height = "180px";
+          htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">`;
+
+        } else if (count === 2) {
+          zonaImg.style.width = "360px";
+          zonaImg.style.height = "180px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+      `;
+
+        } else if (count === 3) {
+          // Diseño Triángulo: 385x307 px
+          zonaImg.style.width = "385px";
+          zonaImg.style.height = "307px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:102.5px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:127px; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:205px;">
+      `;
         }
 
-        // Generar/Pintar QR
+        zonaImg.innerHTML = htmlPictos;
+
         if (nombreReactivo && analista) {
-            generarQRdeCarpeta(nombreReactivo, analista);
+          generarQRdeCarpeta(nombreReactivo, analista);
         }
-    }, 50); // 50ms de retraso es imperceptible pero suficiente
-  }
-
-  // Función auxiliar para el QR
-  // Busca la función generarQRdeCarpeta (alrededor de la línea 275) y reemplázala:
-async function generarQRdeCarpeta(nombre, analista) {
-  const url = `${API_URL}/api/procesarCarpetaReactivo`;
-  const qrElemento = document.getElementById('qrCarpetaDrive');
-  
-  // Obtenemos los datos guardados para saber el modo y fabricante
-  const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
-  const { modoReactivosPuros, fabricante } = datos.usuario || {};
-
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', "ngrok-skip-browser-warning": "true"},
-      body: JSON.stringify({ 
-        nombreReactivo: nombre, 
-        usuarioAnalista: analista,
-        modoReactivosPuros: modoReactivosPuros, // <--- AHORA EL SERVIDOR SABRÁ DÓNDE BUSCAR
-        fabricante: fabricante 
-      })
-    });
-
-    if (!response.ok) {
-        console.error("Error en servidor al generar QR:", response.status);
-        return;
+      }, 50);
     }
 
-    const data = await response.json();
-    if (data.qr) qrElemento.src = data.qr;
+    // Función auxiliar necesaria para mapear los nombres de archivos
+    function getPictogramName(ghsCode) {
+      const map = {
+        "GHS01": "explosivo",
+        "GHS02": "Inflamable",
+        "GHS03": "comburente",
+        "GHS04": "gas",
+        "GHS05": "corrosivo",
+        "GHS06": "toxico",
+        "GHS07": "irritacion",
+        "GHS08": "salud",
+        "GHS09": "Medioambiente"
+      };
+      return map[ghsCode] || "noaplica";
+    }
 
-  } catch (e) {
-    console.error("Fallo la conexión para el QR:", e);
-  }
-}
-
-  // =======================================================
-  // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
-  // =======================================================
-  window.addEventListener("pageshow", (event) => {
+    // =======================================================
+    // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
+    // =======================================================
+    window.addEventListener("pageshow", (event) => {
       // Llamamos a cargarDatos cada vez que la página se muestra
       // Esto sobreescribe cualquier estado visual corrupto del caché
       cargarDatos();
-  });
+    });
 
 
-  // =======================================================
-  // BOTÓN DE DESCARGA DOCX
-  // =======================================================
-  btnPreview.addEventListener("click", async () => {
-    if (!window.__ultimoArchivoGenerado) {
+    // =======================================================
+    // BOTÓN DE DESCARGA DOCX
+    // =======================================================
+    btnPreview.addEventListener("click", async () => {
+      if (!window.__ultimoArchivoGenerado) {
         setStatus("No hay archivo generado. Genera el documento primero.", true);
         return;
-    }
-    
-    setStatus("Iniciando descarga DOCX...");
+      }
 
-    const archivo = window.__ultimoArchivoGenerado;
-    const urlDescarga = `${API_URL}/api/descargar/${archivo}`;
-    
-    try {
+      setStatus("Iniciando descarga DOCX...");
+
+      const archivo = window.__ultimoArchivoGenerado;
+      const urlDescarga = `${API_URL}/api/descargar/${archivo}`;
+
+      try {
         const response = await fetch(urlDescarga, {
-            method: 'GET',
-            headers: { 
-                'ngrok-skip-browser-warning': 'true' 
-            }
+          method: 'GET',
+          headers: {
+            'ngrok-skip-browser-warning': 'true'
+          }
         });
 
         if (!response.ok) {
-            setStatus("Error al descargar el archivo. Código: " + response.status, true);
-            return;
+          setStatus("Error al descargar el archivo. Código: " + response.status, true);
+          return;
         }
 
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = archivo; 
+        a.download = archivo;
         document.body.appendChild(a);
         a.click();
-        a.remove(); 
+        a.remove();
         window.URL.revokeObjectURL(url);
 
         setStatus("Archivo DOCX descargado correctamente.");
 
-    } catch (error) {
+      } catch (error) {
         console.error("Error en la descarga:", error);
         setStatus("Fallo la descarga. Revisa la conexión o consola.", true);
-    }
-  });
+      }
+    });
 
-  // =======================================================
-  // BOTÓN GENERAR (Captura HTML2Canvas)
-  // =======================================================
-  btn.addEventListener("click", async (e) => {
-    e.preventDefault();
-    console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
-    setStatus("Capturando etiqueta...");
+    // =======================================================
+    // BOTÓN GENERAR (Captura HTML2Canvas)
+    // =======================================================
+    btn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
+      setStatus("Capturando etiqueta...");
 
-    const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
-    if (!cantidad || cantidad <= 0) {
-      setStatus("Cantidad inválida.", true);
-      return;
-    }
-
-    try {
-      const canvas = await html2canvas(contenedor, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff"
-      });
-
-      const dataUrl = canvas.toDataURL("image/png");
-      const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
-
-      setStatus("Enviando imagen al servidor...");
-
-      const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json","ngrok-skip-browser-warning": "true" },
-        body: JSON.stringify({
-          base64Imagen: base64,
-          cantidad,
-          envase
-        })
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(()=>({error:"Error desconocido"}));
-        setStatus("Error generando documento: " + (err.error || res.statusText), true);
+      const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
+      if (!cantidad || cantidad <= 0) {
+        setStatus("Cantidad inválida.", true);
         return;
       }
 
-      setStatus("Recibiendo documento...");
+      try {
+        const canvas = await html2canvas(contenedor, {
+          scale: 2,
+          useCORS: true,
+          backgroundColor: "#ffffff"
+        });
 
-      const respuesta = await res.json();
-      if (!respuesta.ok || !respuesta.archivo) {
-         setStatus("Error: No se recibió nombre del archivo generado.", true);
-         return; 
+        const dataUrl = canvas.toDataURL("image/png");
+        const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
+
+        setStatus("Enviando imagen al servidor...");
+
+        const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+          body: JSON.stringify({
+            base64Imagen: base64,
+            cantidad,
+            envase
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({ error: "Error desconocido" }));
+          setStatus("Error generando documento: " + (err.error || res.statusText), true);
+          return;
+        }
+
+        setStatus("Recibiendo documento...");
+
+        const respuesta = await res.json();
+        if (!respuesta.ok || !respuesta.archivo) {
+          setStatus("Error: No se recibió nombre del archivo generado.", true);
+          return;
+        }
+
+        window.__ultimoArchivoGenerado = respuesta.archivo;
+        setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
+
+      } catch (err) {
+        console.error(err);
+        setStatus("Error generando documento. Revisa la consola.", true);
       }
+    });
 
-      window.__ultimoArchivoGenerado = respuesta.archivo;
-      setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
-
-    } catch (err) {
-      console.error(err);
-      setStatus("Error generando documento. Revisa la consola.", true);
-    }
-  });
-
-</script>
+  </script>
 
 </body>
+
 </html>
