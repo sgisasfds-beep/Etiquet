@@ -31,10 +31,12 @@
     }
 
     .container {
-      max-width: 900px;
+      width: fit-content;
+      /* Se ajusta al ancho real de la etiqueta */
+      min-width: 900px;
       margin: 40px auto;
-      background: #ffffff;
       padding: 28px;
+      background: #ffffff;
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       border: 1px solid #dfe6f5;
@@ -137,7 +139,7 @@
 
     <div class="etiqueta-wrapper">
       <div id="contenedorEtiqueta">
-        <div style="display: grid; grid-template-columns: 1fr 30px auto; column-gap: 0;">
+        <div style="display: grid; grid-template-columns: 450px 30px auto; column-gap: 0;">
           <div style="grid-column: 1;">
             <div id="proveedorInfo" style="font-size:14px;">
               <strong>Proveedor:</strong> <span id="displayFabricante"></span></p>
