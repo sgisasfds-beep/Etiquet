@@ -38,6 +38,7 @@
       border-radius: 12px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
       border: 1px solid #dfe6f5;
+      overflow-x: auto;
     }
 
     h2 {
@@ -47,29 +48,31 @@
       text-align: center;
     }
 
+    /* CONTENEDOR GENERAL DE TODAS LAS ETIQUETAS */
     #listaEtiquetas {
       display: flex;
       flex-direction: column;
       gap: 35px;
       align-items: center;
+      /* Centra las etiquetas horizontalmente */
       margin-top: 25px;
       width: 100%;
+      /* Ocupa todo el ancho del .container */
       overflow: visible;
+      /* Permite que los pictogramas se vean si sobresalen */
     }
 
-    /* ESTILOS SINCRONIZADOS CON ETIQUETA.HTML */
+    /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
     .etiqueta {
-      display: inline-block;
-      min-width: 400px;
-      border: 4px solid black; /* Igual a referencia */
-      padding: 25px;           /* Igual a referencia */
-      font-family: Arial, sans-serif;
-      background: white;
-      overflow: visible;
-      box-sizing: border-box;
+      width: fit-content;
+      /* Se ajusta al ancho real de la etiqueta */
+      min-width: 900px;
       margin: 40px auto;
-      border-radius: 0;        /* Sin bordes redondeados */
-      box-shadow: none;        /* Sin sombras */
+      padding: 28px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      border: 1px solid #000000;
     }
 
     .img-pictograma {
@@ -81,15 +84,10 @@
 
     .zonaPictogramas {
       position: relative !important;
+      /* Permite posicionamiento interno */
       margin: 20px auto;
+      /* Centra el bloque de pictogramas */
       display: inline-block;
-    }
-
-    .controls {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-top: 20px;
     }
 
     button {
@@ -107,6 +105,13 @@
       background: #6c757d;
     }
 
+    .controls {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
     #status {
       margin-top: 20px;
       text-align: center;
@@ -115,6 +120,7 @@
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 </head>
 
 <body>
@@ -124,7 +130,9 @@
   </div>
 
   <div class="container">
+
     <h2>Etiquetas generadas</h2>
+
     <div id="listaEtiquetas"></div>
 
     <div class="controls">
@@ -133,25 +141,42 @@
     </div>
 
     <div id="status"></div>
+
   </div>
 
   <script type="module">
     import { API_URL } from "./config.js";
 
+    /* =====================================================
+       Recuperar datos enviados desde multiIndex.html
+    ===================================================== */
     const datosJSON = sessionStorage.getItem("multiEtiquetas_datos");
     const datos = datosJSON ? JSON.parse(datosJSON) : [];
-    window.datos = datos;
+    window.datos = datos; // Guardamos en window para que sea globalmente accesible
 
+    if (datos.length === 0) {
+      console.error("No se encontraron datos de etiquetas en sessionStorage.");
+      // Podrías redirigir al usuario aquí o mostrar un mensaje
+    }
+
+    // ⭐ CAMBIO 1 (CORRECCIÓN): Definición ÚNICA del elemento de estatus
     const statusEl = document.getElementById("status");
 
+    // ⭐ CAMBIO 2 (CORRECCIÓN): Definición ÚNICA de la función setStatus
     function setStatus(message, isError = false) {
       if (!statusEl) return;
       statusEl.textContent = message;
       statusEl.style.color = isError ? "red" : "green";
+      console.log(isError ? `[ERROR] ${message}` : `[STATUS] ${message}`);
     }
+
+    /* =====================================================
+       Plantilla HTML original de etiqueta (igual al index)
+    ===================================================== */
 
     function crearPlantillaMiniEtiqueta() {
       const div = document.createElement("div");
+
       div.className = "etiqueta";
       div.style.width = "500px";
       div.style.height = "350px";
@@ -163,29 +188,110 @@
       div.style.fontFamily = "Arial, sans-serif";
 
       div.innerHTML = `
-        <div class="etiqueta-grid" style="display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto auto auto auto; gap:8px 0; height:100%; align-items:start;">
-            <div style="grid-column:1/3; text-align:left; font-size:10px; font-weight:bold; padding-bottom:6px; border-bottom:2px solid black;">
+        <div class="etiqueta-grid"
+             style="display:grid;
+                    grid-template-columns:1fr 1fr;
+                    grid-template-rows:auto auto auto auto;
+                    gap:8px 0;
+                    height:100%;
+                    align-items:start;">
+
+            <div style="grid-column:1/3;
+                        text-align:left;
+                        font-size:10px;
+                        font-weight:bold;
+                        padding-bottom:6px;
+                        border-bottom:2px solid black;">
                 ADVERTENCIA: <span class="advertencia">ATENCION</span>
             </div>
-            <div style="grid-column:1/3; display:flex; flex-direction:column; align-items:center; padding-top:6px; flex:1;">
-                <div class="nombreReactivo" style="font-size:20px; font-weight:bold; margin-bottom:8px; text-align:center; line-height:1.15; max-height:60px; overflow:hidden; word-break:break-word;">REACTIVO</div>
-                <div style="width:100%; display:flex; justify-content:center; gap:40px; margin-top:4px;">
-                    <div class="zonaPictogramas" style="width:180px; height:180px; margin-top:-10px; display:flex; align-items:center; justify-content:center;">PICTOGRAMA</div>
-                    <div style="width:150px; height:150px; display:flex; align-items:center; justify-content:center;">
-                        <img class="qr" src="" style="max-width:100%; max-height:100%; object-fit:contain;">
+
+            <div style="grid-column:1/3;
+                        display:flex;
+                        flex-direction:column;
+                        align-items:center;
+                        padding-top:6px;
+                        flex:1;">
+
+                <div class="nombreReactivo"
+                     style="font-size:20px;
+                            font-weight:bold;
+                            margin-bottom:8px;
+                            text-align:center;
+                            line-height:1.15;
+                            max-height:60px;
+                            overflow:hidden;
+                            word-break:break-word;">
+                    REACTIVO
+                </div>
+
+                <div style="width:100%;
+                            display:flex;
+                            justify-content:center;
+                            gap:40px;
+                            margin-top:4px;">
+
+                    <div class="zonaPictogramas"
+                         style="width:180px;
+                                height:180px;
+                                margin-top:-10px;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;">
+                        PICTOGRAMA
                     </div>
+
+                    <div style="width:150px;
+                                height:150px;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;">
+                        <img class="qr"
+                             src=""
+                             style="max-width:100%;
+                                    max-height:100%;
+                                    object-fit:contain;">
+                    </div>
+
                 </div>
             </div>
-            <div style="grid-column:1/3; border-top:2px solid black; margin-top:6px;"></div>
-            <div class="footer-proveedor" style="grid-column:1/3; padding-top:6px;">
-                <div style="display:flex; align-items:center; width:100%; font-size:11px; font-weight:bold;">
-                  <span style="margin-right:6px; white-space:nowrap;">Fabricante:</span>
-                  <div class="fabricante-wrapper" style="flex:1; overflow:hidden;">
-                      <span class="fabricante-text" style="display:inline-block; white-space:nowrap; transform-origin:left center;"></span>
+
+            <div style="grid-column:1/3;
+                        border-top:2px solid black;
+                        margin-top:6px;">
+            </div>
+
+            <div class="footer-proveedor"
+                style="grid-column:1/3;
+                padding-top:6px;">
+
+                <div style="display:flex;
+                    align-items:center;
+                    width:100%;
+                    font-size:11px;
+                    font-weight:bold;">
+
+                  <span style="margin-right:6px; white-space:nowrap;">
+                      Fabricante:
+                  </span>
+
+                  <div class="fabricante-wrapper"
+                        style="flex:1; overflow:hidden;">
+
+                        <span class="fabricante-text"
+                              style="display:inline-block;
+                                    white-space:nowrap;
+                                    transform-origin:left center;">
+                        </span>
+
                   </div>
+
                 </div>
+
             </div>
+
+
         </div>
+
         <div style="display:none;">
             <span class="preparacion"></span>
             <span class="analista"></span>
@@ -193,74 +299,146 @@
             <span class="fechaVencimiento"></span>
             <div class="frasesHP"></div>
         </div>
-      `;
+    `;
+
       return div;
     }
 
-    /* PLANTILLA GRANDE ACTUALIZADA PARA IGUALAR ETIQUETA.HTML */
+
     function crearPlantillaEtiqueta() {
+
       const div = document.createElement("div");
+
       div.className = "etiqueta";
+
       div.innerHTML = `
-        <div style="display: grid; grid-template-columns: 450px 30px auto; column-gap: 0;">
-          <div style="grid-column: 1;">
-            <div class="proveedorContenedor" style="font-size:14px;">
-              <strong>Proveedor:</strong> <span class="proveedor"></span>
-            </div>
+
+    <div style="display: grid; grid-template-columns: 450px 30px auto; column-gap: 0;">
+
+      <div style="grid-column: 1;">
+
+        <strong>Proveedor:</strong> <span class="proveedor"></span>
+
+      </div>
+
+
+
+      <div style="grid-column: 3; text-align:center;">
+
+        <strong>Pictogramas de<br>Peligro</strong>
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:14px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
+
+        <br><br>
+
+
+
+        <p><strong>Preparación:</strong></p>
+
+        <p class="preparacion">---</p>
+
+
+
+        <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
+
+
+
+        <div class="frasesHP"></div>
+
+      </div>
+
+
+
+      <div style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
+
+        <div class="zonaPictogramas" style="min-height: 220px;"></div>
+
+        <img class="qr" src="" style="width:150px; border:1px solid #ccc;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <hr style="border:1px solid black; margin:0;">
+
+      </div>
+
+
+
+      <div style="grid-column: 1; margin-top:20px;">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
+
+          <div>
+
+            <strong>Fecha Preparado:</strong><br>
+
+            <span class="fechaPreparado">DD/MM/YYYY</span>
+
           </div>
 
-          <div style="grid-column: 3; text-align:center;">
-            <strong>Pictogramas de<br>Peligro</strong>
+
+
+          <div style="text-align: right;">
+
+            <strong>Fecha Vencimiento:</strong><br>
+
+            <span class="fechaVencimiento">DD/MM/YYYY</span>
+
           </div>
 
-          <div style="grid-column: 1; margin-top:14px;">
-            <hr style="border:1px solid black; margin:0;">
-          </div>
-
-          <div style="grid-column: 1; margin-top:20px;">
-            <strong style="font-size: 17px;" class="nombreReactivo">NOMBRE</strong>
-            <br><br>
-            <p><strong>Preparación:</strong></p>
-            <p class="preparacion">---</p>
-            <p><strong>ADVERTENCIA: <span class="advertencia">---</span></strong></p>
-            <div class="frasesHP"></div>
-          </div>
-
-          <div style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center; min-width: max-content;">
-            <div class="zonaPictogramas" style="min-height: 220px;"></div>
-            <img class="qr" src="" style="width:150px; border:1px solid #ccc; margin-top: 10px;">
-          </div>
-
-          <div style="grid-column: 1; margin-top:20px;">
-            <hr style="border:1px solid black; margin:0;">
-          </div>
-
-          <div style="grid-column: 1; margin-top:20px;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
-              <div>
-                <strong>Fecha Preparado:</strong><br>
-                <span class="fechaPreparado">DD/MM/YYYY</span>
-              </div>
-              <div style="text-align: right;">
-                <strong>Fecha Vencimiento:</strong><br>
-                <span class="fechaVencimiento">DD/MM/YYYY</span>
-              </div>
-            </div>
-            <div style="margin-top:18px;">
-              <strong>Preparado por:</strong><br>
-              <span class="analista">---</span>
-            </div>
-          </div>
         </div>
-      `;
+
+
+
+        <div style="margin-top:18px;">
+
+          <strong>Preparado por:</strong><br>
+
+          <span class="analista">---</span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
       return div;
+
     }
 
+
+    /* =====================================================
+       Renderizar TODAS las etiquetas solicitadas
+    ===================================================== */
     async function cargarEtiquetas() {
       const contenedor = document.getElementById("listaEtiquetas");
-      setStatus("Generando datos y QRs, por favor espera...", false);
+      // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO ARRIBA
+
+      // Mostrar mensaje de carga porque esto tardará unos segundos creando carpetas
+      setStatus("Generando carpetas y QRs en Google Drive, por favor espera...", false); // Usando setStatus
 
       for (const item of datos) {
+
+        // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
         const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
@@ -273,6 +451,11 @@
         });
         const info = await resVisual.json();
 
+        console.log("INFO BACKEND:", info);
+
+
+        // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
+        // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
         let qrBase64 = "";
         try {
           const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
@@ -286,179 +469,359 @@
             })
           });
           const dataQR = await resQR.json();
-          if (dataQR.ok) qrBase64 = dataQR.qr;
-        } catch (err) { console.error("Error QR:", err); }
+
+          if (dataQR.ok) {
+            qrBase64 = dataQR.qr; // Aquí recibimos el QR único de la nueva carpeta
+          } else {
+            console.error("Error generando QR:", dataQR.error);
+          }
+        } catch (err) {
+          console.error("Error conectando para QR:", err);
+        }
 
         if (!resVisual.ok) continue;
 
         const copias = item.copias || 1;
-        const envaseMini = ["30", "30 mL", "40", "40 mL", "60", "60 mL"];
 
+        // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
         for (let c = 0; c < copias; c++) {
-          let et = envaseMini.includes(item.envase) ? crearPlantillaMiniEtiqueta() : crearPlantillaEtiqueta();
 
-          // Llenar datos básicos
+          const envaseMini = ["30", "30 mL", "40", "40 mL", "60", "60 mL"];
+
+          let et;
+          if (envaseMini.includes(item.envase)) {
+            et = crearPlantillaMiniEtiqueta();  // NUEVA PLANTILLA MINI
+          } else {
+            et = crearPlantillaEtiqueta();      // TU PLANTILLA NORMAL
+          }
+
+          // Llenar datos visuales
           et.querySelector(".nombreReactivo").textContent = info.nombre;
           et.querySelector(".preparacion").textContent = info.preparación || "No aplica";
           et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
           et.querySelector(".analista").textContent = item.analista || "—";
 
-          // Lógica del Proveedor (IGUAL A ETIQUETA.HTML)
+
+
+          // =======================================
+          // 🔥 ASIGNACIÓN DE PROVEEDOR / FABRICANTE COMPLETO
+          // =======================================
+
           const proveedorNormal = et.querySelector(".proveedor");
           const fabricanteTextMini = et.querySelector(".fabricante-text");
+          const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
+
+          // 1. Lógica de decisión: ¿Es Puro O es Reenvasado?
           const nombreUpper = (info.nombre || "").toUpperCase();
           const esReenvasado = nombreUpper.includes("REENVASADO") || nombreUpper.includes("REENVASADA");
 
           let infoCompleta = "";
+
+          // Si es puro O si el nombre indica que es reenvasado, usamos datos del proveedor
           if (item.soloPuros || esReenvasado) {
-            infoCompleta = info.fabricanteFiltrado || "Fabricante no definido";
-            if (info.direccion) infoCompleta += " - " + info.direccion;
-            if (info.telefono) infoCompleta += " - Tel: " + info.telefono;
+            const fabricante = info.fabricanteFiltrado || "Fabricante no definido";
+            const direccion = info.direccion || "";
+            const telefono = info.telefono || "";
+
+            infoCompleta = fabricante;
+            if (direccion) infoCompleta += " - " + direccion;
+            if (telefono) infoCompleta += " - Tel: " + telefono;
           } else {
+            // Datos por defecto para soluciones preparadas internamente
             infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
           }
 
+          // 2. Inyectar en la Etiqueta Normal (La que no quieres modificar)
           if (proveedorNormal) {
             proveedorNormal.textContent = infoCompleta;
-            const contenedorTexto = et.querySelector(".proveedorContenedor");
-            // Ajuste dinámico de fuente de la referencia
-            if (infoCompleta.length > 80) {
-              contenedorTexto.style.fontSize = "10px";
-            } else if (infoCompleta.length > 50) {
-              contenedorTexto.style.fontSize = "12px";
-            } else {
-              contenedorTexto.style.fontSize = "14px";
-            }
+            // Ajuste de fuente para que quepa la dirección y el teléfono
+            proveedorNormal.style.fontSize = "11px";
+            proveedorNormal.style.display = "inline-block";
+            proveedorNormal.style.lineHeight = "1.1";
           }
 
-          if (fabricanteTextMini) {
+          // 3. Inyectar en la Etiqueta Mini (Si aplica)
+          if (fabricanteTextMini && fabricanteWrapper) {
             fabricanteTextMini.textContent = infoCompleta;
+
+            requestAnimationFrame(() => {
+              const textWidth = fabricanteTextMini.scrollWidth;
+              const containerWidth = fabricanteWrapper.offsetWidth;
+              if (textWidth > containerWidth) {
+                let scale = containerWidth / textWidth;
+                if (scale < 0.6) scale = 0.6; // Un poco más pequeño para info larga
+                fabricanteTextMini.style.transform = `scale(${scale})`;
+              } else {
+                fabricanteTextMini.style.transform = "scale(1)";
+              }
+            });
           }
 
-          // Frases H/P
           let htmlHP = "";
           info.frases_h?.forEach(f => htmlHP += `<p>${f}</p>`);
           info.frases_p?.forEach(f => htmlHP += `<p>${f}</p>`);
           et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-          // Pictogramas (IGUAL A ETIQUETA.HTML - SIN ESCALADO 0.75)
+          // ======================================================
+          // LÓGICA DE PICTOGRAMAS CON DISEÑOS Y DIMENSIONES EXACTAS
+          // ======================================================
           const zonaImg = et.querySelector(".zonaPictogramas");
           if (zonaImg) {
             const picos = info.pictogramas || [];
             const volNumerico = parseInt(item.envase) || 0;
-            const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
-            const count = listaFinal.length;
-            let htmlPictos = "";
+            const esMini = envaseMini.includes(item.envase);
 
+            // Regla de volumen: < 100ml solo muestra el primero
+            const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
+
+            let htmlPictos = "";
+            const count = listaFinal.length;
+
+            // DISEÑOS SEGÚN TU LÓGICA ORIGINAL
             if (count === 1) {
-              zonaImg.style.width = "180px"; zonaImg.style.height = "180px";
+              zonaImg.style.width = "180px";
+              zonaImg.style.height = "180px";
               htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">`;
+
             } else if (count === 2) {
-              zonaImg.style.width = "360px"; zonaImg.style.height = "180px";
-              htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;"><img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">`;
+              zonaImg.style.width = "360px";
+              zonaImg.style.height = "180px";
+              htmlPictos = `
+                <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+                <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+              `;
+
             } else if (count === 3) {
-              zonaImg.style.width = "385px"; zonaImg.style.height = "307px";
-              htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:102.5px;"><img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:127px; left:0;"><img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:205px;">`;
+              zonaImg.style.width = "385px";
+              zonaImg.style.height = "307px";
+              htmlPictos = `
+                <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:102.5px;">
+                <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:127px; left:0;">
+                <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:205px;">
+              `;
+
             } else if (count === 4) {
-              zonaImg.style.width = "360px"; zonaImg.style.height = "307px";
-              htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;"><img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;"><img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:0;"><img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:180px;">`;
+              zonaImg.style.width = "360px";
+              zonaImg.style.height = "307px";
+              htmlPictos = `
+                <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+                <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+                <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:0;">
+                <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:180px;">
+              `;
+
             } else if (count === 5) {
-              zonaImg.style.width = "540px"; zonaImg.style.height = "307px";
-              htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;"><img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;"><img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:0; left:360px;"><img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:90px;"><img src="/imagenes/${getPictogramName(listaFinal[4])}.png" class="img-pictograma" style="top:127px; left:270px;">`;
+              zonaImg.style.width = "540px";
+              zonaImg.style.height = "307px";
+              htmlPictos = `
+                <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+                <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+                <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:0; left:360px;">
+                <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:90px;">
+                <img src="/imagenes/${getPictogramName(listaFinal[4])}.png" class="img-pictograma" style="top:127px; left:270px;">
+              `;
             }
+
+            // Insertar imágenes UNA SOLA VEZ (Eliminado duplicado)
             zonaImg.innerHTML = htmlPictos;
 
-            // Ajuste de escalado solo para MINI
-            if (envaseMini.includes(item.envase)) {
+            // ======================================================
+            // 🔥 SOLUCIÓN DEL ESCALADO UNIFICADO (CORREGIDO)
+            // ======================================================
+            // Sin esto, el diseño se desborda de la etiqueta física
+            if (esMini) {
+              // PARA ETIQUETAS MINI (<100ml)
               zonaImg.style.transform = "scale(0.48)";
               zonaImg.style.transformOrigin = "center top";
               zonaImg.style.marginBottom = "-40px";
             } else {
-              // En la etiqueta normal (>100ml) NO aplicamos escalado 0.75 para ser igual a etiqueta.html
-              zonaImg.style.transform = "none";
-              zonaImg.style.marginBottom = "0";
+              // PARA ETIQUETAS GRANDES (≥ 100ml)
+              // Copiamos exactamente lo de etiqueta.html: 0.75x y -50px
+              zonaImg.style.transform = "scale(0.75)";
+              zonaImg.style.transformOrigin = "center top";
+              zonaImg.style.marginBottom = "-50px";
             }
+            // (Eliminado innerHTML duplicado y bloque duplicado que causaba el error)
           }
 
-          if (qrBase64) et.querySelector(".qr").src = qrBase64;
+
+          // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
+          if (qrBase64) {
+            et.querySelector(".qr").src = qrBase64;
+          }
+          // ------------------------------------------------------
 
           // Fechas
-          if (item.incluirFechas) {
-            const hoy = new Date();
-            et.querySelector(".fechaPreparado").textContent = hoy.toLocaleDateString("es-CO");
-            let venc = new Date(hoy);
-            const val = parseInt(item.vigenciaValor) || 0;
-            switch (item.vigenciaUnidad) {
-              case "Día(s)": venc.setDate(venc.getDate() + val); break;
-              case "Semana(s)": venc.setDate(venc.getDate() + 7 * val); break;
-              case "Mes(es)": venc.setMonth(venc.getMonth() + val); break;
-              case "Año(s)": venc.setFullYear(venc.getFullYear() + val); break;
-            }
-            et.querySelector(".fechaVencimiento").textContent = venc.toLocaleDateString("es-CO");
+          if (!item.incluirFechas) {
+            et.querySelector(".fechaPreparado").style.display = "none";
+            et.querySelector(".fechaVencimiento").style.display = "none";
           } else {
-            et.querySelector(".fechaPreparado").parentElement.style.display = "none";
-            et.querySelector(".fechaVencimiento").parentElement.style.display = "none";
+            const hoy = new Date();
+            et.querySelector(".fechaPreparado").textContent =
+              hoy.toLocaleDateString("es-CO");
+
+            let venc = new Date(hoy);
+            // Conversión segura a número
+            const valorVigencia = parseInt(item.vigenciaValor) || 0;
+
+            switch (item.vigenciaUnidad) {
+              case "Día(s)": venc.setDate(venc.getDate() + valorVigencia); break;
+              case "Semana(s)": venc.setDate(venc.getDate() + 7 * valorVigencia); break;
+              case "Mes(es)": venc.setMonth(venc.getMonth() + valorVigencia); break;
+              case "Año(s)": venc.setFullYear(venc.getFullYear() + valorVigencia); break;
+            }
+            et.querySelector(".fechaVencimiento").textContent =
+              venc.toLocaleDateString("es-CO");
           }
 
           contenedor.appendChild(et);
         }
       }
-      setStatus("Etiquetas listas para generar DOCX.", false);
+
+      setStatus("Etiquetas listas. Revisa los QRs y haz clic en 'Generar archivo DOCX'.", false); // Usando setStatus
     }
 
     cargarEtiquetas();
 
+
+
     document.getElementById("btnGenerarDOCX").addEventListener("click", async () => {
+      // 1. Obtener todos los elementos de etiqueta renderizados
       const etiquetasDOM = [...document.querySelectorAll(".etiqueta")];
-      if (etiquetasDOM.length === 0) return setStatus("No hay etiquetas.", true);
-      setStatus("Procesando imágenes...", false);
+
+      if (etiquetasDOM.length === 0) {
+        setStatus("No hay etiquetas para convertir.", true); // Usando setStatus
+        return;
+      }
+
+      setStatus("Procesando etiquetas…", false); // Usando setStatus
+
+      // Asumo que 'window.datos' contiene el array de reactivos con 'envase' y 'copias'.
+      if (!window.datos) {
+        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true); // Usando setStatus
+        return;
+      }
 
       const payloadEtiquetas = [];
-      let index = 0;
+      let etiquetasIndex = 0;
+
+      // Recorrer los datos originales para obtener el 'envase' correcto
       for (const item of window.datos) {
-        for (let c = 0; c < (item.copias || 1); c++) {
-          const et = etiquetasDOM[index++];
+        const copias = item.copias || 1;
+
+        // Iterar por cada copia generada por este formulario
+        for (let c = 0; c < copias; c++) {
+          const et = etiquetasDOM[etiquetasIndex]; // Obtener el elemento DOM en el orden correcto
+
+          if (!et) {
+            console.error("Faltan elementos DOM para la etiqueta #", etiquetasIndex);
+            break;
+          }
+
+          // 2. Usar html2canvas para tomar la 'foto' (screenshot)
           const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
+
+          // 3. Crear el objeto con la imagen y el envase para el backend
           payloadEtiquetas.push({
             base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
             envase: item.envase
           });
+
+          etiquetasIndex++;
         }
       }
 
+      // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
       const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+        // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
         body: JSON.stringify({ etiquetas: payloadEtiquetas })
       });
+
       const data = await res.json();
+
       if (data.ok) {
         window.__archivoFinal = data.archivo;
-        setStatus("Documento generado. Haz clic en 'Descargar'.");
+        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.", false); // Usando setStatus
       } else {
-        setStatus("Error: " + data.error, true);
+        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true); // Usando setStatus
       }
     });
 
+    /* =====================================================
+       DESCARGAR ARCHIVO FINAL
+    ===================================================== */
     document.getElementById("btnDescargar").addEventListener("click", async () => {
-      if (!window.__archivoFinal) return setStatus("Genera el archivo primero.", true);
-      const url = `${API_URL}/api/descargar/${window.__archivoFinal}`;
+      // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO Y NO SE NECESITA REPETIR AQUÍ
+
+      if (!window.__archivoFinal) {
+        setStatus("Primero genera el documento.", true); // Usando setStatus
+        return;
+      }
+
+      setStatus("Iniciando descarga del archivo...", false); // Usando setStatus
+
+
+      const archivoADescargar = window.__archivoFinal;
+      const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
+
       try {
-        const response = await fetch(url, { headers: { 'ngrok-skip-browser-warning': 'true' } });
+        // 1. Usar FETCH para incluir el encabezado de ngrok
+        const response = await fetch(urlDescarga, {
+          method: 'GET',
+          headers: {
+            // Encabezado CLAVE para evitar la página de advertencia de ngrok
+            'ngrok-skip-browser-warning': 'true'
+          }
+        });
+
+        if (!response.ok) {
+          setStatus(`Error ${response.status} al descargar el archivo.`, true); // Usando setStatus
+          return;
+        }
+
+        // 2. Procesar la respuesta binaria (Blob)
         const blob = await response.blob();
+
+        // 3. Crear un enlace temporal para forzar la descarga en el navegador
+        const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = window.URL.createObjectURL(blob);
-        a.download = window.__archivoFinal;
+        a.href = url;
+        a.download = archivoADescargar; // Usa el nombre de archivo final
         document.body.appendChild(a);
         a.click();
-        a.remove();
-      } catch (e) { setStatus("Error descarga", true); }
+        a.remove(); // Limpiar el elemento
+
+        // 4. Liberar el objeto URL creado
+        window.URL.revokeObjectURL(url);
+
+        setStatus("Archivo descargado.", false); // Usando setStatus
+
+      } catch (error) {
+        console.error("Error en la descarga:", error);
+        setStatus("Fallo la descarga. Revisa la consola.", true); // Usando setStatus
+      }
     });
 
+    // Función para mapear códigos GHS a nombres de archivo reales
     function getPictogramName(ghsCode) {
-      const map = { "GHS01": "explosivo", "GHS02": "inflamable", "GHS03": "comburente", "GHS04": "gas", "GHS05": "corrosivo", "GHS06": "toxico", "GHS07": "irritacion", "GHS08": "salud", "GHS09": "medioambiente" };
+      const map = {
+        "GHS01": "explosivo",
+        "GHS02": "inflamable",
+        "GHS03": "comburente",
+        "GHS04": "gas",
+        "GHS05": "corrosivo",
+        "GHS06": "toxico",
+        "GHS07": "irritacion",
+        "GHS08": "salud",
+        "GHS09": "medioambiente"
+      };
       return map[ghsCode] || "noaplica";
     }
+
   </script>
+
 </body>
+
 </html>
