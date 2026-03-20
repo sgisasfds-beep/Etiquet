@@ -196,7 +196,6 @@
                     height:100%;
                     align-items:start;">
 
-            <!-- HEADER -->
             <div style="grid-column:1/3;
                         text-align:left;
                         font-size:10px;
@@ -206,7 +205,6 @@
                 ADVERTENCIA: <span class="advertencia">ATENCION</span>
             </div>
 
-            <!-- CONTENIDO -->
             <div style="grid-column:1/3;
                         display:flex;
                         flex-direction:column;
@@ -257,13 +255,11 @@
                 </div>
             </div>
 
-            <!-- LINEA DIVISORIA -->
             <div style="grid-column:1/3;
                         border-top:2px solid black;
                         margin-top:6px;">
             </div>
 
-            <!-- FOOTER FABRICANTE -->
             <div class="footer-proveedor"
                 style="grid-column:1/3;
                 padding-top:6px;">
@@ -296,7 +292,6 @@
 
         </div>
 
-        <!-- DATOS OCULTOS -->
         <div style="display:none;">
             <span class="preparacion"></span>
             <span class="analista"></span>
@@ -627,28 +622,26 @@
               `;
             }
 
+            // Insertar imágenes UNA SOLA VEZ (Eliminado duplicado)
             zonaImg.innerHTML = htmlPictos;
 
-            // ESCALADO PARA QUE EL DISEÑO QUE MIDE 300px-540px QUEPA EN LA ETIQUETA
+            // ======================================================
+            // 🔥 SOLUCIÓN DEL ESCALADO UNIFICADO (CORREGIDO)
+            // ======================================================
             // Sin esto, el diseño se desborda de la etiqueta física
             if (esMini) {
-              zonaImg.style.transform = "scale(0.4)";
+              // PARA ETIQUETAS MINI (<100ml)
+              zonaImg.style.transform = "scale(0.48)";
               zonaImg.style.transformOrigin = "center top";
-              zonaImg.style.marginBottom = "-120px"; // Ajuste visual por el espacio del transform
+              zonaImg.style.marginBottom = "-40px";
             } else {
+              // PARA ETIQUETAS GRANDES (≥ 100ml)
+              // Copiamos exactamente lo de etiqueta.html: 0.75x y -50px
               zonaImg.style.transform = "scale(0.75)";
               zonaImg.style.transformOrigin = "center top";
               zonaImg.style.marginBottom = "-50px";
             }
-
-            zonaImg.innerHTML = htmlPictos;
-
-            // Ajuste de escala para el diseño en etiquetas pequeñas
-            if (esMini) {
-              zonaImg.style.transform = "scale(0.48)";
-              zonaImg.style.transformOrigin = "center top";
-              zonaImg.style.marginBottom = "-40px";
-            }
+            // (Eliminado innerHTML duplicado y bloque duplicado que causaba el error)
           }
 
 
