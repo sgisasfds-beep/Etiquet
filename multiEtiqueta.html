@@ -64,15 +64,16 @@
 
     /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
     .etiqueta {
-      width: fit-content;
-      /* Se ajusta al ancho real de la etiqueta */
-      min-width: 900px;
-      margin: 40px auto;
-      padding: 28px;
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-      border: 1px solid #000000;
+      display: inline-block;
+      /* Permite que el ancho se ajuste al contenido interno */
+      min-width: 400px;
+      border: 4px solid black;
+      /* Un poco más grueso para que resalte */
+      padding: 25px;
+      font-family: Arial, sans-serif;
+      background: white;
+      overflow: visible;
+      box-sizing: border-box;
     }
 
     .img-pictograma {
