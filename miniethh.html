@@ -166,6 +166,23 @@
             background: #5a6268;
             transform: scale(1.03);
         }
+
+        /* Estilos para el nuevo pie de página de la etiqueta */
+        .footer-line {
+            width: 100%;
+            border-top: 2px solid black;
+            margin-top: 15px;
+        }
+
+        .footer-text {
+            width: 100%;
+            text-align: left;
+            font-size: 10px;
+            font-weight: bold;
+            padding-top: 5px;
+            text-transform: uppercase;
+            /* Para mantener consistencia con etiqueta.html */
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -198,6 +215,9 @@
                         <div class="box" id="pictogramaBox">PICTOGRAMA</div>
                         <div class="box" id="qrBox">CÓDIGO QR</div>
                     </div>
+
+                    <div class="footer-line"></div>
+                    <div class="footer-text" id="proveedorFooter"></div>
                 </div>
 
             </div>
@@ -370,6 +390,29 @@
                 pintarQR(qrGuardado);
             } else if (nombreReactivo && analista) {
                 generarQRdeCarpeta(nombreReactivo, analista);
+            }
+
+            const proveedorFooter = document.getElementById("proveedorFooter");
+
+            // Lógica de proveedor idéntica a etiqueta.html
+            const nombreNormalizado = (nombreReactivo || "").toLowerCase();
+            const esReenvasado = nombreNormalizado.includes("reenvasado") || nombreNormalizado.includes("reenvasada");
+            const modoReactivosPuros = datosEtiqueta.usuario.modoReactivosPuros;
+
+            if (esReenvasado || modoReactivosPuros) {
+                // Si es puro o reenvasado, usamos los datos del fabricante externo
+                const fabricanteProv = datosEtiqueta.usuario.fabricante || "";
+                const direccion = datosEtiqueta.reactivo.direccion || "";
+                const telefono = datosEtiqueta.reactivo.telefono || "";
+
+                let infoCompleta = fabricanteProv;
+                if (direccion) infoCompleta += " - " + direccion;
+                if (telefono) infoCompleta += " - Tel: " + telefono;
+
+                proveedorFooter.textContent = (infoCompleta || "Proveedor no definido").toUpperCase();
+            } else {
+                // Caso por defecto: SGI SAS
+                proveedorFooter.textContent = "PROVEEDOR: SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
             }
 
             // ===================================================================
