@@ -252,8 +252,7 @@
             // =======================================================
             // LÓGICA DE PICTOGRAMA (Backend)
             // =======================================================
-            // Mapeo corregido idéntico a la lógica de etiqueta.html
-            // Mapeo idéntico al de etiqueta.html (nombres base sin extensión)
+            // 1. Mapeo idéntico a etiqueta.html
             const mapeoImagenes = {
                 "GHS01": "explosivo",
                 "GHS02": "inflamable",
@@ -268,10 +267,11 @@
 
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
-                pictogramaBox.textContent = "Cargando...";
+                // Limpiamos el texto "Pictograma" de inmediato
+                pictogramaBox.innerHTML = "<span style='font-size:10px;'>Cargando...</span>";
 
                 try {
-                    // 1. Pedir los datos al API
+                    // Obtenemos los datos del reactivo
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
                         headers: {
@@ -281,38 +281,39 @@
                         body: JSON.stringify({ nombreReactivo, fabricante, volumen: envase })
                     });
 
-                    if (!res.ok) throw new Error("Error en servidor");
                     const data = await res.json();
 
                     if (data.pictogramas && data.pictogramas.length > 0) {
                         const primerCodigo = data.pictogramas[0];
-                        const nombreArchivoBase = mapeoImagenes[primerCodigo];
+                        const nombreBase = mapeoImagenes[primerCodigo];
 
-                        if (nombreArchivoBase) {
-                            // 2. IMPORTANTE: En lugar de poner la URL directo en el <img>,
-                            // hacemos un fetch de la imagen misma para enviar el header de ngrok.
-                            const urlImagenReal = `${API_URL}/imagenes/${nombreArchivoBase}.png`;
+                        if (nombreBase) {
+                            // RUTA DE LA IMAGEN
+                            const urlImagenReal = `${API_URL}/imagenes/${nombreBase}.png`;
 
-                            const imgRes = await fetch(urlImagenReal, {
+                            // --- TRUCO PARA NGROK ---
+                            // Hacemos un segundo fetch a la imagen pero incluyendo el header que salta la advertencia
+                            const imgFetch = await fetch(urlImagenReal, {
                                 headers: { "ngrok-skip-browser-warning": "true" }
                             });
 
-                            if (!imgRes.ok) throw new Error("No se pudo obtener el archivo de imagen");
+                            if (!imgFetch.ok) throw new Error("No se pudo descargar el archivo png");
 
-                            const blob = await imgRes.blob();
-                            const urlLocal = URL.createObjectURL(blob); // Creamos una URL temporal local
+                            // Convertimos la respuesta en un objeto que el <img> sí pueda leer
+                            const blob = await imgFetch.blob();
+                            const objectURL = URL.createObjectURL(blob);
 
-                            // 3. Ahora sí, la imagen cargará sin pasar por la advertencia de ngrok
-                            pictogramaBox.innerHTML = `<img src="${urlLocal}" alt="Pictograma">`;
+                            // Insertamos la imagen en el HTML
+                            pictogramaBox.innerHTML = `<img src="${objectURL}" alt="GHS" style="max-width:100%; max-height:100%; display:block; margin:auto;">`;
                         } else {
-                            pictogramaBox.textContent = "CÓDIGO NO MAPEADO";
+                            pictogramaBox.textContent = "CÓDIGO NO VÁLIDO";
                         }
                     } else {
                         pictogramaBox.textContent = "SIN PICTOGRAMA";
                     }
                 } catch (error) {
-                    console.error("Error en carga de pictograma:", error);
-                    pictogramaBox.textContent = "Error de carga";
+                    console.error("Error cargando pictograma:", error);
+                    pictogramaBox.textContent = "ERROR";
                 }
             }
             // =======================================================
