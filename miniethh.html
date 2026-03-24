@@ -205,7 +205,7 @@
                 </div>
 
                 <div class="header-right">
-                    </div>
+                </div>
 
                 <div class="content-row">
                     <div class="reactivo-name" id="nombreReactivo">REACTIVO</div>
@@ -265,8 +265,30 @@
 
             // Rellenar Textos
             document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
-            document.getElementById("proveedorTexto").textContent = "SGI SAS";
             document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
+            // 2. Lógica de Proveedor (Solo para proveedorFooter)
+            const proveedorFooter = document.getElementById("proveedorFooter");
+            const nombreNormalizado = (nombreReactivo || "").toLowerCase();
+
+            // Verificamos si es un producto externo o reenvasado
+            const esReenvasado = nombreNormalizado.includes("reenvasado") || nombreNormalizado.includes("reenvasada");
+            const modoReactivosPuros = datosEtiqueta.usuario.modoReactivosPuros;
+
+            if (esReenvasado || modoReactivosPuros) {
+                // Datos del fabricante original
+                const fabricanteProv = datosEtiqueta.usuario.fabricante || "";
+                const direccion = datosEtiqueta.reactivo.direccion || "";
+                const telefono = datosEtiqueta.reactivo.telefono || "";
+
+                let infoCompleta = fabricanteProv;
+                if (direccion) infoCompleta += " - " + direccion;
+                if (telefono) infoCompleta += " - TEL: " + telefono;
+
+                proveedorFooter.textContent = (infoCompleta || "PROVEEDOR NO DEFINIDO").toUpperCase();
+            } else {
+                // Caso por defecto (SGI SAS)
+                proveedorFooter.textContent = "PROVEEDOR: SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
+            }
 
             // =======================================================
             // LÓGICA DE PICTOGRAMA (Backend)
@@ -391,29 +413,7 @@
                 generarQRdeCarpeta(nombreReactivo, analista);
             }
 
-            const proveedorFooter = document.getElementById("proveedorFooter");
-
-            // Lógica de proveedor idéntica a etiqueta.html
-            const nombreNormalizado = (nombreReactivo || "").toLowerCase();
-            const esReenvasado = nombreNormalizado.includes("reenvasado") || nombreNormalizado.includes("reenvasada");
-            const modoReactivosPuros = datosEtiqueta.usuario.modoReactivosPuros;
-
-            if (esReenvasado || modoReactivosPuros) {
-                // Si es puro o reenvasado, usamos los datos del fabricante externo
-                const fabricanteProv = datosEtiqueta.usuario.fabricante || "";
-                const direccion = datosEtiqueta.reactivo.direccion || "";
-                const telefono = datosEtiqueta.reactivo.telefono || "";
-
-                let infoCompleta = fabricanteProv;
-                if (direccion) infoCompleta += " - " + direccion;
-                if (telefono) infoCompleta += " - Tel: " + telefono;
-
-                proveedorFooter.textContent = (infoCompleta || "Proveedor no definido").toUpperCase();
-            } else {
-                // Caso por defecto: SGI SAS
-                proveedorFooter.textContent = "PROVEEDOR: SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
-            }
-
+            
             // ===================================================================
             // 🔥 SOLUCIÓN AL PROBLEMA DE "ATRÁS" (PAGESHOW EVENT)
             // ===================================================================
