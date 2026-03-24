@@ -264,61 +264,36 @@
             // =======================================================
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
-
-                if (!pictogramaBox.innerHTML.includes('img')) {
-                    pictogramaBox.textContent = "Cargando...";
-                }
+                pictogramaBox.textContent = "Cargando...";
 
                 try {
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "ngrok-skip-browser-warning": "true"
-                        },
-                        body: JSON.stringify({
-                            nombreReactivo,
-                            fabricante,
-                            volumen: envase
-                        })
+                        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+                        body: JSON.stringify({ nombreReactivo, fabricante, volumen: envase })
                     });
 
-                    if (!res.ok) {
-                        pictogramaBox.textContent = "Error al generar pictograma";
-                        return;
-                    }
-
+                    if (!res.ok) throw new Error("Error en servidor");
                     const data = await res.json();
 
-                    // LÓGICA PARA COLOCAR SOLO UNA IMAGEN
                     if (data.pictogramas && data.pictogramas.length > 0) {
-                        // 1. Tomamos solo el primer código del array
                         const primerCodigo = data.pictogramas[0];
-
-                        // 2. Buscamos el nombre del archivo en nuestro mapeo
                         const nombreArchivo = mapeoImagenes[primerCodigo];
 
                         if (nombreArchivo) {
-                            // 3. Construimos la URL apuntando a la carpeta de imágenes del servidor
                             const urlImagen = `${API_URL}/imagenes/${nombreArchivo}`;
-
-                            pictogramaBox.innerHTML = "";
-                            setTimeout(() => {
-                                pictogramaBox.innerHTML = `<img src="${urlImagen}" alt="pictograma ${primerCodigo}">`;
-                            }, 50);
+                            pictogramaBox.innerHTML = `<img src="${urlImagen}" alt="Pictograma">`;
                         } else {
-                            pictogramaBox.textContent = "CÓDIGO NO RECONOCIDO";
+                            pictogramaBox.textContent = "CÓDIGO NO MAPEADO";
                         }
                     } else {
-                        pictogramaBox.textContent = "NO APLICAN PICTOGRAMAS";
+                        pictogramaBox.textContent = "SIN PICTOGRAMA";
                     }
-
                 } catch (error) {
-                    console.error("Error en la carga:", error);
-                    pictogramaBox.textContent = "Error de conexión";
+                    console.error(error);
+                    pictogramaBox.textContent = "Error de carga";
                 }
             }
-
             // =======================================================
             // LÓGICA DE CÓDIGO QR
             // =======================================================
