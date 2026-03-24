@@ -216,17 +216,7 @@
     <script type="module">
         import { API_URL } from "./config.js";
 
-        const mapeoImagenes = {
-            "GHS01": "explosivo.png",
-            "GHS02": "Inflamable.png",
-            "GHS03": "comburente.png",
-            "GHS04": "gas.png",
-            "GHS05": "corrosivo.png",
-            "GHS06": "toxico.png",
-            "GHS07": "irritacion.png",
-            "GHS08": "salud.png",
-            "GHS09": "Medioambiente.png"
-        };
+        
 
         const statusEl = document.getElementById("status");
 
@@ -262,6 +252,19 @@
             // =======================================================
             // LÓGICA DE PICTOGRAMA (Backend)
             // =======================================================
+            // Mapeo corregido idéntico a la lógica de etiqueta.html
+            const mapeoImagenes = {
+                "GHS01": "explosivo",
+                "GHS02": "inflamable",
+                "GHS03": "comburente",
+                "GHS04": "gas",
+                "GHS05": "corrosivo",
+                "GHS06": "toxico",
+                "GHS07": "irritacion",
+                "GHS08": "salud",
+                "GHS09": "medioambiente"
+            };
+
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
                 pictogramaBox.textContent = "Cargando...";
@@ -269,19 +272,25 @@
                 try {
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true"
+                        },
                         body: JSON.stringify({ nombreReactivo, fabricante, volumen: envase })
                     });
 
                     if (!res.ok) throw new Error("Error en servidor");
                     const data = await res.json();
 
+                    // Lógica para mostrar solo el primer pictograma (índice 0)
                     if (data.pictogramas && data.pictogramas.length > 0) {
                         const primerCodigo = data.pictogramas[0];
-                        const nombreArchivo = mapeoImagenes[primerCodigo];
+                        const nombreBase = mapeoImagenes[primerCodigo];
 
-                        if (nombreArchivo) {
-                            const urlImagen = `${API_URL}/imagenes/${nombreArchivo}`;
+                        if (nombreBase) {
+                            // Se construye la URL usando API_URL, la carpeta /imagenes/ y la extensión .png
+                            // Tal como lo hace etiqueta.html en su función getPictogramName
+                            const urlImagen = `${API_URL}/imagenes/${nombreBase}.png`;
                             pictogramaBox.innerHTML = `<img src="${urlImagen}" alt="Pictograma">`;
                         } else {
                             pictogramaBox.textContent = "CÓDIGO NO MAPEADO";
@@ -290,7 +299,7 @@
                         pictogramaBox.textContent = "SIN PICTOGRAMA";
                     }
                 } catch (error) {
-                    console.error(error);
+                    console.error("Error al cargar pictograma:", error);
                     pictogramaBox.textContent = "Error de carga";
                 }
             }
