@@ -216,7 +216,7 @@
     <script type="module">
         import { API_URL } from "./config.js";
 
-        
+
 
         const statusEl = document.getElementById("status");
 
@@ -253,6 +253,7 @@
             // LÓGICA DE PICTOGRAMA (Backend)
             // =======================================================
             // Mapeo corregido idéntico a la lógica de etiqueta.html
+            // Mapeo idéntico al de etiqueta.html (nombres base sin extensión)
             const mapeoImagenes = {
                 "GHS01": "explosivo",
                 "GHS02": "inflamable",
@@ -274,7 +275,7 @@
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "ngrok-skip-browser-warning": "true"
+                            "ngrok-skip-browser-warning": "true" // Evita la advertencia de ngrok en el fetch
                         },
                         body: JSON.stringify({ nombreReactivo, fabricante, volumen: envase })
                     });
@@ -288,9 +289,10 @@
                         const nombreBase = mapeoImagenes[primerCodigo];
 
                         if (nombreBase) {
-                            // Se construye la URL usando API_URL, la carpeta /imagenes/ y la extensión .png
-                            // Tal como lo hace etiqueta.html en su función getPictogramName
+                            // Se construye la URL agregando .png al final (igual que etiqueta.html)
                             const urlImagen = `${API_URL}/imagenes/${nombreBase}.png`;
+
+                            // Limpiamos el contenedor e insertamos la imagen
                             pictogramaBox.innerHTML = `<img src="${urlImagen}" alt="Pictograma">`;
                         } else {
                             pictogramaBox.textContent = "CÓDIGO NO MAPEADO";
