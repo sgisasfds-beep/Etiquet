@@ -271,11 +271,12 @@
                 pictogramaBox.textContent = "Cargando...";
 
                 try {
+                    // 1. Pedir los datos al API
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            "ngrok-skip-browser-warning": "true" // Evita la advertencia de ngrok en el fetch
+                            "ngrok-skip-browser-warning": "true"
                         },
                         body: JSON.stringify({ nombreReactivo, fabricante, volumen: envase })
                     });
@@ -283,17 +284,26 @@
                     if (!res.ok) throw new Error("Error en servidor");
                     const data = await res.json();
 
-                    // Lógica para mostrar solo el primer pictograma (índice 0)
                     if (data.pictogramas && data.pictogramas.length > 0) {
                         const primerCodigo = data.pictogramas[0];
-                        const nombreBase = mapeoImagenes[primerCodigo];
+                        const nombreArchivoBase = mapeoImagenes[primerCodigo];
 
-                        if (nombreBase) {
-                            // Se construye la URL agregando .png al final (igual que etiqueta.html)
-                            const urlImagen = `${API_URL}/imagenes/${nombreBase}.png`;
+                        if (nombreArchivoBase) {
+                            // 2. IMPORTANTE: En lugar de poner la URL directo en el <img>,
+                            // hacemos un fetch de la imagen misma para enviar el header de ngrok.
+                            const urlImagenReal = `${API_URL}/imagenes/${nombreArchivoBase}.png`;
 
-                            // Limpiamos el contenedor e insertamos la imagen
-                            pictogramaBox.innerHTML = `<img src="${urlImagen}" alt="Pictograma">`;
+                            const imgRes = await fetch(urlImagenReal, {
+                                headers: { "ngrok-skip-browser-warning": "true" }
+                            });
+
+                            if (!imgRes.ok) throw new Error("No se pudo obtener el archivo de imagen");
+
+                            const blob = await imgRes.blob();
+                            const urlLocal = URL.createObjectURL(blob); // Creamos una URL temporal local
+
+                            // 3. Ahora sí, la imagen cargará sin pasar por la advertencia de ngrok
+                            pictogramaBox.innerHTML = `<img src="${urlLocal}" alt="Pictograma">`;
                         } else {
                             pictogramaBox.textContent = "CÓDIGO NO MAPEADO";
                         }
@@ -301,7 +311,7 @@
                         pictogramaBox.textContent = "SIN PICTOGRAMA";
                     }
                 } catch (error) {
-                    console.error("Error al cargar pictograma:", error);
+                    console.error("Error en carga de pictograma:", error);
                     pictogramaBox.textContent = "Error de carga";
                 }
             }
