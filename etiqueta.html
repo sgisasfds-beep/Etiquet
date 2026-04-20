@@ -69,24 +69,15 @@
     }
 
     #zonaPictogramas {
-      display: grid;
-      justify-items: center;
-      /* Centra horizontalmente */
-      align-items: center;
-      /* Centra verticalmente */
+      position: relative;
+      display:inline-block;
       margin: 20px auto;
-      row-gap: -45px;
-      /* El "secreto": une los rombos verticalmente sin taparlos */
-      column-gap: 5px;
-      /* Separación mínima horizontal */
-      width: fit-content;
+      /* El ancho y alto se definen dinámicamente por JS según la cantidad */
     }
 
     .img-pictograma {
-      position: relative;
-      /* Ya no es absolute */
+      position: absolute;
       width: 180px;
-      /* Mantenemos tus 180px */
       height: 180px;
       object-fit: contain;
     }
@@ -170,8 +161,8 @@
           <div
             style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
             <div id="zonaPictogramas"></div>
-
-
+            
+            
             <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
               style="width:150px; margin-top:10px; border: 1px solid #ccc;">
           </div>
@@ -334,60 +325,53 @@
         let htmlPictos = "";
         const count = listaFinal.length;
 
-        // 4. IMÁGENES: Lógica de Pictogramas Dinámicos
-        const zonaImg = document.getElementById("zonaPictogramas");
-        const qrElemento = document.getElementById('qrCarpetaDrive');
+        if (count === 1) {
+          zonaImg.style.width = "180px";
+          zonaImg.style.height = "180px";
+          htmlPictos = `<img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">`;
 
-        zonaImg.innerHTML = "";
-        qrElemento.src = "";
+        } else if (count === 2) {
+          zonaImg.style.width = "360px";
+          zonaImg.style.height = "180px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+      `;
 
-        setTimeout(() => {
-          const picos = pictogramas || [];
-          const volNumerico = parseInt(envase);
-          const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
-          const count = listaFinal.length;
+        } else if (count === 3) {
+          // Diseño Triángulo: 385x307 px
+          zonaImg.style.width = "385px";
+          zonaImg.style.height = "307px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:102.5px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:127px; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:205px;">
+      `;
 
-          if (count > 0) {
-            // Definimos las columnas según tu diseño original
-            if (count === 1) {
-              zonaImg.style.gridTemplateColumns = "180px";
-            } else if (count === 2) {
-              zonaImg.style.gridTemplateColumns = "repeat(2, 180px)";
-            } else if (count === 3) {
-              // Diseño triangular: 2 columnas, el primero ocupa 2 espacios arriba
-              zonaImg.style.gridTemplateColumns = "repeat(2, 180px)";
-            } else if (count === 4) {
-              // Tu diseño 2x2
-              zonaImg.style.gridTemplateColumns = "repeat(2, 180px)";
-            } else {
-              // Diseño para 5 o más
-              zonaImg.style.gridTemplateColumns = "repeat(3, 180px)";
-            }
 
-            listaFinal.forEach((pic, index) => {
-              const imgName = getPictogramName(pic);
-              const img = document.createElement("img");
-              img.src = `/imagenes/${imgName}.png`;
-              img.className = "img-pictograma";
+        } else if (count === 4) {
+          // DISEÑO 4: Cuadrado 2x2 (360x307px)
+          zonaImg.style.width = "360px";
+          zonaImg.style.height = "307px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:127px; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:180px;">
+      `;
 
-              // Lógica especial para centrar el primero si son 3 (Efecto triángulo)
-              if (count === 3 && index === 0) {
-                img.style.gridColumn = "1 / span 2";
-              }
-
-              // Lógica especial para la fila de abajo si son 5 (3 arriba, 2 abajo)
-              if (count === 5 && index === 3) {
-                img.style.marginLeft = "90px"; // Desplaza para centrar la fila de 2
-              }
-
-              zonaImg.appendChild(img);
-            });
-          }
-
-          if (nombreReactivo && analista) {
-            generarQRdeCarpeta(nombreReactivo, analista);
-          }
-        }, 50);
+        } else if (count === 5) {
+          // DISEÑO 5: 3 arriba y 2 abajo centrados (540x307px)
+          zonaImg.style.width = "540px";
+          zonaImg.style.height = "310px";
+          htmlPictos = `
+        <img src="/imagenes/${getPictogramName(listaFinal[0])}.png" class="img-pictograma" style="top:0; left:0;">
+        <img src="/imagenes/${getPictogramName(listaFinal[1])}.png" class="img-pictograma" style="top:0; left:180px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[2])}.png" class="img-pictograma" style="top:0; left:360px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[3])}.png" class="img-pictograma" style="top:127px; left:90px;">
+        <img src="/imagenes/${getPictogramName(listaFinal[4])}.png" class="img-pictograma" style="top:127px; left:270px;">
+      `;
+        }
 
         zonaImg.innerHTML = htmlPictos;
 
