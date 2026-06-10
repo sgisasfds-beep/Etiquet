@@ -1,2 +1,4 @@
 https://safelabel.onrender.com
 ngrok http 4000
+cd "C:\Program Files\MongoDB\Server\7.0\bin"
+mongod --dbpath "C:\Program Files\MongoDB\Server\7.0\data"
