@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vista previa de múltiples etiquetas</title>
+  <title>SafeLabel</title>
 
   <style>
     body {
@@ -48,27 +48,20 @@
       text-align: center;
     }
 
-    /* CONTENEDOR GENERAL DE TODAS LAS ETIQUETAS */
     #listaEtiquetas {
       display: flex;
       flex-direction: column;
       gap: 35px;
       align-items: center;
-      /* Centra las etiquetas horizontalmente */
       margin-top: 25px;
       width: 100%;
-      /* Ocupa todo el ancho del .container */
       overflow: visible;
-      /* Permite que los pictogramas se vean si sobresalen */
     }
 
-    /* FORMATO EXACTO DE TU ETIQUETA INDIVIDUAL */
     .etiqueta {
       display: inline-block;
-      /* Permite que el ancho se ajuste al contenido interno */
       min-width: 400px;
       border: 4px solid black;
-      /* Un poco más grueso para que resalte */
       padding: 25px;
       font-family: Arial, sans-serif;
       background: white;
@@ -85,9 +78,7 @@
 
     .zonaPictogramas {
       position: relative !important;
-      /* Permite posicionamiento interno */
       margin: 20px auto;
-      /* Centra el bloque de pictogramas */
       display: inline-block;
     }
 
@@ -148,22 +139,16 @@
   <script type="module">
     import { API_URL } from "./config.js";
 
-    /* =====================================================
-       Recuperar datos enviados desde multiIndex.html
-    ===================================================== */
     const datosJSON = sessionStorage.getItem("multiEtiquetas_datos");
     const datos = datosJSON ? JSON.parse(datosJSON) : [];
-    window.datos = datos; // Guardamos en window para que sea globalmente accesible
+    window.datos = datos;
 
     if (datos.length === 0) {
       console.error("No se encontraron datos de etiquetas en sessionStorage.");
-      // Podrías redirigir al usuario aquí o mostrar un mensaje
     }
 
-    // ⭐ CAMBIO 1 (CORRECCIÓN): Definición ÚNICA del elemento de estatus
     const statusEl = document.getElementById("status");
 
-    // ⭐ CAMBIO 2 (CORRECCIÓN): Definición ÚNICA de la función setStatus
     function setStatus(message, isError = false) {
       if (!statusEl) return;
       statusEl.textContent = message;
@@ -171,9 +156,6 @@
       console.log(isError ? `[ERROR] ${message}` : `[STATUS] ${message}`);
     }
 
-    /* =====================================================
-       Plantilla HTML original de etiqueta (igual al index)
-    ===================================================== */
 
     function crearPlantillaMiniEtiqueta() {
       const div = document.createElement("div");
@@ -378,19 +360,13 @@
     }
 
 
-    /* =====================================================
-       Renderizar TODAS las etiquetas solicitadas
-    ===================================================== */
     async function cargarEtiquetas() {
       const contenedor = document.getElementById("listaEtiquetas");
-      // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO ARRIBA
 
-      // Mostrar mensaje de carga porque esto tardará unos segundos creando carpetas
-      setStatus("Generando carpetas y QRs en Google Drive, por favor espera...", false); // Usando setStatus
+      setStatus("Generando carpetas y QRs en Google Drive, por favor espera...", false);
 
       for (const item of datos) {
 
-        // 1. Obtener Datos Visuales (Pictogramas, Frases H/P)
         const resVisual = await fetch(`${API_URL}/api/generarEtiqueta`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
@@ -405,9 +381,6 @@
 
         console.log("INFO BACKEND:", info);
 
-
-        // 2. GENERAR LA CARPETA Y EL QR ÚNICO (Esta es la parte que faltaba)
-        // Llamamos al endpoint que crea la carpeta en Drive y nos devuelve el QR
         let qrBase64 = "";
         try {
           const resQR = await fetch(`${API_URL}/api/procesarCarpetaReactivo`, {
@@ -423,7 +396,7 @@
           const dataQR = await resQR.json();
 
           if (dataQR.ok) {
-            qrBase64 = dataQR.qr; // Aquí recibimos el QR único de la nueva carpeta
+            qrBase64 = dataQR.qr;
           } else {
             console.error("Error generando QR:", dataQR.error);
           }
@@ -435,41 +408,32 @@
 
         const copias = item.copias || 1;
 
-        // 3. Renderizar las copias (Mismo QR para las copias del mismo formulario)
         for (let c = 0; c < copias; c++) {
 
           const envaseMini = ["30", "30 mL", "40", "40 mL", "60", "60 mL"];
 
           let et;
           if (envaseMini.includes(item.envase)) {
-            et = crearPlantillaMiniEtiqueta();  // NUEVA PLANTILLA MINI
+            et = crearPlantillaMiniEtiqueta();
           } else {
-            et = crearPlantillaEtiqueta();      // TU PLANTILLA NORMAL
+            et = crearPlantillaEtiqueta();
           }
 
-          // Llenar datos visuales
           et.querySelector(".nombreReactivo").textContent = info.nombre;
           et.querySelector(".preparacion").textContent = info.preparación || "No aplica";
           et.querySelector(".advertencia").textContent = info.palabra_advertencia || "—";
           et.querySelector(".analista").textContent = item.analista || "—";
 
 
-
-          // =======================================
-          // 🔥 ASIGNACIÓN DE PROVEEDOR / FABRICANTE COMPLETO
-          // =======================================
-
           const proveedorNormal = et.querySelector(".proveedor");
           const fabricanteTextMini = et.querySelector(".fabricante-text");
           const fabricanteWrapper = et.querySelector(".fabricante-wrapper");
 
-          // 1. Lógica de decisión: ¿Es Puro O es Reenvasado?
           const nombreUpper = (info.nombre || "").toUpperCase();
           const esReenvasado = nombreUpper.includes("REENVASADO") || nombreUpper.includes("REENVASADA");
 
           let infoCompleta = "";
 
-          // Si es puro O si el nombre indica que es reenvasado, usamos datos del proveedor
           if (item.soloPuros || esReenvasado) {
             const fabricante = info.fabricanteFiltrado || "Fabricante no definido";
             const direccion = info.direccion || "";
@@ -479,20 +443,16 @@
             if (direccion) infoCompleta += " - " + direccion;
             if (telefono) infoCompleta += " - Tel: " + telefono;
           } else {
-            // Datos por defecto para soluciones preparadas internamente
             infoCompleta = "SGI SAS - Cra. 32B #22B-29 - Tel: 3142742383";
           }
 
-          // 2. Inyectar en la Etiqueta Normal (La que no quieres modificar)
           if (proveedorNormal) {
             proveedorNormal.textContent = infoCompleta;
-            // Ajuste de fuente para que quepa la dirección y el teléfono
             proveedorNormal.style.fontSize = "11px";
             proveedorNormal.style.display = "inline-block";
             proveedorNormal.style.lineHeight = "1.1";
           }
 
-          // 3. Inyectar en la Etiqueta Mini (Si aplica)
           if (fabricanteTextMini && fabricanteWrapper) {
             fabricanteTextMini.textContent = infoCompleta;
 
@@ -501,7 +461,7 @@
               const containerWidth = fabricanteWrapper.offsetWidth;
               if (textWidth > containerWidth) {
                 let scale = containerWidth / textWidth;
-                if (scale < 0.6) scale = 0.6; // Un poco más pequeño para info larga
+                if (scale < 0.6) scale = 0.6;
                 fabricanteTextMini.style.transform = `scale(${scale})`;
               } else {
                 fabricanteTextMini.style.transform = "scale(1)";
@@ -514,22 +474,17 @@
           info.frases_p?.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
           et.querySelector(".frasesHP").innerHTML = htmlHP;
 
-          // ======================================================
-          // LÓGICA DE PICTOGRAMAS CON DISEÑOS Y DIMENSIONES EXACTAS
-          // ======================================================
           const zonaImg = et.querySelector(".zonaPictogramas");
           if (zonaImg) {
             const picos = info.pictogramas || [];
             const volNumerico = parseInt(item.envase) || 0;
             const esMini = envaseMini.includes(item.envase);
 
-            // Regla de volumen: < 100ml solo muestra el primero
             const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
 
             let htmlPictos = "";
             const count = listaFinal.length;
 
-            // DISEÑOS SEGÚN TU LÓGICA ORIGINAL
             if (count === 1) {
               zonaImg.style.width = "180px";
               zonaImg.style.height = "180px";
@@ -574,36 +529,25 @@
               `;
             }
 
-            // Insertar imágenes UNA SOLA VEZ (Eliminado duplicado)
             zonaImg.innerHTML = htmlPictos;
 
-            // ======================================================
-            // 🔥 SOLUCIÓN DEL ESCALADO UNIFICADO (CORREGIDO)
-            // ======================================================
-            // Sin esto, el diseño se desborda de la etiqueta física
             if (esMini) {
-              // PARA ETIQUETAS MINI (<100ml)
+
               zonaImg.style.transform = "scale(1)";
               zonaImg.style.transformOrigin = "center top";
               zonaImg.style.marginBottom = "-40px";
             } else {
-              // PARA ETIQUETAS GRANDES (≥ 100ml)
-              // Copiamos exactamente lo de etiqueta.html: 0.75x y -50px
               zonaImg.style.transform = "scale(1)";
               zonaImg.style.transformOrigin = "center top";
               zonaImg.style.marginBottom = "-50px";
             }
-            // (Eliminado innerHTML duplicado y bloque duplicado que causaba el error)
           }
 
 
-          // --- AQUÍ ASIGNAMOS EL QR QUE TRAJIMOS DEL SERVIDOR ---
           if (qrBase64) {
             et.querySelector(".qr").src = qrBase64;
           }
-          // ------------------------------------------------------
 
-          // Fechas
           if (!item.incluirFechas) {
             et.querySelector(".fechaPreparado").style.display = "none";
             et.querySelector(".fechaVencimiento").style.display = "none";
@@ -613,7 +557,6 @@
               hoy.toLocaleDateString("es-CO");
 
             let venc = new Date(hoy);
-            // Conversión segura a número
             const valorVigencia = parseInt(item.vigenciaValor) || 0;
 
             switch (item.vigenciaUnidad) {
@@ -638,42 +581,35 @@
 
 
     document.getElementById("btnGenerarDOCX").addEventListener("click", async () => {
-      // 1. Obtener todos los elementos de etiqueta renderizados
       const etiquetasDOM = [...document.querySelectorAll(".etiqueta")];
 
       if (etiquetasDOM.length === 0) {
-        setStatus("No hay etiquetas para convertir.", true); // Usando setStatus
+        setStatus("No hay etiquetas para convertir.", true);
         return;
       }
 
-      setStatus("Procesando etiquetas…", false); // Usando setStatus
-
-      // Asumo que 'window.datos' contiene el array de reactivos con 'envase' y 'copias'.
+      setStatus("Procesando etiquetas…", false);
       if (!window.datos) {
-        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true); // Usando setStatus
+        setStatus("Error: No se encontraron los datos de los reactivos ('window.datos').", true);
         return;
       }
 
       const payloadEtiquetas = [];
       let etiquetasIndex = 0;
 
-      // Recorrer los datos originales para obtener el 'envase' correcto
       for (const item of window.datos) {
         const copias = item.copias || 1;
 
-        // Iterar por cada copia generada por este formulario
         for (let c = 0; c < copias; c++) {
-          const et = etiquetasDOM[etiquetasIndex]; // Obtener el elemento DOM en el orden correcto
+          const et = etiquetasDOM[etiquetasIndex];
 
           if (!et) {
             console.error("Faltan elementos DOM para la etiqueta #", etiquetasIndex);
             break;
           }
 
-          // 2. Usar html2canvas para tomar la 'foto' (screenshot)
           const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
 
-          // 3. Crear el objeto con la imagen y el envase para el backend
           payloadEtiquetas.push({
             base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
             envase: item.envase
@@ -683,11 +619,9 @@
         }
       }
 
-      // 4. Enviar el nuevo payload ({ etiquetas: [...] }) al backend
       const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
         method: "POST",
         headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-        // 👈 CAMBIO AQUÍ: Enviar un objeto con la clave 'etiquetas'
         body: JSON.stringify({ etiquetas: payloadEtiquetas })
       });
 
@@ -695,68 +629,59 @@
 
       if (data.ok) {
         window.__archivoFinal = data.archivo;
-        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.", false); // Usando setStatus
+        setStatus("Documento generado correctamente. Usa 'Descargar archivo'.", false);
       } else {
-        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true); // Usando setStatus
+        setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true);
       }
     });
 
-    /* =====================================================
-       DESCARGAR ARCHIVO FINAL
-    ===================================================== */
     document.getElementById("btnDescargar").addEventListener("click", async () => {
-      // const statusEl = document.getElementById("status"); // << YA ESTÁ DEFINIDO Y NO SE NECESITA REPETIR AQUÍ
+
 
       if (!window.__archivoFinal) {
-        setStatus("Primero genera el documento.", true); // Usando setStatus
+        setStatus("Primero genera el documento.", true);
         return;
       }
 
-      setStatus("Iniciando descarga del archivo...", false); // Usando setStatus
+      setStatus("Iniciando descarga del archivo...", false);
 
 
       const archivoADescargar = window.__archivoFinal;
       const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
 
       try {
-        // 1. Usar FETCH para incluir el encabezado de ngrok
         const response = await fetch(urlDescarga, {
           method: 'GET',
           headers: {
-            // Encabezado CLAVE para evitar la página de advertencia de ngrok
             'ngrok-skip-browser-warning': 'true'
           }
         });
 
         if (!response.ok) {
-          setStatus(`Error ${response.status} al descargar el archivo.`, true); // Usando setStatus
+          setStatus(`Error ${response.status} al descargar el archivo.`, true);
           return;
         }
 
-        // 2. Procesar la respuesta binaria (Blob)
         const blob = await response.blob();
 
-        // 3. Crear un enlace temporal para forzar la descarga en el navegador
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = archivoADescargar; // Usa el nombre de archivo final
+        a.download = archivoADescargar;
         document.body.appendChild(a);
         a.click();
-        a.remove(); // Limpiar el elemento
+        a.remove();
 
-        // 4. Liberar el objeto URL creado
         window.URL.revokeObjectURL(url);
 
-        setStatus("Archivo descargado.", false); // Usando setStatus
+        setStatus("Archivo descargado.", false);
 
       } catch (error) {
         console.error("Error en la descarga:", error);
-        setStatus("Fallo la descarga. Revisa la consola.", true); // Usando setStatus
+        setStatus("Fallo la descarga. Revisa la consola.", true);
       }
     });
 
-    // Función para mapear códigos GHS a nombres de archivo reales
     function getPictogramName(ghsCode) {
       const map = {
         "GHS01": "explosivo",

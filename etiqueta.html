@@ -67,7 +67,7 @@
 
     #zonaPictogramas {
       position: relative;
-      display:inline-block;
+      display: inline-block;
       margin: 20px auto;
     }
 
@@ -150,15 +150,15 @@
             <strong style="font-size: 17px;" id="nombreReactivo">NOMBRE DEL REACTIVO</strong>
             <br><br>
             <p><strong>Preparación:</strong></p>
-            <p id="preparacion">DESCRIPCIÓN DEL REACTIVO O PREPARACIÓN</p>
+            <p id="preparacion" style="outline: none; padding: 4px; transition: background 0.3s;"></p>
             <p><strong>ADVERTENCIA: <span id="advertencia">ATENCIÓN</span></strong></p>
             <div id="frasesHP"></div>
           </div>
           <div
             style="grid-column: 3; text-align: center; display:flex; flex-direction:column; align-items:center;min-width: max-content;">
             <div id="zonaPictogramas"></div>
-            
-            
+
+
             <img id="qrCarpetaDrive" src="" alt="Código QR Carpeta Drive"
               style="width:150px; margin-top:10px; border: 1px solid #ccc;">
           </div>
@@ -195,6 +195,10 @@
         <label class="small">(Opcional) Nombre archivo:</label>
         <input id="nombreArchivo" type="text" placeholder="etiquetas" />
       </div>
+    </div>
+
+    <div id="contenedorGuardarPrep" style="display: none; margin-top: 12px;">
+      <button id="btnGuardarPrep" style="background: #28a745; width: 100%;">Guardar Preparación Editada</button>
     </div>
 
     <div style="display:flex; gap:10px; margin-top:12px;">
@@ -268,6 +272,28 @@
       document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
       document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
       document.getElementById("preparacion").textContent = preparación || "No aplica";
+      // Lógica para habilitar/deshabilitar la edición de la preparación
+      const pPreparacion = document.getElementById("preparacion");
+      const contenedorGuardar = document.getElementById("contenedorGuardarPrep");
+      const modoPuros = datos.usuario && datos.usuario.modoReactivosPuros;
+
+      if (modoPuros) {
+        pPreparacion.contentEditable = "false";
+        pPreparacion.style.border = "none";
+        contenedorGuardar.style.display = "none";
+      } else {
+        pPreparacion.contentEditable = "true";
+        contenedorGuardar.style.display = "block";
+
+        pPreparacion.addEventListener("focus", () => {
+          pPreparacion.style.background = "#fff3cd";
+          pPreparacion.style.border = "1px dashed #ffc107";
+        });
+        pPreparacion.addEventListener("blur", () => {
+          pPreparacion.style.background = "transparent";
+          pPreparacion.style.border = "none";
+        });
+      }
       document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
 
       const spanPreparado = document.getElementById("fechaPreparado");
@@ -416,6 +442,44 @@
       cargarDatos();
     });
 
+    document.getElementById("btnGuardarPrep").addEventListener("click", async () => {
+      const nombreReactivo = document.getElementById("nombreReactivo").textContent;
+      const nuevaPreparacion = document.getElementById("preparacion").innerText.trim();
+
+      if (!nuevaPreparacion) {
+        setStatus("La preparación no puede estar vacía.", true);
+        return;
+      }
+
+      setStatus("Guardando en la base de datos...");
+
+      try {
+        const res = await fetch(`${API_URL}/api/actualizarPreparacion`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true"
+          },
+          body: JSON.stringify({
+            nombre: nombreReactivo,
+            preparacion: nuevaPreparacion
+          })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          setStatus("Error al guardar: " + (data.error || "Desconocido"), true);
+          return;
+        }
+
+        setStatus("Preparación actualizada correctamente en la base de datos.");
+      } catch (err) {
+        console.error("Error en petición PUT:", err);
+        setStatus("Error de red al intentar guardar la preparación.", true);
+      }
+    });
+
     btnPreview.addEventListener("click", async () => {
       if (!window.__ultimoArchivoGenerado) {
         setStatus("No hay archivo generado. Genera el documento primero.", true);
@@ -470,6 +534,9 @@
       }
 
       try {
+        const pPrep = document.getElementById("preparacion");
+        pPrep.style.background = "transparent";
+        pPrep.style.border = "none";
         const canvas = await html2canvas(contenedor, {
           scale: 2,
           useCORS: true,
