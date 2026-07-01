@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Generar Etiqueta</title>
+    <title>SafeLabel</title>
 
     <style>
         body {
@@ -131,7 +131,7 @@
 <body>
 
     <div class="hero">
-        <h1>Generar Etiqueta</h1>
+        <h1>SafeLabel</h1>
         <div style="
             margin-top: 25px;
             display: flex;
@@ -160,7 +160,6 @@
     <div class="container">
         <h2>Datos del Reactivo</h2>
 
-        <!-- 🔬 BOTÓN MODO -->
         <div style="display:flex; justify-content:flex-end; margin-bottom:15px;">
             <button id="btnModoReactivo">🧪 Reactivos Puros</button>
         </div>
@@ -291,7 +290,6 @@
 
     cargarReactivos();
 
-    // 🔬 BOTÓN MODO
     btnModoReactivo.addEventListener("click", async () => {
         modoReactivosPuros = !modoReactivosPuros;
         btnModoReactivo.classList.toggle("activo", modoReactivosPuros);
@@ -307,9 +305,6 @@
         await cargarReactivos();
     });
 
-    // ============================
-    // AUTOCOMPLETE
-    // ============================
     inputReactivo.addEventListener("input", () => {
         const texto = inputReactivo.value.toLowerCase();
         lista.innerHTML = "";
@@ -350,9 +345,6 @@
         }
     });
 
-    // ============================
-    // GENERAR ETIQUETA
-    // ============================
     document.getElementById("btnGenerar").addEventListener("click", async () => {
 
         const datosUsuario = {
