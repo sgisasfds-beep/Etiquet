@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Etiqueta Generada</title>
+    <title>SafeLabel</title>
 
     <style>
         body {
@@ -181,7 +181,7 @@
 <body>
 
     <div class="hero">
-        <h1>Etiqueta Generada</h1>
+        <h1>SafeLabel</h1>
     </div>
 
     <div class="container">
@@ -233,7 +233,6 @@
 
         let ultimoArchivoGenerado = null;
 
-        // Variables que usaremos para las peticiones a la API
         let nombreParaBusqueda = "";
         let fabricanteParaBusqueda = "";
         let analistaParaBusqueda = "";
@@ -241,14 +240,13 @@
         
 
         if (!datosEtiqueta) {
-            statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
+            statusEl.textContent = "Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
             statusEl.style.color = "red";
             document.getElementById("nombreReactivo").textContent = "ERROR AL CARGAR DATOS";
         } else {
-            statusEl.textContent = "✅ Etiqueta cargada correctamente.";
+            statusEl.textContent = "Etiqueta cargada correctamente.";
             statusEl.style.color = "green";
 
-            // --- ASIGNACIÓN DE DATOS SEGÚN EL MODO ---
             analistaParaBusqueda = datosEtiqueta.usuario.analista;
             envaseParaBusqueda = datosEtiqueta.usuario.envase;
 
@@ -256,34 +254,24 @@
             const advertenciaSpan = document.getElementById("advertenciaTexto");
 
             if (datosEtiqueta.usuario.modoReactivosPuros) {
-               // MODO PURO: Priorizamos la info de la base de datos (objeto reactivo)
                 nombreParaBusqueda = datosEtiqueta.reactivo.nombre || datosEtiqueta.usuario.nombreReactivo;
                 fabricanteParaBusqueda = datosEtiqueta.reactivo.fabricante || datosEtiqueta.usuario.fabricante;
 
-                
-                            
-                // Construir texto de proveedor dinámico
                 const proveedor = datosEtiqueta.reactivo.proveedor || "";
                 const direccion = datosEtiqueta.reactivo.direccion || "";
                 const telefono = datosEtiqueta.reactivo.telefono || "";
                 let textoProveedor = `${proveedor} ${direccion} Tel: ${telefono}`.trim();
             
                 proveedorSpan.textContent = textoProveedor;
-                // Ajuste de tamaño de fuente
                 proveedorSpan.style.fontSize = textoProveedor.length > 90 ? "9px" : (textoProveedor.length > 70 ? "10px" : "11px");
 
             } else {
-                 // MODO NORMAL: Usamos lo que el usuario escribió
                 nombreParaBusqueda = datosEtiqueta.usuario.nombreReactivo;
                 fabricanteParaBusqueda = datosEtiqueta.usuario.fabricante;
                 proveedorSpan.textContent = "SGI SAS Cra. 32B #22B - 29 TEL: 3142742383";
             }
-
-            // Mostrar nombre y advertencia en la etiqueta
             document.getElementById("nombreReactivo").textContent = nombreParaBusqueda.toUpperCase();
             advertenciaSpan.textContent = (datosEtiqueta.reactivo.palabra_advertencia || "ATENCIÓN").toUpperCase();
-
-            // --- FUNCIONES DE CARGA DE IMÁGENES ---
 
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
@@ -321,7 +309,7 @@
                     }
 
                 } catch (error) {
-                    console.error("🚨 Fallo cargarPictograma:", error);
+                    console.error("Fallo cargarPictograma:", error);
                     pictogramaBox.textContent = "Error: " + error.message;
                 }
             }
@@ -375,7 +363,6 @@
             }
         }
 
-        // --- LÓGICA DE CAPTURA Y DESCARGA ---
 
         const contenedorEtiqueta = document.querySelector(".etiqueta");
         const btnGenerate = document.getElementById("btnCapturar");
@@ -390,7 +377,7 @@
             setStatus("Capturando etiqueta...");
             try {
                 const canvas = await html2canvas(contenedorEtiqueta, {
-                    scale: 3, // Mejoramos calidad
+                    scale: 3,
                     useCORS: true,
                     backgroundColor: "#ffffff"
                 });
@@ -416,13 +403,13 @@
                 const respuesta = await res.json();
                 if (respuesta.ok) {
                     ultimoArchivoGenerado = respuesta.archivo;
-                    setStatus("✅ Documento listo para descargar.");
+                    setStatus("Documento listo para descargar.");
                 } else {
                     throw new Error(respuesta.error);
                 }
             } catch (e) {
                 console.error(e);
-                setStatus("❌ Error al generar: " + e.message, true);
+                setStatus("Error al generar: " + e.message, true);
             }
         });
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Etiqueta Generada</title>
+  <title>SafeLabel</title>
 
   <style>
     body {
@@ -32,7 +32,6 @@
 
     .container {
       width: fit-content;
-      /* Se ajusta al ancho real de la etiqueta */
       min-width: 900px;
       margin: 40px auto;
       padding: 28px;
@@ -57,10 +56,8 @@
 
     #contenedorEtiqueta {
       display: inline-block;
-      /* Permite que el ancho se ajuste al contenido interno */
       min-width: 400px;
       border: 4px solid black;
-      /* Un poco más grueso para que resalte */
       padding: 25px;
       font-family: Arial, sans-serif;
       background: white;
@@ -72,7 +69,6 @@
       position: relative;
       display:inline-block;
       margin: 20px auto;
-      /* El ancho y alto se definen dinámicamente por JS según la cantidad */
     }
 
     .img-pictograma {
@@ -129,7 +125,7 @@
 
 <body>
   <div class="hero">
-    <h1>Etiqueta Generada</h1>
+    <h1>SafeLabel</h1>
   </div>
 
   <div class="container">
@@ -213,21 +209,17 @@
   <script type="module">
     import { API_URL } from "./config.js";
 
-    // Variables globales
     const statusEl = document.getElementById("status");
     const contenedor = document.getElementById("contenedorEtiqueta");
     const btn = document.getElementById("btnCapturar");
     const btnPreview = document.getElementById("btnPreview");
-    let envase = ""; // Variable global para compartir entre cargarDatos y el botón
+    let envase = "";
 
     function setStatus(msg, isError = false) {
       statusEl.textContent = msg;
       statusEl.style.color = isError ? "#b20000" : "#0b5";
     }
 
-    // =======================================================
-    // FUNCIÓN PRINCIPAL DE CARGA DE DATOS (CORREGIDA)
-    // =======================================================
     async function cargarDatos() {
       console.log("🔥 Ejecutando cargarDatos (Pageshow/Load)");
 
@@ -240,7 +232,6 @@
       const { nombreReactivo, analista, vigenciaValor, vigenciaUnidad, incluirFechas } = datos.usuario || {};
       envase = (datos.usuario && datos.usuario.envase) || (datos.reactivo && datos.reactivo.volumen) || "";
 
-      // IMPORTANTE: Ahora usamos 'pictogramas' (el array) en lugar de 'imagenPictograma'
       const { preparación, palabra_advertencia, frases_h, frases_p, pictogramas } = datos.reactivo || {};
 
       const proveedorEl = document.getElementById("displayFabricante");
@@ -274,13 +265,11 @@
         }
       }
 
-      // 1. Asignar Textos
       document.getElementById("nombreReactivo").textContent = nombreReactivo || "NOMBRE DEL REACTIVO";
       document.getElementById("analista").textContent = analista || "ANALISTA DE LABORATORIO";
       document.getElementById("preparacion").textContent = preparación || "No aplica";
       document.getElementById("advertencia").textContent = palabra_advertencia || "No definida";
 
-      // 2. Manejo de Fechas
       const spanPreparado = document.getElementById("fechaPreparado");
       const spanVencimiento = document.getElementById("fechaVencimiento");
 
@@ -302,13 +291,11 @@
         spanVencimiento.style.display = "none";
       }
 
-      // 3. Frases H y P
       let htmlHP = "";
       if (frases_h) frases_h.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
       if (frases_p) frases_p.forEach(f => htmlHP += `<p style="margin: 2px 0;">${f}</p>`);
       document.getElementById("frasesHP").innerHTML = htmlHP;
 
-      // 4. IMÁGENES: Lógica de Pictogramas Dinámicos
       const zonaImg = document.getElementById("zonaPictogramas");
       const qrElemento = document.getElementById('qrCarpetaDrive');
 
@@ -319,7 +306,6 @@
         const picos = pictogramas || [];
         const volNumerico = parseInt(envase);
 
-        // Regla de volumen: < 100ml solo muestra el primero
         const listaFinal = (volNumerico < 100 && picos.length > 0) ? [picos[0]] : picos;
 
         let htmlPictos = "";
@@ -339,7 +325,6 @@
       `;
 
         } else if (count === 3) {
-          // Diseño Triángulo: 385x307 px
           zonaImg.style.width = "385px";
           zonaImg.style.height = "307px";
           htmlPictos = `
@@ -350,7 +335,6 @@
 
 
         } else if (count === 4) {
-          // DISEÑO 4: Cuadrado 2x2 (360x307px)
           zonaImg.style.width = "360px";
           zonaImg.style.height = "370px";
           htmlPictos = `
@@ -362,7 +346,6 @@
     `;
 
         } else if (count === 5) {
-          // DISEÑO 5: 3 arriba y 2 abajo centrados (540x307px)
           zonaImg.style.width = "540px";
           zonaImg.style.height = "310px";
           htmlPictos = `
@@ -382,7 +365,6 @@
       }, 50);
     }
 
-    // Función auxiliar necesaria para mapear los nombres de archivos
     function getPictogramName(ghsCode) {
       const map = {
         "GHS01": "explosivo",
@@ -398,13 +380,10 @@
       return map[ghsCode] || "noaplica";
     }
 
-    // Función auxiliar para el QR
-    // Busca la función generarQRdeCarpeta (alrededor de la línea 275) y reemplázala:
     async function generarQRdeCarpeta(nombre, analista) {
       const url = `${API_URL}/api/procesarCarpetaReactivo`;
       const qrElemento = document.getElementById('qrCarpetaDrive');
 
-      // Obtenemos los datos guardados para saber el modo y fabricante
       const datos = JSON.parse(sessionStorage.getItem("datosEtiqueta") || "{}");
       const { modoReactivosPuros, fabricante } = datos.usuario || {};
 
@@ -415,7 +394,7 @@
           body: JSON.stringify({
             nombreReactivo: nombre,
             usuarioAnalista: analista,
-            modoReactivosPuros: modoReactivosPuros, // <--- AHORA EL SERVIDOR SABRÁ DÓNDE BUSCAR
+            modoReactivosPuros: modoReactivosPuros,
             fabricante: fabricante
           })
         });
@@ -433,19 +412,10 @@
       }
     }
 
-    // =======================================================
-    // EVENTO PAGESHOW: LA CLAVE PARA ARREGLAR EL BOTÓN "ATRÁS"
-    // =======================================================
     window.addEventListener("pageshow", (event) => {
-      // Llamamos a cargarDatos cada vez que la página se muestra
-      // Esto sobreescribe cualquier estado visual corrupto del caché
       cargarDatos();
     });
 
-
-    // =======================================================
-    // BOTÓN DE DESCARGA DOCX
-    // =======================================================
     btnPreview.addEventListener("click", async () => {
       if (!window.__ultimoArchivoGenerado) {
         setStatus("No hay archivo generado. Genera el documento primero.", true);
@@ -488,12 +458,9 @@
       }
     });
 
-    // =======================================================
-    // BOTÓN GENERAR (Captura HTML2Canvas)
-    // =======================================================
     btn.addEventListener("click", async (e) => {
       e.preventDefault();
-      console.log("🟦 CLICK EN BOTÓN AZUL DETECTADO");
+      console.log("CLICK EN BOTÓN AZUL DETECTADO");
       setStatus("Capturando etiqueta...");
 
       const cantidad = parseInt(document.getElementById("inputCantidad").value || "0", 10);
@@ -508,7 +475,6 @@
           useCORS: true,
           backgroundColor: "#ffffff",
           logging: false,
-          // Forzamos al canvas a usar el ancho total real del contenido
           width: contenedor.offsetWidth,
           windowWidth: contenedor.offsetWidth
         });

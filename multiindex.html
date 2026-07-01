@@ -3,10 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Generar Múltiples Etiquetas</title>
+    <title>SafeLabel</title>
 
     <style>
-        /* ======== MISMO ESTILO BASE DE index.html ======== */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
@@ -112,7 +111,6 @@
             text-align: center;
         }
 
-        /* Autocomplete idéntico a index */
         .lista-autocomplete {
             position: absolute;
             background: #ffffff;
@@ -163,13 +161,9 @@
     <script type="module">
         import { API_URL } from "./config.js";
 
-        /* ======================================
-            🔵 CARGAR LISTA DE REACTIVOS
-        ====================================== */
 
         window.addEventListener("pageshow", async () => {
             console.log("Recargando vista múltiple...");
-            // Lógica para forzar repintado de imágenes (mantener para compatibilidad)
             setTimeout(() => {
                 document.querySelectorAll('img').forEach(img => {
                     const src = img.src;
@@ -188,7 +182,6 @@
                         "ngrok-skip-browser-warning": "true"
                     }
                 });
-                // ❗ IMPORTANTE: listaReactivosGlobal DEBE CONTENER OBJETOS { nombre, codigo } ❗
                 listaReactivosGlobal = await res.json();
             } catch (err) {
                 console.error("Error cargando reactivos:", err);
@@ -197,9 +190,6 @@
 
         cargarReactivos();
 
-        /* ======================================
-            🔵 CREAR FORMULARIO INDIVIDUAL
-        ====================================== */
         function crearFormulario(i) {
 
             const card = document.createElement("div");
@@ -208,7 +198,6 @@
 
             const idLista = `listaReact_${i}`;
             const idInput = `reactivoInput_${i}`;
-            // ❗ CAMBIO: ID DINÁMICO PARA EL LABEL DEL FABRICANTE ❗
             const idLabelFabricante = `labelFabricante_${i}`; 
 
             card.innerHTML = `
@@ -306,20 +295,14 @@
                     <input type="checkbox" class="fld incluirFechas"> Incluir fechas en etiqueta
                 </label>
             `;
-            
-            // Elementos DOM de esta tarjeta
+
             const inputReactivo = card.querySelector(`#${idInput}`);
             const lista = card.querySelector(`#${idLista}`);
-            // ❗ NUEVO: REFERENCIA AL LABEL DINÁMICO ❗
             const labelFabricante = card.querySelector(`#${idLabelFabricante}`); 
 
             const soloPurosCheckbox = card.querySelector(".soloPuros");
             let listaReactivosLocal = [];
 
-            
-            /**
-             * ❗ NUEVO: FUNCIÓN LOCAL PARA ACTUALIZAR EL LABEL ❗
-             */
             function actualizarLabelFabricante(codigo) {
                 if (labelFabricante) {
                     labelFabricante.textContent = `Seleccione el fabricante para "${codigo}":`;
@@ -354,19 +337,9 @@
             await cargarReactivosLocal();
         });
 
-
-
-
-
-
-            /* ============================  
-                AUTOCOMPLETE INDIVIDUAL  
-            ============================ */
             inputReactivo.addEventListener("input", () => {
                 const texto = inputReactivo.value.toLowerCase();
                 lista.innerHTML = "";
-
-                // ❗ CAMBIO: RESETEAR CÓDIGO Y LABEL AL ESCRIBIR ❗
                 card.dataset.codigoReactivo = null;
                 actualizarLabelFabricante("código");
 
@@ -374,13 +347,9 @@
                     lista.style.display = "none";
                     return;
                 }
-
-                // ❗ CAMBIO: FILTRAR USANDO LA PROPIEDAD 'nombre' del objeto reactivo ❗
                 const filtrados = listaReactivosLocal.filter(r =>
                     r.nombre.toLowerCase().includes(texto)
                 );
-
-                // ❗ CAMBIO: RECORRER OBJETOS (reactivo) EN LUGAR DE SOLO STRINGS ❗
                 filtrados.slice(0, 20).forEach(reactivo => { 
                     const div = document.createElement("div");
                     div.className = "reactivo-opcion";
@@ -389,8 +358,6 @@
                     div.addEventListener("click", () => {
                         inputReactivo.value = reactivo.nombre;
                         lista.style.display = "none";
-                        
-                        // ❗ CAMBIO: GUARDAR CÓDIGO Y ACTUALIZAR LABEL AL SELECCIONAR ❗
                         card.dataset.codigoReactivo = reactivo.codigo;
                         actualizarLabelFabricante(reactivo.codigo);
                     });
@@ -400,8 +367,6 @@
 
                 lista.style.display = filtrados.length ? "block" : "none";
             });
-
-            // Ajuste del cierre de lista
             document.addEventListener("click", (e) => {
                 if (e.target !== inputReactivo && !lista.contains(e.target)) {
                     lista.style.display = "none";
@@ -410,10 +375,6 @@
 
             return card;
         }
-
-        /* ======================================
-            🔵 GENERAR FORMULARIOS
-        ====================================== */
         const formContainer = document.getElementById("formContainer");
 
         function generarNForms(n) {
@@ -432,10 +393,6 @@
             formContainer.appendChild(crearFormulario(index));
             document.getElementById("numEtiquetas").value = formContainer.children.length;
         });
-
-        /* ======================================
-            🔵 BOTÓN SIGUIENTE
-        ====================================== */
         document.getElementById("btnSiguiente").addEventListener("click", () => {
 
             const cards = [...formContainer.children];
@@ -443,15 +400,12 @@
 
             for (const c of cards) {
                 const nombre = c.querySelector(".nombreReactivo").value.trim();
-                // ❗ NUEVO: OBTENER EL CÓDIGO DEL DATASET ❗
                 const codigoReactivo = c.dataset.codigoReactivo;
 
                 if (!nombre) {
                     alert("Cada etiqueta debe tener un nombre de reactivo.");
                     return;
                 }
-                
-                // ❗ NUEVO: VALIDAR QUE SE HAYA SELECCIONADO UN CÓDIGO ❗
                 if (!codigoReactivo) {
                     alert(`Debes seleccionar un reactivo válido de la lista en la etiqueta #${parseInt(c.dataset.index) + 1} para obtener su código.`);
                     return;

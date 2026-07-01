@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Etiqueta Generada</title>
+    <title>SafeLabel</title>
 
     <style>
         body {
@@ -69,7 +69,6 @@
 
         .header-full {
             grid-column: 1 / 3;
-            /* Ocupa las dos columnas */
             border-bottom: 2px solid black;
             padding-bottom: 10px;
         }
@@ -77,7 +76,6 @@
         .header-content {
             display: flex;
             justify-content: space-between;
-            /* Empuja el texto a los extremos */
             font-size: 10px;
             font-weight: bold;
         }
@@ -124,9 +122,6 @@
             object-fit: contain;
         }
 
-        /* ============================================================
-           🔵 AGRANDAR SOLO EL PICTOGRAMA
-        ============================================================ */
         #pictogramaBox {
             width: 180px !important;
             height: 180px !important;
@@ -142,8 +137,6 @@
             width: 150px !important;
             height: 150px !important;
         }
-
-        /* ============================================================ */
 
         button {
             background: #6c757d;
@@ -164,7 +157,6 @@
             transform: scale(1.03);
         }
 
-        /* Estilos para el nuevo pie de página de la etiqueta */
         .footer-line {
             width: 100%;
             border-top: 2px solid black;
@@ -178,7 +170,6 @@
             font-weight: bold;
             padding-top: 5px;
             text-transform: uppercase;
-            /* Para mantener consistencia con etiqueta.html */
         }
     </style>
 
@@ -188,7 +179,7 @@
 <body>
 
     <div class="hero">
-        <h1>Etiqueta Generada</h1>
+        <h1>SafeLabel</h1>
     </div>
 
     <div class="container">
@@ -236,43 +227,39 @@
 
         const statusEl = document.getElementById("status");
 
-        // 1. OBTENCIÓN DE DATOS
         const datosJSON = sessionStorage.getItem("datosEtiqueta");
         const datosEtiqueta = datosJSON ? JSON.parse(datosJSON) : null;
 
-        // Variables globales para lógica interna
         let nombreReactivo = "";
         let analista = "";
         let ultimoArchivoGenerado = null;
 
         if (!datosEtiqueta) {
-            statusEl.textContent = "❌ Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
+            statusEl.textContent = "Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
             statusEl.style.color = "red";
             document.getElementById("nombreReactivo").textContent = "ERROR AL CARGAR DATOS";
         } else {
-            statusEl.textContent = "✅ Etiqueta cargada correctamente.";
+            statusEl.textContent = "Etiqueta cargada correctamente.";
             statusEl.style.color = "green";
 
-            // Asignación de variables
+
             nombreReactivo = datosEtiqueta.usuario.nombreReactivo;
             analista = datosEtiqueta.usuario.analista;
             const envase = datosEtiqueta.usuario.envase;
             const fabricante = datosEtiqueta.usuario.fabricante;
             const palabra_advertencia = datosEtiqueta.reactivo.palabra_advertencia;
 
-            // Rellenar Textos
             document.getElementById("nombreReactivo").textContent = nombreReactivo.toUpperCase();
             document.getElementById("advertenciaTexto").textContent = (palabra_advertencia || "ATENCIÓN").toUpperCase();
-            // 2. Lógica de Proveedor (Solo para proveedorFooter)
+
             const proveedorFooter = document.getElementById("proveedorFooter");
             const nombreNormalizado = (nombreReactivo || "").toLowerCase();
 
-            // Verificamos si es un producto externo o reenvasado
             const esReenvasado = nombreNormalizado.includes("reenvasado") || nombreNormalizado.includes("reenvasada");
             const modoReactivosPuros = datosEtiqueta.usuario.modoReactivosPuros;
 
             if (esReenvasado || modoReactivosPuros) {
-                // Datos del fabricante original
+
                 const fabricanteProv = datosEtiqueta.usuario.fabricante || "";
                 const direccion = datosEtiqueta.reactivo.direccion || "";
                 const telefono = datosEtiqueta.reactivo.telefono || "";
@@ -283,14 +270,10 @@
 
                 proveedorFooter.textContent = (infoCompleta || "PROVEEDOR NO DEFINIDO").toUpperCase();
             } else {
-                // Caso por defecto (SGI SAS)
+
                 proveedorFooter.textContent = "PROVEEDOR: SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
             }
 
-            // =======================================================
-            // LÓGICA DE PICTOGRAMA (Backend)
-            // =======================================================
-            // 1. Mapeo idéntico a etiqueta.html
             const mapeoImagenes = {
                 "GHS01": "explosivo",
                 "GHS02": "inflamable",
@@ -305,11 +288,11 @@
 
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
-                // Limpiamos el texto "Pictograma" de inmediato
+
                 pictogramaBox.innerHTML = "<span style='font-size:10px;'>Cargando...</span>";
 
                 try {
-                    // Obtenemos los datos del reactivo
+
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
                         headers: {
@@ -326,22 +309,18 @@
                         const nombreBase = mapeoImagenes[primerCodigo];
 
                         if (nombreBase) {
-                            // RUTA DE LA IMAGEN
+
                             const urlImagenReal = `${API_URL}/imagenes/${nombreBase}.png`;
 
-                            // --- TRUCO PARA NGROK ---
-                            // Hacemos un segundo fetch a la imagen pero incluyendo el header que salta la advertencia
                             const imgFetch = await fetch(urlImagenReal, {
                                 headers: { "ngrok-skip-browser-warning": "true" }
                             });
 
                             if (!imgFetch.ok) throw new Error("No se pudo descargar el archivo png");
 
-                            // Convertimos la respuesta en un objeto que el <img> sí pueda leer
                             const blob = await imgFetch.blob();
                             const objectURL = URL.createObjectURL(blob);
 
-                            // Insertamos la imagen en el HTML
                             pictogramaBox.innerHTML = `<img src="${objectURL}" alt="GHS" style="max-width:100%; max-height:100%; display:block; margin:auto;">`;
                         } else {
                             pictogramaBox.textContent = "CÓDIGO NO VÁLIDO";
@@ -354,9 +333,6 @@
                     pictogramaBox.textContent = "ERROR";
                 }
             }
-            // =======================================================
-            // LÓGICA DE CÓDIGO QR
-            // =======================================================
             const qrBox = document.getElementById("qrBox");
 
             async function generarQRdeCarpeta(nombre, analista) {
@@ -393,14 +369,12 @@
             }
 
             function pintarQR(qrUrl) {
-                // Truco para repintar imagen en cache
                 qrBox.innerHTML = "";
                 setTimeout(() => {
                     qrBox.innerHTML = `<img src="${qrUrl}" alt="Código QR Carpeta Drive">`;
                 }, 50);
             }
 
-            // Lógica inicial de carga
             cargarPictograma();
 
             const qrGuardado = sessionStorage.getItem("qr_generado_miniet");
@@ -410,16 +384,11 @@
                 generarQRdeCarpeta(nombreReactivo, analista);
             }
 
-
-            // ===================================================================
-            // 🔥 SOLUCIÓN AL PROBLEMA DE "ATRÁS" (PAGESHOW EVENT)
-            // ===================================================================
             window.addEventListener("pageshow", (event) => {
-                // Si la página se muestra desde la caché (botón atrás)
+
                 if (event.persisted) {
                     console.log("♻️ Restaurando imágenes tras volver...");
 
-                    // Repintar Pictograma si existe en memoria, si no, se recarga solo
                     const boxPic = document.getElementById("pictogramaBox");
                     const imgPic = boxPic.querySelector('img');
                     if (imgPic) {
@@ -428,7 +397,6 @@
                         setTimeout(() => imgPic.src = src, 10);
                     }
 
-                    // Repintar QR
                     const qrG = sessionStorage.getItem("qr_generado_miniet");
                     if (qrG) {
                         pintarQR(qrG);
@@ -437,9 +405,6 @@
             });
         }
 
-        // =======================================================
-        // CAPTURA ETIQUETA + GENERAR DOCX
-        // =======================================================
 
         const contenedorEtiqueta = document.querySelector(".etiqueta");
         const btnGenerate = document.getElementById("btnCapturar");
@@ -498,9 +463,6 @@
             }
         });
 
-        // =======================================================
-        // DESCARGAR DOCX
-        // =======================================================
 
         btnDownload.addEventListener("click", async () => {
             if (!ultimoArchivoGenerado) {
