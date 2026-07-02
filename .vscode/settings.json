@@ -1,0 +1,9 @@
+{
+  "liveServer.settings.ignoreFiles": [
+    "**/tmp/**",
+    "**/tmpDescargas/**",
+    "**/*.docx",
+    "**/*.png",
+    ".vscode/**"
+  ]
+}

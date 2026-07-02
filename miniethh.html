@@ -4,172 +4,189 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SafeLabel</title>
+    <title>SafeLabel | Vista Previa</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary: #0F172A;
+            --primary-hover: #1E293B;
+            --accent: #2563EB;
+            --success: #059669;
+            --danger: #DC2626;
+            --bg-color: #F1F5F9;
+            --card-bg: #FFFFFF;
+            --text-main: #1E293B;
+            --text-muted: #475569;
+            --border-color: #CBD5E1;
+            --input-border: #94A3B8;
+            --input-bg: #F8FAFC;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #eef2fb;
-            color: #1e1e1e;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .hero {
-            background: linear-gradient(135deg, #000000, #003d99);
-            color: #b7d9ff;
-            padding: 60px 40px;
-            text-align: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-            border-bottom: 3px solid #007bff;
+        
+        .topbar {
+            background: var(--primary);
+            color: #ffffff;
+            padding: 0 40px;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .hero h1 {
-            font-size: 42px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #008cff;
-            margin: 0;
+        .topbar h1 {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
         }
 
+        .btn-multi {
+            text-decoration: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .btn-multi:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #38BDF8;
+        }
+
+        
         .container {
-            max-width: 960px;
+            width: fit-content;
+            min-width: 800px;
             margin: 40px auto;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid #dfe6f5;
-            text-align: center;
+            background: var(--card-bg);
+            padding: 32px;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid var(--border-color);
         }
 
         h2 {
-            color: #004a99;
-            font-size: 26px;
-            margin-top: 0;
+            color: var(--primary);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .etiqueta-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+            background: #F8FAFC;
+            padding: 24px;
+            border-radius: 8px;
+            border: 1px dashed var(--border-color);
         }
 
         .etiqueta {
             width: 500px;
             height: 350px;
-            margin: 30px auto;
+            margin: 0 auto;
             border: 3px solid black;
             padding: 15px;
             font-family: Arial, sans-serif;
             box-sizing: border-box;
             background-color: white;
-        }
-
-        .etiqueta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: auto auto;
-            gap: 10px 0;
-            height: 100%;
-            align-items: start;
-        }
-
-        .header-full {
-            grid-column: 1 / 3;
-            border-bottom: 2px solid black;
-            padding-bottom: 10px;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .content-row {
-            grid-column: 1 / 3;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding-top: 10px;
-        }
-
-        .reactivo-name {
-            font-size: 26px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #000;
-        }
-
-        .cajas-row {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            margin-top: 5px;
-        }
-
-        .box {
-            width: 150px;
-            height: 150px;
-            background-color: white;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #333;
-            padding: 5px;
-        }
-
-        .box img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
-
-        #pictogramaBox {
-            width: 180px !important;
-            height: 180px !important;
-            margin-top: -18px;
+            overflow: hidden;
         }
 
         #pictogramaBox img {
             max-width: 100%;
             max-height: 100%;
+            object-fit: contain;
         }
 
-        #qrBox {
-            width: 150px !important;
-            height: 150px !important;
+        #qrBox img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
-        button {
-            background: #6c757d;
-            padding: 14px 26px;
+        .button-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 24px;
+            justify-content: center;
+        }
+
+        button.action-btn {
+            padding: 14px 24px;
             border: none;
-            width: 100%;
-            max-width: 300px;
-            color: #fff;
-            font-size: 16px;
+            font-size: 14px;
+            font-weight: 600;
             border-radius: 6px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            margin-top: 20px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        button:hover {
-            background: #5a6268;
-            transform: scale(1.03);
+        #btnCapturar {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
         }
 
-        .footer-line {
-            width: 100%;
-            border-top: 2px solid black;
-            margin-top: 15px;
+        #btnCapturar:hover {
+            background: #1D4ED8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(37, 99, 235, 0.3);
         }
 
-        .footer-text {
-            width: 100%;
-            text-align: left;
-            font-size: 10px;
-            font-weight: bold;
-            padding-top: 5px;
-            text-transform: uppercase;
+        #btnPreview {
+            background: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--input-border);
+        }
+
+        #btnPreview:hover {
+            border-color: #64748B;
+            color: var(--text-main);
+            background: var(--input-bg);
+        }
+
+        #status {
+            margin-top: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
         }
     </style>
 
@@ -178,52 +195,174 @@
 
 <body>
 
-    <div class="hero">
-        <h1>SafeLabel</h1>
-    </div>
+    <header class="topbar">
+        <h1>
+            <svg class="icon-safelabel" width="28" height="28" viewBox="0 0 32 32" fill="none"
+                xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L30 6V14C30 23 16 30 16 30C16 30 2 23 2 14V6L16 2Z" stroke="#2563EB" stroke-width="2.5"
+                    stroke-linejoin="round" />
+                <path d="M21 11H13L11 15.5H21L19 21H11" stroke="#EF4444" stroke-width="3" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <path d="M6 7L16 4L26 7" stroke="#EF4444" stroke-width="1.5" stroke-linecap="round" />
+            </svg>
+            SafeLabel
+        </h1>
+        <a href="index.html" class="btn-multi">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Volver al Formulario
+        </a>
+    </header>
 
     <div class="container">
-        <h2>Vista previa de la etiqueta</h2>
+        <h2>Vista Previa (Envases Pequeños)</h2>
 
-        <div class="etiqueta">
-            <div class="etiqueta-grid">
+        <div class="etiqueta-wrapper">
+            <div class="etiqueta">
+                <div class="etiqueta-grid"
+                     style="display:grid;
+                            grid-template-columns:1fr 1fr;
+                            grid-template-rows:auto auto auto auto;
+                            gap:8px 0;
+                            height:100%;
+                            align-items:start;">
 
-                <div class="header-full">
-                    <div class="header-content">
-                        <span>ADVERTENCIA: <span id="advertenciaTexto">ATENCION</span></span>
-                        <span class="header-right-text"></span>
+                    <div style="grid-column:1/3;
+                                text-align:left;
+                                font-size:10px;
+                                font-weight:bold;
+                                padding-bottom:6px;
+                                border-bottom:2px solid black;">
+                        ADVERTENCIA: <span class="advertencia" id="advertenciaTexto">ATENCION</span>
                     </div>
+
+                    <div style="grid-column:1/3;
+                                display:flex;
+                                flex-direction:column;
+                                align-items:center;
+                                padding-top:6px;
+                                flex:1;">
+
+                        <div class="nombreReactivo"
+                             id="nombreReactivo"
+                             style="font-size:20px;
+                                    font-weight:bold;
+                                    margin-bottom:8px;
+                                    text-align:center;
+                                    line-height:1.15;
+                                    max-height:60px;
+                                    overflow:hidden;
+                                    word-break:break-word;">
+                            REACTIVO
+                        </div>
+
+                        <div style="width:100%;
+                                    display:flex;
+                                    justify-content:center;
+                                    gap:40px;
+                                    margin-top:4px;">
+
+                            <div class="zonaPictogramas"
+                                 id="pictogramaBox"
+                                 style="width:180px;
+                                        height:180px;
+                                        margin-top:-10px;
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;
+                                        font-weight:bold;
+                                        color:#333;">
+                                PICTOGRAMA
+                            </div>
+
+                            <div id="qrBox"
+                                 style="width:150px;
+                                        height:150px;
+                                        display:flex;
+                                        align-items:center;
+                                        justify-content:center;
+                                        font-weight:bold;
+                                        color:#333;">
+                                CÓDIGO QR
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div style="grid-column:1/3;
+                                border-top:2px solid black;
+                                margin-top:6px;">
+                    </div>
+
+                    <div class="footer-proveedor"
+                         style="grid-column:1/3;
+                                padding-top:6px;">
+
+                        <div style="display:flex;
+                                    align-items:center;
+                                    width:100%;
+                                    font-size:11px;
+                                    font-weight:bold;">
+
+                          <span style="margin-right:6px; white-space:nowrap;">
+                              Fabricante:
+                          </span>
+
+                          <div class="fabricante-wrapper"
+                                style="flex:1; overflow:hidden;">
+
+                                <span class="fabricante-text"
+                                      id="proveedorFooter"
+                                      style="display:inline-block;
+                                             white-space:nowrap;
+                                             transform-origin:left center;">
+                                </span>
+
+                          </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div class="content-row">
-                    <div class="reactivo-name" id="nombreReactivo">REACTIVO</div>
-
-                    <div class="cajas-row">
-                        <div class="box" id="pictogramaBox">PICTOGRAMA</div>
-                        <div class="box" id="qrBox">CÓDIGO QR</div>
-                    </div>
-
-                    <div class="footer-line"></div>
-                    <div class="footer-text" id="proveedorFooter"></div>
+                <div style="display:none;">
+                    <span class="preparacion"></span>
+                    <span class="analista"></span>
+                    <span class="fechaPreparado"></span>
+                    <span class="fechaVencimiento"></span>
+                    <div class="frasesHP"></div>
                 </div>
-
             </div>
         </div>
 
-        <div style="display:flex; gap:10px; margin-top:12px;justify-content:center; width:100%;">
-            <button id="btnCapturar" type="button">Capturar etiqueta y generar documento</button>
-            <button id="btnPreview" class="secondary" type="button">Descargar archivo DOCX</button>
+        <div class="button-group">
+            <button id="btnCapturar" class="action-btn" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                    <circle cx="12" cy="13" r="4"></circle>
+                </svg>
+                Capturar etiqueta y generar documento
+            </button>
+            <button id="btnPreview" class="action-btn" type="button">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                Descargar archivo DOCX
+            </button>
         </div>
 
-        <button onclick="window.location.href='index.html'">Volver al formulario</button>
         <p id="status"></p>
-
     </div>
 
+    <!-- Script mantenido y adaptado a los IDs -->
     <script type="module">
         import { API_URL } from "./config.js";
-
-
 
         const statusEl = document.getElementById("status");
 
@@ -236,12 +375,11 @@
 
         if (!datosEtiqueta) {
             statusEl.textContent = "Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
-            statusEl.style.color = "red";
+            statusEl.style.color = "var(--danger)";
             document.getElementById("nombreReactivo").textContent = "ERROR AL CARGAR DATOS";
         } else {
             statusEl.textContent = "Etiqueta cargada correctamente.";
-            statusEl.style.color = "green";
-
+            statusEl.style.color = "var(--success)";
 
             nombreReactivo = datosEtiqueta.usuario.nombreReactivo;
             analista = datosEtiqueta.usuario.analista;
@@ -259,7 +397,6 @@
             const modoReactivosPuros = datosEtiqueta.usuario.modoReactivosPuros;
 
             if (esReenvasado || modoReactivosPuros) {
-
                 const fabricanteProv = datosEtiqueta.usuario.fabricante || "";
                 const direccion = datosEtiqueta.reactivo.direccion || "";
                 const telefono = datosEtiqueta.reactivo.telefono || "";
@@ -270,8 +407,7 @@
 
                 proveedorFooter.textContent = (infoCompleta || "PROVEEDOR NO DEFINIDO").toUpperCase();
             } else {
-
-                proveedorFooter.textContent = "PROVEEDOR: SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
+                proveedorFooter.textContent = "SGI SAS - CRA. 32B #22B-29 - TEL: 3142742383";
             }
 
             const mapeoImagenes = {
@@ -288,11 +424,9 @@
 
             async function cargarPictograma() {
                 const pictogramaBox = document.getElementById("pictogramaBox");
-
                 pictogramaBox.innerHTML = "<span style='font-size:10px;'>Cargando...</span>";
 
                 try {
-
                     const res = await fetch(`${API_URL}/api/generarEtiqueta`, {
                         method: "POST",
                         headers: {
@@ -309,9 +443,7 @@
                         const nombreBase = mapeoImagenes[primerCodigo];
 
                         if (nombreBase) {
-
                             const urlImagenReal = `${API_URL}/imagenes/${nombreBase}.png`;
-
                             const imgFetch = await fetch(urlImagenReal, {
                                 headers: { "ngrok-skip-browser-warning": "true" }
                             });
@@ -321,7 +453,7 @@
                             const blob = await imgFetch.blob();
                             const objectURL = URL.createObjectURL(blob);
 
-                            pictogramaBox.innerHTML = `<img src="${objectURL}" alt="GHS" style="max-width:100%; max-height:100%; display:block; margin:auto;">`;
+                            pictogramaBox.innerHTML = `<img class="img-pictograma" src="${objectURL}" alt="GHS" style="max-width:100%; max-height:100%; display:block; margin:auto; object-fit:contain;">`;
                         } else {
                             pictogramaBox.textContent = "CÓDIGO NO VÁLIDO";
                         }
@@ -363,7 +495,7 @@
                 } catch (e) {
                     console.error("Fallo la generación de QR:", e);
                     qrBox.textContent = "Error QR";
-                    qrBox.style.backgroundColor = "red";
+                    qrBox.style.backgroundColor = "var(--danger)";
                     qrBox.style.color = "white";
                 }
             }
@@ -371,7 +503,7 @@
             function pintarQR(qrUrl) {
                 qrBox.innerHTML = "";
                 setTimeout(() => {
-                    qrBox.innerHTML = `<img src="${qrUrl}" alt="Código QR Carpeta Drive">`;
+                    qrBox.innerHTML = `<img class="qr" src="${qrUrl}" alt="Código QR Carpeta Drive" style="max-width:100%; max-height:100%; object-fit:contain;">`;
                 }, 50);
             }
 
@@ -385,7 +517,6 @@
             }
 
             window.addEventListener("pageshow", (event) => {
-
                 if (event.persisted) {
                     console.log("♻️ Restaurando imágenes tras volver...");
 
@@ -405,14 +536,13 @@
             });
         }
 
-
         const contenedorEtiqueta = document.querySelector(".etiqueta");
         const btnGenerate = document.getElementById("btnCapturar");
         const btnDownload = document.getElementById("btnPreview");
 
         function setStatus(msg, isError = false) {
             statusEl.textContent = msg;
-            statusEl.style.color = isError ? "red" : "green";
+            statusEl.style.color = isError ? "var(--danger)" : "var(--success)";
         }
 
         btnGenerate.addEventListener("click", async () => {
@@ -463,7 +593,6 @@
             }
         });
 
-
         btnDownload.addEventListener("click", async () => {
             if (!ultimoArchivoGenerado) {
                 setStatus("Primero genera el documento (botón azul).", true);
@@ -496,7 +625,5 @@
             }
         });
     </script>
-
 </body>
-
 </html>
