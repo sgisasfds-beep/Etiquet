@@ -12,12 +12,13 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "googleapis": "^166.0.0",
     "mongoose": "^8.20.0",
     "path": "^0.12.7",
-    "pdf-parse": "^1.1.1",
+    "pdf-parse": "^1.1.4",
     "qrcode": "^1.5.4",
     "sharp": "^0.34.5"
   },
