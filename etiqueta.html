@@ -715,7 +715,10 @@
             } catch (err) {
                 console.error(err);
                 setStatus("Error generando documento. Revisa la consola.", true);
-            }
+            } finally {
+                btn.disabled = false;
+                btn.style.opacity = "1";
+            }    
         });
     </script>
 
