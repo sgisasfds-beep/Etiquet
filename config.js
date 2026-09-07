@@ -1,4 +1,4 @@
-const API_RENDER = "https://tu-backend-nombre.onrender.com";
+const API_RENDER = "https://backendet-g5fi.onrender.com";
 const API_LOCAL = "http://localhost:4000";
 
 function getApiURL() {
