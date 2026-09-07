@@ -658,6 +658,9 @@
 
         btn.addEventListener("click", async (e) => {
             e.preventDefault();
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
+            setStatus("Procesando en Render... Esto puede demorar unos segundos si el servidor estaba dormido.");
             console.log("CLICK EN BOTÓN AZUL DETECTADO");
             setStatus("Capturando etiqueta...");
 
