@@ -372,6 +372,7 @@
         let nombreReactivo = "";
         let analista = "";
         let ultimoArchivoGenerado = null;
+        let ultimoBlobGenerado = null;
 
         if (!datosEtiqueta) {
             statusEl.textContent = "Error: No se encontraron datos de la etiqueta. Vuelve al formulario.";
@@ -578,13 +579,11 @@
                     return;
                 }
 
-                const respuesta = await res.json();
-                if (!respuesta.ok || !respuesta.archivo) {
-                    setStatus("Error: El servidor no devolvió un nombre de archivo.", true);
-                    return;
-                }
+                const nombreHeader = res.headers.get("Content-Disposition")
+                    ?.match(/filename="(.+)"/)?.[1] || `etiquetas_${Date.now()}.docx`;
 
-                ultimoArchivoGenerado = respuesta.archivo;
+                ultimoBlobGenerado = await res.blob();
+                ultimoArchivoGenerado = nombreHeader;
                 setStatus("Documento generado correctamente. Ahora puedes descargarlo.");
 
             } catch (e) {
@@ -593,29 +592,17 @@
             }
         });
 
-        btnDownload.addEventListener("click", async () => {
-            if (!ultimoArchivoGenerado) {
+        btnDownload.addEventListener("click", () => {
+            if (!ultimoBlobGenerado) {
                 setStatus("Primero genera el documento (botón azul).", true);
                 return;
             }
 
             setStatus("Descargando archivo...");
-            const url = `${API_URL}/api/descargar/${ultimoArchivoGenerado}`;
 
             try {
-                const response = await fetch(url, {
-                    method: "GET",
-                    headers: { "ngrok-skip-browser-warning": "true" }
-                });
-
-                if (!response.ok) {
-                    setStatus("Error descargando archivo.", true);
-                    return;
-                }
-
-                const blob = await response.blob();
                 const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
+                link.href = URL.createObjectURL(ultimoBlobGenerado);
                 link.download = ultimoArchivoGenerado;
                 link.click();
                 setStatus("Archivo DOCX descargado correctamente.");

@@ -737,15 +737,19 @@
                     headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
                     body: JSON.stringify({ etiquetas: payloadEtiquetas })
                 });
-                const data = await res.json();
 
                 btn.innerHTML = originalText;
                 btn.style.pointerEvents = 'auto';
 
-                if (data.ok) {
-                    window.__archivoFinal = data.archivo;
+                if (res.ok) {
+                    const nombreHeader = res.headers.get("Content-Disposition")
+                        ?.match(/filename="(.+)"/)?.[1] || `Lote_Etiquetas_${Date.now()}.docx`;
+
+                    window.__blobFinal = await res.blob();
+                    window.__archivoFinal = nombreHeader;
                     setStatus("Documento generado correctamente. Usa 'Descargar archivo'.", false);
                 } else {
+                    const data = await res.json().catch(() => ({}));
                     setStatus(`Error generando documento: ${data.error || 'Desconocido'}`, true);
                 }
             } catch (e) {
@@ -755,31 +759,18 @@
             }
         });
 
-        document.getElementById("btnDescargar").addEventListener("click", async () => {
-            if (!window.__archivoFinal) {
+        document.getElementById("btnDescargar").addEventListener("click", () => {
+            if (!window.__blobFinal) {
                 setStatus("Primero genera el documento.", true);
                 return;
             }
             setStatus("Iniciando descarga del archivo...", false);
-            const archivoADescargar = window.__archivoFinal;
-            const urlDescarga = `${API_URL}/api/descargar/${archivoADescargar}`;
 
             try {
-                const response = await fetch(urlDescarga, {
-                    method: 'GET',
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-
-                if (!response.ok) {
-                    setStatus(`Error ${response.status} al descargar el archivo.`, true);
-                    return;
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                const url = window.URL.createObjectURL(window.__blobFinal);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = archivoADescargar;
+                a.download = window.__archivoFinal;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();

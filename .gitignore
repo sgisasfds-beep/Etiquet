@@ -16,6 +16,7 @@ h_p_data.json
 
 # Archivo del servidor
 server.js
+server2.js
 
 # Controladores del backend
 controllers/

@@ -631,32 +631,19 @@
             }
         });
 
-        btnPreview.addEventListener("click", async () => {
-            if (!window.__ultimoArchivoGenerado) {
+        btnPreview.addEventListener("click", () => {
+            if (!window.__ultimoBlobGenerado) {
                 setStatus("No hay archivo generado. Genera el documento primero.", true);
                 return;
             }
 
             setStatus("Iniciando descarga DOCX...");
-            const archivo = window.__ultimoArchivoGenerado;
-            const urlDescarga = `${API_URL}/api/descargar/${archivo}`;
 
             try {
-                const response = await fetch(urlDescarga, {
-                    method: 'GET',
-                    headers: { 'ngrok-skip-browser-warning': 'true' }
-                });
-
-                if (!response.ok) {
-                    setStatus("Error al descargar el archivo. Código: " + response.status, true);
-                    return;
-                }
-
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                const url = window.URL.createObjectURL(window.__ultimoBlobGenerado);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = archivo;
+                a.download = window.__ultimoArchivoGenerado;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
@@ -665,7 +652,7 @@
                 setStatus("Archivo DOCX descargado correctamente.");
             } catch (error) {
                 console.error("Error en la descarga:", error);
-                setStatus("Fallo la descarga. Revisa la conexión o consola.", true);
+                setStatus("Fallo la descarga. Revisa la consola.", true);
             }
         });
 
@@ -716,13 +703,11 @@
 
                 setStatus("Recibiendo documento...");
 
-                const respuesta = await res.json();
-                if (!respuesta.ok || !respuesta.archivo) {
-                    setStatus("Error: No se recibió nombre del archivo generado.", true);
-                    return;
-                }
+                const nombreHeader = res.headers.get("Content-Disposition")
+                    ?.match(/filename="(.+)"/)?.[1] || `etiquetas_${Date.now()}.docx`;
 
-                window.__ultimoArchivoGenerado = respuesta.archivo;
+                window.__ultimoBlobGenerado = await res.blob();
+                window.__ultimoArchivoGenerado = nombreHeader;
                 setStatus("Documento generado correctamente. Ahora puedes descargarlo con el botón gris.");
             } catch (err) {
                 console.error(err);
