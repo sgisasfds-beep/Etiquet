@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         
@@ -316,7 +316,7 @@
                     <div style="grid-column: 1; margin-top:20px;">
                         <div style="display: grid; grid-template-columns: 1fr 1fr; column-gap: 40px;">
                             <div>
-                                <strong>Fecha Preparado:</strong><br>
+                                <strong>Fecha Preparación:</strong><br>
                                 <span id="fechaPreparado">DD/MM/YYYY</span>
                             </div>
                             <div style="text-align: right;">
@@ -382,6 +382,28 @@
         function setStatus(msg, isError = false) {
             statusEl.textContent = msg;
             statusEl.style.color = isError ? "var(--danger)" : "var(--success)";
+        }
+
+        // Los planes gratuitos de Render "duermen" el backend tras ~15 min sin uso.
+        // La primera petición tras eso puede tardar 30-60s en responder y el navegador
+        // la puede reportar como "Failed to fetch" (conexión rechazada mientras arranca).
+        // Este helper reintenta automáticamente con timeouts largos para cubrir ese caso.
+        async function fetchConReintento(url, opciones, intentos = 3, timeoutMs = 45000, onReintento) {
+            for (let i = 0; i < intentos; i++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const res = await fetch(url, { ...opciones, signal: controller.signal });
+                    clearTimeout(timer);
+                    return res;
+                } catch (err) {
+                    clearTimeout(timer);
+                    const esUltimoIntento = i === intentos - 1;
+                    if (esUltimoIntento) throw err;
+                    if (onReintento) onReintento(i + 1, intentos);
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
         }
 
         async function cargarDatos() {
@@ -658,9 +680,6 @@
 
         btn.addEventListener("click", async (e) => {
             e.preventDefault();
-            btn.disabled = true;
-            btn.style.opacity = "0.5";
-            setStatus("Procesando en Render... Esto puede demorar unos segundos si el servidor estaba dormido.");
             console.log("CLICK EN BOTÓN AZUL DETECTADO");
             setStatus("Capturando etiqueta...");
 
@@ -688,15 +707,21 @@
 
                 setStatus("Enviando imagen al servidor...");
 
-                const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-                    body: JSON.stringify({
-                        base64Imagen: base64,
-                        cantidad,
-                        envase
-                    })
-                });
+                const res = await fetchConReintento(
+                    `${API_URL}/api/generarDocumentoEtiquetas`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+                        body: JSON.stringify({
+                            base64Imagen: base64,
+                            cantidad,
+                            envase
+                        })
+                    },
+                    3,
+                    45000,
+                    (intento, total) => setStatus(`El servidor está despertando (intento ${intento}/${total})...`)
+                );
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({ error: "Error desconocido" }));
@@ -715,10 +740,7 @@
             } catch (err) {
                 console.error(err);
                 setStatus("Error generando documento. Revisa la consola.", true);
-            } finally {
-                btn.disabled = false;
-                btn.style.opacity = "1";
-            }    
+            }
         });
     </script>
 
