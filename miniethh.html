@@ -546,11 +546,32 @@
             statusEl.style.color = isError ? "var(--danger)" : "var(--success)";
         }
 
+        // Igual que en etiqueta.html: reintenta con timeout largo por si el
+        // servidor está "despertando" o la subida de la imagen tarda.
+        async function fetchConReintento(url, opciones, intentos = 3, timeoutMs = 90000, onReintento) {
+            for (let i = 0; i < intentos; i++) {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const res = await fetch(url, { ...opciones, signal: controller.signal });
+                    clearTimeout(timer);
+                    return res;
+                } catch (err) {
+                    clearTimeout(timer);
+                    const esUltimoIntento = i === intentos - 1;
+                    if (esUltimoIntento) throw err;
+                    if (onReintento) onReintento(i + 1, intentos);
+                    await new Promise(r => setTimeout(r, 2000));
+                }
+            }
+        }
+
         btnGenerate.addEventListener("click", async () => {
             setStatus("Capturando etiqueta...");
             try {
+                // scale 1.5 en vez de 2: imagen más liviana, sube más rápido.
                 const canvas = await html2canvas(contenedorEtiqueta, {
-                    scale: 2,
+                    scale: 1.5,
                     useCORS: true,
                     backgroundColor: "#ffffff"
                 });
@@ -558,20 +579,29 @@
                 const dataUrl = canvas.toDataURL("image/png");
                 const base64 = dataUrl.replace(/^data:image\/png;base64,/, "");
 
-                setStatus("Enviando imagen al servidor...");
+                const pesoKB = Math.round(base64.length / 1024);
+                console.log("Tamaño base64 (KB):", pesoKB);
 
-                const res = await fetch(`${API_URL}/api/generarDocumentoEtiquetas`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "ngrok-skip-browser-warning": "true"
+                setStatus(`Enviando imagen al servidor (${pesoKB} KB)...`);
+
+                const res = await fetchConReintento(
+                    `${API_URL}/api/generarDocumentoEtiquetas`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "ngrok-skip-browser-warning": "true"
+                        },
+                        body: JSON.stringify({
+                            base64Imagen: base64,
+                            cantidad: 1,
+                            envase: datosEtiqueta.usuario.envase
+                        })
                     },
-                    body: JSON.stringify({
-                        base64Imagen: base64,
-                        cantidad: 1,
-                        envase: datosEtiqueta.usuario.envase
-                    })
-                });
+                    3,
+                    90000,
+                    (intento, total) => setStatus(`La subida está tardando (intento ${intento}/${total})... esto puede tomar hasta 1-2 min.`)
+                );
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => ({ error: "Error desconocido" }));
