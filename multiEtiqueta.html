@@ -722,7 +722,9 @@
                         break;
                     }
 
-                    const canvas = await html2canvas(et, { scale: 2, background: '#fff' });
+                    // scale 1.5 en vez de 2: con varias etiquetas por lote, el
+                    // payload total se multiplica rápido — esto lo mantiene manejable.
+                    const canvas = await html2canvas(et, { scale: 1.5, background: '#fff' });
                     payloadEtiquetas.push({
                         base64Image: canvas.toDataURL("image/png").replace(/^data:image\/png;base64,/, ""),
                         envase: item.envase
@@ -731,12 +733,26 @@
                 }
             }
 
+            const pesoTotalKB = Math.round(
+                payloadEtiquetas.reduce((acc, e) => acc + e.base64Image.length, 0) / 1024
+            );
+            console.log("Tamaño total del lote (KB):", pesoTotalKB);
+            setStatus(`Enviando ${payloadEtiquetas.length} etiqueta(s) al servidor (${pesoTotalKB} KB)...`, false);
+
             try {
-                const res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
-                    body: JSON.stringify({ etiquetas: payloadEtiquetas })
-                });
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 120000); // 2 min: lote puede pesar más que una sola etiqueta
+                let res;
+                try {
+                    res = await fetch(`${API_URL}/api/generarDocumentoMultiples`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "ngrok-skip-browser-warning": "true" },
+                        body: JSON.stringify({ etiquetas: payloadEtiquetas }),
+                        signal: controller.signal
+                    });
+                } finally {
+                    clearTimeout(timer);
+                }
 
                 btn.innerHTML = originalText;
                 btn.style.pointerEvents = 'auto';
